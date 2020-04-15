@@ -1,9 +1,6 @@
 package controllers
 
-import java.time.LocalDate
-
 import javax.inject._
-import model.EventosDia
 import play.api.mvc._
 import service.RepositoryService
 

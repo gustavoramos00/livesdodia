@@ -9,7 +9,6 @@ import play.api.libs.ws.WSClient
 import play.api.libs.ws.ahc.AhcCurlRequestLogger
 
 import scala.concurrent.{ExecutionContext, Future}
-import play.api.libs.json.Reads._
 
 @Singleton
 class RepositoryService @Inject()(
@@ -26,25 +25,25 @@ class RepositoryService @Inject()(
   val urlSpreadSheet = s"$endpoint/v4/spreadsheets/${spreadsheetId}/values/$ranges"
   val cacheKey = "eventos"
 
-  def update() = {
+  def update(): Future[List[Evento]] = {
     ws.url(urlSpreadSheet)
       .addQueryStringParameters("key" -> apiKey)
       .withRequestFilter(AhcCurlRequestLogger())
       .get()
       .map { response =>
-        val valuesArray = (response.json \ "values").as[Array[Array[String]]]
-        val eventos = valuesArray
+        val valuesList = (response.json \ "values").as[List[List[String]]]
+        val eventos = valuesList
           .tail // remove cabeçalho
           .map {
-            case Array(nome, info, dia, hora, horaFim, youtube, instagram, imagem, "S", _*) =>
+            case List(nome, info, dia, hora, horaFim, youtube, instagram, imagem, "S", _*) =>
               val data = Evento.parseData(dia, hora)
               val dataFim = Evento.parseData(dia, horaFim)
               val dataFimAjustado = if (dataFim.isAfter(data)) dataFim else data.plusDays(1) // Termina no dia seguinte
               val evento = Evento(nome, info, data, dataFimAjustado, Some(youtube), Some(instagram), Some(imagem))
               Some(evento)
-            case errArray =>
+            case errList =>
               println(s"### Error: ###")
-              errArray.foreach(str => s" $str /")
+              errList.foreach(str => s" $str /")
               println(s"### Error FIM ###")
               None
           }
@@ -57,9 +56,9 @@ class RepositoryService @Inject()(
 
   private def getEventos = {
     cache
-      .get[Array[Evento]](cacheKey)
+      .get[List[Evento]](cacheKey)
       .map {
-        case Some(array) => Future.successful(array)
+        case Some(values) => Future.successful(values)
         case None => update()
       }
       .flatten
@@ -81,13 +80,13 @@ class RepositoryService @Inject()(
 
   def eventosProximosDias() = {
 
-    getEventos.map(array => {
-      array
+    getEventos.map(values => {
+      values
         .filter(_.data.toLocalDate.isAfter(LocalDate.now))
         .groupBy(_.data.toLocalDate)
         .toList
         .sortBy(_._1)
-        .map { case (dia: LocalDate, eventos: Array[Evento]) => EventosDia(dia, eventos)}
+        .map { case (dia: LocalDate, eventos: List[Evento]) => EventosDia(dia, eventos)}
     })
   }
 
