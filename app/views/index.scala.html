@@ -1,4 +1,29 @@
-<!--@()-->
+@import model.Evento
+@import model.EventosDia
+
+@(eventosAgora: Seq[Evento], eventosHoje: Seq[Evento], eventosDia: Seq[EventosDia])
+
+@displayEvento(evento: Evento) = {
+<div class="testi-item text-center">
+  <div class="testi-meta-inner d-flex justify-content-center align-items-center">
+    <div class="testi-img mr-2">
+      <img src='@routes.Assets.versioned("img/testi-1.jpg")' alt="">
+    </div>
+    <div class="testi-details">
+      <p class="testi-author mb-0 font-weight-bolder">@evento.nome</p>
+      <p class="testi-desc mb-0">@evento.horarioFmt</p>
+    </div>
+  </div>
+</div>
+}
+
+@tituloHoje() = {
+  @if(eventosAgora.nonEmpty) {
+    Outros hoje
+  } else {
+    Hoje
+  }
+}
 
 <!--@main("Welcome to Play") {-->
   <!--<h1>Welcome to Play!</h1>-->
@@ -14,14 +39,14 @@
   -->
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Roxy by GetTemplates.co</title>
+  <title>Lives do Dia</title>
   <meta name="description" content="LIVES DO DIA">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
   <!-- External CSS -->
   <link rel="stylesheet" href='@routes.Assets.versioned("vendor/bootstrap/bootstrap.min.css")'>
   <!--<link rel="stylesheet" href='@routes.Assets.versioned("vendor/select2/select2.min.css")'>-->
-  <!--<link rel="stylesheet" href='@routes.Assets.versioned("vendor/owlcarousel/owl.carousel.min.css")'>-->
+  <link rel="stylesheet" href='@routes.Assets.versioned("vendor/owlcarousel/owl.carousel.min.css")'>
   <!--<link rel="stylesheet" href='@routes.Assets.versioned("vendor/lightcase/lightcase.css")'>-->
   <!--<link rel="stylesheet" href="https://unpkg.com/aos@@next/dist/aos.css" />-->
 
@@ -83,8 +108,8 @@
 
 
 <!-- ACONTECENDO AGORA -->
-
-<section id="testimonial" class="section-padding bg-white">
+@if(eventosAgora.nonEmpty) {
+<section class="section-padding bg-white">
   <div class="container">
     <div class="section-content" data-aos="fade-up">
       <div class="heading-section text-center">
@@ -94,131 +119,113 @@
       </div>
       <div class="row">
         <div class="testi-content">
-          
-
+          @for(evento <- eventosAgora) {
+            <!--@displayEvento(evento)-->
           <div class="testi-item text-center">
             <div class="testi-meta-inner d-flex justify-content-center align-items-center">
               <div class="testi-img mr-2">
                 <img src='@routes.Assets.versioned("img/testi-1.jpg")' alt="">
               </div>
               <div class="testi-details">
-                <p class="testi-author mb-0 font-weight-bolder">Jorge e Matheus</p>
-                <p class="testi-desc mb-0">18h</p>
+                <p class="testi-author mb-0 font-weight-bolder">@evento.nome</p>
+                <p class="testi-desc mb-0">@evento.horarioFmt</p>
               </div>
             </div>
           </div>
 
-          <div class="testi-item text-center">
-            <div class="testi-meta-inner d-flex justify-content-center align-items-center">
-              <div class="testi-img mr-2">
-                <img src='@routes.Assets.versioned("img/testi-1.jpg")' alt="">
-              </div>
-              <div class="testi-details">
-                <p class="testi-author mb-0 font-weight-bolder">Jorge e Matheus</p>
-                <p class="testi-desc mb-0">18h</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="testi-item text-center">
-            <div class="testi-meta-inner d-flex justify-content-center align-items-center">
-              <div class="testi-img mr-2">
-                <img src='@routes.Assets.versioned("img/testi-1.jpg")' alt="">
-              </div>
-              <div class="testi-details">
-                <p class="testi-author mb-0 font-weight-bolder">Jorge e Matheus</p>
-                <p class="testi-desc mb-0">18h</p>
-              </div>
-            </div>
-          </div>
+          }
           
         </div>
       </div>
     </div>
   </div>
 </section>
-
+}
 <!-- FIM ACONTECENDO AGORA-->
 
-<div class="jumbotron d-flex flex-column align-items-center">
-
-  <div class="container text-center">
-    <h1 class="display-1 mb-4">LIVES<br>DO DIA</h1>
-  </div>
-  <!-- <div class="rectangle-1"></div>
-  <div class="rectangle-2"></div>
-  <div class="rectangle-transparent-1"></div>
-  <div class="rectangle-transparent-2"></div>
-  <div class="circle-1"></div>
-  <div class="circle-2"></div>
-  <div class="circle-3"></div>
-  <div class="triangle triangle-1">
-    <img src='@routes.Assets.versioned("img/obj_triangle.png")' alt="">
-  </div>
-  <div class="triangle triangle-2">
-    <img src='@routes.Assets.versioned("img/obj_triangle.png")' alt="">
-  </div>
-  <div class="triangle triangle-3">
-    <img src='@routes.Assets.versioned("img/obj_triangle.png")' alt="">
-  </div>
-  <div class="triangle triangle-4">
-    <img src='@routes.Assets.versioned("img/obj_triangle.png")' alt="">
-  </div> -->
-</div>
-
-<section id="testimonial" class="section-padding bg-fixed bg-white">
+@if(eventosHoje.nonEmpty) {
+<section class="section-padding bg-fixed bg-white">
   <div class="container">
     <div class="section-content" data-aos="fade-up">
       <div class="heading-section text-center">
         <h2>
-          Ainda hoje
+          @tituloHoje()
         </h2>
       </div>
       <div class="row">
         <div class="testi-content">
-          
 
-          <div class="testi-item text-center">
-            <div class="testi-meta-inner d-flex justify-content-center align-items-center">
-              <div class="testi-img mr-2">
-                <img src='@routes.Assets.versioned("img/testi-1.jpg")' alt="">
-              </div>
-              <div class="testi-details">
-                <p class="testi-author mb-0 font-weight-bolder">Jorge e Matheus</p>
-                <p class="testi-desc mb-0">18h</p>
-              </div>
-            </div>
-          </div>
+          @for(evento <- eventosHoje) {
+            @displayEvento(evento)
+          }
 
-          <div class="testi-item text-center">
-            <div class="testi-meta-inner d-flex justify-content-center align-items-center">
-              <div class="testi-img mr-2">
-                <img src='@routes.Assets.versioned("img/testi-1.jpg")' alt="">
-              </div>
-              <div class="testi-details">
-                <p class="testi-author mb-0 font-weight-bolder">Jorge e Matheus</p>
-                <p class="testi-desc mb-0">18h</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="testi-item text-center">
-            <div class="testi-meta-inner d-flex justify-content-center align-items-center">
-              <div class="testi-img mr-2">
-                <img src='@routes.Assets.versioned("img/testi-1.jpg")' alt="">
-              </div>
-              <div class="testi-details">
-                <p class="testi-author mb-0 font-weight-bolder">Jorge e Matheus</p>
-                <p class="testi-desc mb-0">18h</p>
-              </div>
-            </div>
-          </div>
-          
         </div>
       </div>
     </div>
   </div>
 </section>
+}
+
+<section id="client" class="overlay bg-fixed" style='background-image: url(@routes.Assets.versioned("img/bg.jpg"));'>
+  <div class="container">
+    <div class="section-content" data-aos="fade-up">
+      <div class="row ">
+        <div class="col-md-12">
+          <div class="title-wrap mb-5">
+            <h2>Programação</h2>
+          </div>
+        </div>
+        <!-- Client Holder -->
+        <div class="col-md-12 client-holder">
+          <div class="client-slider owl-carousel">
+            @for(item <- eventosDia){
+            <div class="p-3 shadow">
+              <div class="heading-section text-center">
+                <p>@item.diaSemanaFmt</p>
+                <h2 class="mb-4">
+                  @item.diaFmt
+                </h2>
+              </div>
+              @for(evento <- item.eventos){
+                @displayEvento(evento)
+              }
+            </div>
+            }
+
+          </div>
+          <!-- End of Client Holder -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--<div class="jumbotron d-flex flex-column align-items-center">-->
+
+  <!--<div class="container text-center">-->
+    <!--<h1 class="display-1 mb-4">LIVES<br>DO DIA</h1>-->
+  <!--</div>-->
+  <!--&lt;!&ndash; <div class="rectangle-1"></div>-->
+  <!--<div class="rectangle-2"></div>-->
+  <!--<div class="rectangle-transparent-1"></div>-->
+  <!--<div class="rectangle-transparent-2"></div>-->
+  <!--<div class="circle-1"></div>-->
+  <!--<div class="circle-2"></div>-->
+  <!--<div class="circle-3"></div>-->
+  <!--<div class="triangle triangle-1">-->
+    <!--<img src='@routes.Assets.versioned("img/obj_triangle.png")' alt="">-->
+  <!--</div>-->
+  <!--<div class="triangle triangle-2">-->
+    <!--<img src='@routes.Assets.versioned("img/obj_triangle.png")' alt="">-->
+  <!--</div>-->
+  <!--<div class="triangle triangle-3">-->
+    <!--<img src='@routes.Assets.versioned("img/obj_triangle.png")' alt="">-->
+  <!--</div>-->
+  <!--<div class="triangle triangle-4">-->
+    <!--<img src='@routes.Assets.versioned("img/obj_triangle.png")' alt="">-->
+  <!--</div> &ndash;&gt;-->
+<!--</div>-->
+
 <!-- End of Testimonial Section-->
 
 <!-- RODAPÉ -->
@@ -245,7 +252,7 @@
 <!--<script src='@routes.Assets.versioned("vendor/bootstrap/popper.min.js")'></script>-->
 <script src='@routes.Assets.versioned("vendor/bootstrap/bootstrap.min.js")'></script>
 <!--<script src='@routes.Assets.versioned("vendor/select2/select2.min.js")'></script>-->
-<!--<script src='@routes.Assets.versioned("vendor/owlcarousel/owl.carousel.min.js")'></script>-->
+<script src='@routes.Assets.versioned("vendor/owlcarousel/owl.carousel.min.js")'></script>
 <!--<script src='@routes.Assets.versioned("vendor/stellar/jquery.stellar.js")' type="text/javascript" charset="utf-8"></script>-->
 <!--<script src='@routes.Assets.versioned("vendor/isotope/isotope.min.js")'></script>-->
 <!--<script src='@routes.Assets.versioned("vendor/lightcase/lightcase.js")'></script>-->
@@ -253,7 +260,8 @@
 <!--<script src="https://unpkg.com/aos@@next/dist/aos.js"></script>-->
 
 <!-- Main JS -->
-<!-- <script src='@routes.Assets.versioned("js/app.min.js")'></script> -->
+ <!--<script src='@routes.Assets.versioned("js/app.min.js")'></script> -->
+<script src='@routes.Assets.versioned("javascripts/main.js")'></script>
 <!--<script src="//localhost:35729/livereload.js"></script>-->
 </body>
 </html>
