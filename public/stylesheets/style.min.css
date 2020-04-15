@@ -38,9 +38,6 @@ a:hover {
   text-decoration: none;
   color: #333399; }
 
-img {
-  max-width: 100%; }
-
 .bg-fixed {
   background-size: cover; }
 
@@ -124,6 +121,21 @@ section {
   line-height: 0.9;
   margin: 0;
   padding: 0 5px;
+}
+
+.icone {
+  font-size: 1.3rem;
+}
+
+.icone i.fab {
+  vertical-align: text-bottom;
+}
+
+.dia-box {
+  width: 300px;
+}
+.col-center {
+  margin: 0 auto;
 }
 
 .jumbotron {
@@ -440,27 +452,51 @@ section {
 /*=============================
 =            TESTI            =
 =============================*/
+
+.testi-img i {
+  font-size: 32px;
+}
+
 .testi-img img {
   height: 60px;
   width: 60px !important;
   border-radius: 50%;
   display: inline-block !important; }
 
+.dia-box .testi-img img {
+  height: 40px;
+  width: 40px !important;  
+}
+
+.destaque-box {
+  max-width: 335px;
+  margin: 30px auto 30px auto;
+  padding: 10px; 
+}
+
 .testi-details {
   text-align: left; }
+
+.testi-author {
+  font-weight: bolder;
+}
 
 .testi-text {
   font-weight: 300;
   padding-top: 50px;
   padding-bottom: 50px; }
 
+.testi-info {
+  font-weight: 100;
+  font-style: italic;
+}
+
 .testi-icon {
   color: #ff00cc; }
 
 .testi-content {
-  width: 100%;
-  margin-top: 30px;
-  padding-bottom: 30px; }
+  margin: 30px auto 10px auto;
+  padding: 10px; }
 
 .testi-item {
   padding-bottom: 15px;

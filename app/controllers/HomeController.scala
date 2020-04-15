@@ -30,7 +30,7 @@ class HomeController @Inject()(repository: RepositoryService,
     for {
       eventosAgora <- repository.eventosAgora()
       eventosHoje <- repository.eventosAconteceraoHoje()
-      eventosProgramacao <- repository.eventosProgramacao()
+      eventosProgramacao <- repository.eventosProximosDias()
     } yield Ok(views.html.index(eventosAgora, eventosHoje, eventosProgramacao))
 
   }

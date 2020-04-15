@@ -3,9 +3,11 @@ $(document).ready(function(){
     margin: 10,
     autoWidth:true,
     autoplay:true,
+    dots: false,
+    nav: true,
+    autoHeight:true,
     autoplayHoverPause:false,
-    autoplayTimeout:3000,
+    autoplayTimeout:5000,
     center: true,
-//    loop: true,
   });
-});
+});e

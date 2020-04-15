@@ -39,15 +39,17 @@ class RepositoryService @Inject()(
             case Array(nome, info, dia, hora, horaFim, youtube, instagram, imagem, "S", _*) =>
               val data = Evento.parseData(dia, hora)
               val dataFim = Evento.parseData(dia, horaFim)
-              val safeDataFim = if (dataFim.isAfter(data)) dataFim else data.plusHours(1) // Evita erro DataFim < Data
-              val evento = Evento(nome, info, data, safeDataFim, Some(youtube), Some(instagram), Some(imagem))
+              val dataFimAjustado = if (dataFim.isAfter(data)) dataFim else data.plusDays(1) // Termina no dia seguinte
+              val evento = Evento(nome, info, data, dataFimAjustado, Some(youtube), Some(instagram), Some(imagem))
               Some(evento)
             case errArray =>
-              println(s"### Error: [$errArray] ###")
-//              println(s"Response status ${response.status}")
-//              println(s"Response body  ${response.body}")
+              println(s"### Error: ###")
+              errArray.foreach(str => s" $str /")
+              println(s"### Error FIM ###")
               None
-          }.flatten
+          }
+          .flatten
+          .sortBy(_.data)
         cache.set(cacheKey, eventos)
         eventos
       }
@@ -77,10 +79,11 @@ class RepositoryService @Inject()(
     getEventos.map(_.filter(filtroEventosHoje))
   }
 
-  def eventosProgramacao() = {
+  def eventosProximosDias() = {
 
     getEventos.map(array => {
       array
+        .filter(_.data.toLocalDate.isAfter(LocalDate.now))
         .groupBy(_.data.toLocalDate)
         .toList
         .sortBy(_._1)

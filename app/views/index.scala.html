@@ -3,15 +3,33 @@
 
 @(eventosAgora: Seq[Evento], eventosHoje: Seq[Evento], eventosDia: Seq[EventosDia])
 
-@displayEvento(evento: Evento) = {
+@displayEvento(evento: Evento, full: Boolean = false) = {
 <div class="testi-item text-center">
-  <div class="testi-meta-inner d-flex justify-content-center align-items-center">
+  <div class="testi-meta-inner d-flex align-items-center">
     <div class="testi-img mr-2">
-      <img src='@routes.Assets.versioned("img/testi-1.jpg")' alt="">
+      <i class="far fa-play-circle"></i>
+      <!-- @if(evento.linkImagem.isDefined && evento.linkImagem.get.nonEmpty) {
+        <img src='@evento.linkImagem.get' alt="">
+      } else {
+        <img src='@routes.Assets.versioned("img/microphone.svg")' alt="">
+      } -->
     </div>
     <div class="testi-details">
-      <p class="testi-author mb-0 font-weight-bolder">@evento.nome</p>
-      <p class="testi-desc mb-0">@evento.horarioFmt</p>
+      <p class="testi-author mb-0">@evento.nome</p>
+      @if(evento.info.nonEmpty) {
+      <p class="testi-info mb-0">
+        @evento.info
+      </p>
+      }
+      <p class="testi-desc mb-0">
+        @evento.horarioFmt
+        @if(full && evento.linkYoutube.isDefined && evento.linkYoutube.get.nonEmpty){
+        <a class="icone" href="@evento.linkYoutube.get" target="_blank">
+          <i class="fab fa-youtube"></i>
+          Youtube
+        </a>
+        }
+      </p>
     </div>
   </div>
 </div>
@@ -25,18 +43,11 @@
   }
 }
 
-<!--@main("Welcome to Play") {-->
-  <!--<h1>Welcome to Play!</h1>-->
-<!--}-->
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <!--
-   - Roxy: Bootstrap template by GettTemplates.com
-   - https://gettemplates.co/roxy
-  -->
+  
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>Lives do Dia</title>
@@ -67,7 +78,6 @@
   <nav id="header-navbar" class="navbar navbar-expand py-4">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center text-white" href="/">
-        <!-- <h3 class="font-weight-bolder mb-0">LIVES DO DIA</h3> -->
         <div class="text-center">
           <h1 class="">LIVES<br>DO DIA</h1>
         </div>
@@ -76,34 +86,20 @@
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-nav-header" aria-controls="navbar-nav-header" aria-expanded="false" aria-label="Toggle navigation">
         <span class="lnr lnr-menu"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbar-nav-header">
+      <!-- TODO Inserir link incluir evento -->
+      <!-- <div class="collapse navbar-collapse" id="navbar-nav-header">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
             <a class="nav-link" href="incluir.html">Incluir evento</a>
           </li>
         </ul>
-      </div>
+      </div> -->
     </div>
   </nav>
   <div class="rectangle-1"></div>
   <div class="rectangle-2"></div>
   <div class="rectangle-transparent-1"></div>
   <div class="rectangle-transparent-2"></div>
-  <!-- <div class="circle-1"></div>
-  <div class="circle-2"></div>
-  <div class="circle-3"></div>
-  <div class="triangle triangle-1">
-    <img src='@routes.Assets.versioned("img/obj_triangle.png")' alt="">
-  </div>
-  <div class="triangle triangle-2">
-    <img src='@routes.Assets.versioned("img/obj_triangle.png")' alt="">
-  </div>
-  <div class="triangle triangle-3">
-    <img src='@routes.Assets.versioned("img/obj_triangle.png")' alt="">
-  </div>
-  <div class="triangle triangle-4">
-    <img src='@routes.Assets.versioned("img/obj_triangle.png")' alt="">
-  </div> -->
 </div>
 
 
@@ -111,7 +107,7 @@
 @if(eventosAgora.nonEmpty) {
 <section class="section-padding bg-white">
   <div class="container">
-    <div class="section-content" data-aos="fade-up">
+    <div class="section-content shadow destaque-box" data-aos="fade-up">
       <div class="heading-section text-center">
         <h2>
           Acontecendo agora!
@@ -120,19 +116,7 @@
       <div class="row">
         <div class="testi-content">
           @for(evento <- eventosAgora) {
-            <!--@displayEvento(evento)-->
-          <div class="testi-item text-center">
-            <div class="testi-meta-inner d-flex justify-content-center align-items-center">
-              <div class="testi-img mr-2">
-                <img src='@routes.Assets.versioned("img/testi-1.jpg")' alt="">
-              </div>
-              <div class="testi-details">
-                <p class="testi-author mb-0 font-weight-bolder">@evento.nome</p>
-                <p class="testi-desc mb-0">@evento.horarioFmt</p>
-              </div>
-            </div>
-          </div>
-
+            @displayEvento(evento, true)
           }
           
         </div>
@@ -146,7 +130,7 @@
 @if(eventosHoje.nonEmpty) {
 <section class="section-padding bg-fixed bg-white">
   <div class="container">
-    <div class="section-content" data-aos="fade-up">
+    <div class="section-content shadow destaque-box" data-aos="fade-up">
       <div class="heading-section text-center">
         <h2>
           @tituloHoje()
@@ -156,7 +140,7 @@
         <div class="testi-content">
 
           @for(evento <- eventosHoje) {
-            @displayEvento(evento)
+            @displayEvento(evento, true)
           }
 
         </div>
@@ -179,9 +163,9 @@
         <div class="col-md-12 client-holder">
           <div class="client-slider owl-carousel">
             @for(item <- eventosDia){
-            <div class="p-3 shadow">
+            <div class="p-3 shadow dia-box">
               <div class="heading-section text-center">
-                <p>@item.diaSemanaFmt</p>
+                <p>@item.diaProgramacaoFmt</p>
                 <h2 class="mb-4">
                   @item.diaFmt
                 </h2>
@@ -199,34 +183,6 @@
     </div>
   </div>
 </section>
-
-<!--<div class="jumbotron d-flex flex-column align-items-center">-->
-
-  <!--<div class="container text-center">-->
-    <!--<h1 class="display-1 mb-4">LIVES<br>DO DIA</h1>-->
-  <!--</div>-->
-  <!--&lt;!&ndash; <div class="rectangle-1"></div>-->
-  <!--<div class="rectangle-2"></div>-->
-  <!--<div class="rectangle-transparent-1"></div>-->
-  <!--<div class="rectangle-transparent-2"></div>-->
-  <!--<div class="circle-1"></div>-->
-  <!--<div class="circle-2"></div>-->
-  <!--<div class="circle-3"></div>-->
-  <!--<div class="triangle triangle-1">-->
-    <!--<img src='@routes.Assets.versioned("img/obj_triangle.png")' alt="">-->
-  <!--</div>-->
-  <!--<div class="triangle triangle-2">-->
-    <!--<img src='@routes.Assets.versioned("img/obj_triangle.png")' alt="">-->
-  <!--</div>-->
-  <!--<div class="triangle triangle-3">-->
-    <!--<img src='@routes.Assets.versioned("img/obj_triangle.png")' alt="">-->
-  <!--</div>-->
-  <!--<div class="triangle triangle-4">-->
-    <!--<img src='@routes.Assets.versioned("img/obj_triangle.png")' alt="">-->
-  <!--</div> &ndash;&gt;-->
-<!--</div>-->
-
-<!-- End of Testimonial Section-->
 
 <!-- RODAPÉ -->
 <footer class="my-3">
