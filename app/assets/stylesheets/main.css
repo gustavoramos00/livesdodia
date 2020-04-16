@@ -77,7 +77,7 @@ section {
 
 .navbar-toggler {
   font-size: 2rem;
-  color: #fff; 
+  color: #fff;
 }
 
 .incluir-frame iframe {
@@ -466,13 +466,13 @@ section {
 
 .dia-box .testi-img img {
   height: 40px;
-  width: 40px !important;  
+  width: 40px !important;
 }
 
 .destaque-box {
   max-width: 335px;
   margin: 30px auto 30px auto;
-  padding: 10px; 
+  padding: 10px;
 }
 
 .testi-details {
@@ -801,7 +801,7 @@ section {
   .header-container h1 {
     font-size: 1rem;
   }
-  
+
   #header-navbar {
     padding-top: 15px !important;
     padding-bottom: 15px !important; }
