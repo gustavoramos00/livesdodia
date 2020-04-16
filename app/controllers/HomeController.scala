@@ -37,4 +37,8 @@ class HomeController @Inject()(repository: RepositoryService,
     repository.update()
       .map(_ => Ok)
   }
+
+  def incluir() = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.incluir())    
+  }
 }

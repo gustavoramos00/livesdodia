@@ -51,241 +51,86 @@
   }
 }
 
-@description = { "Agenda das Lives. Veja aqui a programação dos shows e eventos ao vivo na internet." }
+@base {
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-163795126-1"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'UA-163795126-1');
-  </script>
-  
-
-  <!-- META TAGS -->
-  <title>Lives do Dia</title>
-  <meta name="title" content="Lives do Dia">
-  <meta name="description" content=@description>
-
-
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
-  <meta name="keywords" content="agenda live programação guia show evento aovivo vivo">
-
-  <!-- Schema.org markup for Google+ -->
-  <meta itemprop="name" content="Lives do Dia">
-  <meta itemprop="description" content=@description>
-  <meta itemprop="image" content="https://livesdodia.com.br/assets/images/logo-200x200.png">
-
-  <!-- Favicon-->
-  <link rel="shortcut icon" href="/assets/favicon.ico">
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/logo-180x180.png">
-  <link rel="icon" type="image/png" href="/assets/images/logo-32x32.png" sizes="32x32">
-  <link rel="icon" type="image/png" href="/assets/images/logo-16x16.png" sizes="16x16">
-
-  <!-- Web app -->
-  <meta name="theme-color" content="#4A00E0">
-  <link rel="manifest" href="/assets/manifest.json">
-
-  <!-- Add to home screen for Safari on iOS -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="Lives do Dia">
-  <link rel="apple-touch-icon" href="/assets/images/logo-168x168.png">
-
-  <!-- Open Graph / Facebook -->
-  <meta property="og:locale" content="pt_BR">
-  <meta property="og:title" content="Lives do Dia">
-  <meta property="og:type" content="website">
-  <meta property="og:image:secure_url" content="https://livesdodia.com.br/assets/images/logo-200x200.png">
-  <meta property="og:image" content="https://livesdodia.com.br/assets/images/logo-200x200.png">
-  <meta property="og:url" content="https://livesdodia.com.br">
-  <meta property="og:description" content=@description>
-
-  <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="https://livesdodia.com.br/">
-  <meta property="twitter:title" content="Lives do Dia">
-  <meta property="twitter:description" content=@description>
-  <!-- <meta name="twitter:site" content="@@toquecard" /> -->
-  <meta name="twitter:image" content="https://livesdodia.com.br/assets/images/logo-200x200.png">
-
-
-
-  <!-- External CSS -->
-  <link rel="stylesheet" href='@routes.Assets.versioned("vendor/bootstrap/bootstrap.min.css")'>
-  <!--<link rel="stylesheet" href='@routes.Assets.versioned("vendor/select2/select2.min.css")'>-->
-  <link rel="stylesheet" href='@routes.Assets.versioned("vendor/owlcarousel/owl.carousel.min.css")'>
-  <link rel="stylesheet" href='@routes.Assets.versioned("vendor/owlcarousel/owl.theme.default.min.css")'>
-  <!--<link rel="stylesheet" href='@routes.Assets.versioned("vendor/lightcase/lightcase.css")'>-->
-  <!--<link rel="stylesheet" href="https://unpkg.com/aos@@next/dist/aos.css" />-->
-
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css?family=Lato:300,400|Work+Sans:300,400,700&display=swap" rel="stylesheet">
-
-  <!-- CSS -->
-  <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/style.min.css")'>
-  <link rel="stylesheet" href="https://cdn.linearicons.com/free/1.0.0/icon-font.min.css">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-
-  <!-- Modernizr JS for IE8 support of HTML5 elements and media queries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.js"></script>
-
-</head>
-<body data-spy="scroll" data-target="#navbar" class="static-layout not-on-top">
-<div class="header-container">
-  <nav id="header-navbar" class="navbar navbar-expand py-4">
+  <!-- ACONTECENDO AGORA -->
+  @if(eventosAgora.nonEmpty) {
+  <section class="section-padding bg-white">
     <div class="container">
-      <a class="navbar-brand d-flex align-items-center text-white" href="/">
-        <div class="text-center">
-          <h1 class="">LIVES<br>DO DIA</h1>
+      <div class="section-content shadow destaque-box" data-aos="fade-up">
+        <div class="heading-section text-center">
+          <h2>
+            Acontecendo agora!
+          </h2>
         </div>
-
-      </a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-nav-header" aria-controls="navbar-nav-header" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="lnr lnr-menu"></span>
-      </button>
-      <!-- TODO Inserir link incluir evento -->
-      <!-- <div class="collapse navbar-collapse" id="navbar-nav-header">
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="incluir.html">Incluir evento</a>
-          </li>
-        </ul>
-      </div> -->
-    </div>
-  </nav>
-  <div class="rectangle-1"></div>
-  <div class="rectangle-2"></div>
-  <div class="rectangle-transparent-1"></div>
-  <div class="rectangle-transparent-2"></div>
-</div>
-
-
-<!-- ACONTECENDO AGORA -->
-@if(eventosAgora.nonEmpty) {
-<section class="section-padding bg-white">
-  <div class="container">
-    <div class="section-content shadow destaque-box" data-aos="fade-up">
-      <div class="heading-section text-center">
-        <h2>
-          Acontecendo agora!
-        </h2>
-      </div>
-      <div class="row">
-        <div class="testi-content">
-          @for(evento <- eventosAgora) {
-            @displayEvento(evento, true)
-          }
-          
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-}
-<!-- FIM ACONTECENDO AGORA-->
-
-@if(eventosHoje.nonEmpty) {
-<section class="section-padding bg-fixed bg-white">
-  <div class="container">
-    <div class="section-content shadow destaque-box" data-aos="fade-up">
-      <div class="heading-section text-center">
-        <h2>
-          @tituloHoje()
-        </h2>
-      </div>
-      <div class="row">
-        <div class="testi-content">
-
-          @for(evento <- eventosHoje) {
-            @displayEvento(evento, true)
-          }
-
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-}
-
-<section id="client" class="overlay bg-fixed" style='background-image: url(@routes.Assets.versioned("img/bg.jpg"));'>
-  <div class="container">
-    <div class="section-content" data-aos="fade-up">
-      <div class="row ">
-        <div class="col-md-12">
-          <div class="title-wrap mb-5">
-            <h2>Programação</h2>
+        <div class="row">
+          <div class="testi-content">
+            @for(evento <- eventosAgora) {
+              @displayEvento(evento, true)
+            }
+            
           </div>
         </div>
-        <!-- Client Holder -->
-        <div class="col-md-12 client-holder">
-          <div class="client-slider owl-carousel">
-            @for(item <- eventosDia){
-            <div class="p-3 shadow dia-box">
-              <div class="heading-section text-center">
-                <p>@item.diaProgramacaoFmt</p>
-                <h2 class="mb-4">
-                  @item.diaFmt
-                </h2>
-              </div>
-              @for(evento <- item.eventos){
-                @displayEvento(evento)
-              }
-            </div>
+      </div>
+    </div>
+  </section>
+  }
+  <!-- FIM ACONTECENDO AGORA-->
+
+  @if(eventosHoje.nonEmpty) {
+  <section class="section-padding bg-fixed bg-white">
+    <div class="container">
+      <div class="section-content shadow destaque-box" data-aos="fade-up">
+        <div class="heading-section text-center">
+          <h2>
+            @tituloHoje()
+          </h2>
+        </div>
+        <div class="row">
+          <div class="testi-content">
+
+            @for(evento <- eventosHoje) {
+              @displayEvento(evento, true)
             }
 
           </div>
-          <!-- End of Client Holder -->
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
+  }
 
-<!-- RODAPÉ -->
-<footer class="my-3">
-  <div class="inner container">
-    <div class="row">      
-      <div class="col-lg-4 col-md-12 d-flex align-items-center">
-      </div>
-      
-      <div class="col-lg-4 col-md-12 d-flex align-items-center">
-        <p class="mx-auto text-center mb-0">&copy; 2020 Lives do Dia</p>
-        <a class="nav-link" href="https://instagram.com/livesdodiaoficial" target="obj_triangle">
-          <i class="fab fa-instagram"></i>
-        </a>
-      </div>
-      <div class="col-lg-4 col-md-12 d-flex align-items-center">
+  <section id="client" class="overlay bg-fixed" style='background-image: url(@routes.Assets.versioned("img/bg.jpg"));'>
+    <div class="container">
+      <div class="section-content" data-aos="fade-up">
+        <div class="row ">
+          <div class="col-md-12">
+            <div class="title-wrap mb-5">
+              <h2>Programação</h2>
+            </div>
+          </div>
+          <!-- Client Holder -->
+          <div class="col-md-12 client-holder">
+            <div class="client-slider owl-carousel">
+              @for(item <- eventosDia){
+              <div class="p-3 shadow dia-box">
+                <div class="heading-section text-center">
+                  <p>@item.diaProgramacaoFmt</p>
+                  <h2 class="mb-4">
+                    @item.diaFmt
+                  </h2>
+                </div>
+                @for(evento <- item.eventos){
+                  @displayEvento(evento)
+                }
+              </div>
+              }
+
+            </div>
+            <!-- End of Client Holder -->
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</footer>	
-
-<!-- External JS -->
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
-<!--<script src='@routes.Assets.versioned("vendor/bootstrap/popper.min.js")'></script>-->
-<script src='@routes.Assets.versioned("vendor/bootstrap/bootstrap.min.js")'></script>
-<!--<script src='@routes.Assets.versioned("vendor/select2/select2.min.js")'></script>-->
-<script src='@routes.Assets.versioned("vendor/owlcarousel/owl.carousel.min.js")'></script>
-<!--<script src='@routes.Assets.versioned("vendor/stellar/jquery.stellar.js")' type="text/javascript" charset="utf-8"></script>-->
-<!--<script src='@routes.Assets.versioned("vendor/isotope/isotope.min.js")'></script>-->
-<!--<script src='@routes.Assets.versioned("vendor/lightcase/lightcase.js")'></script>-->
-<!--<script src='@routes.Assets.versioned("vendor/waypoints/waypoint.min.js")'></script>-->
-<!--<script src="https://unpkg.com/aos@@next/dist/aos.js"></script>-->
-
-<!-- Main JS -->
- <!--<script src='@routes.Assets.versioned("js/app.min.js")'></script> -->
-<script src='@routes.Assets.versioned("javascripts/main.js")'></script>
-<!--<script src="//localhost:35729/livereload.js"></script>-->
-</body>
-</html>
+  </section>
+}
