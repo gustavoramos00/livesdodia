@@ -11,9 +11,9 @@ case class EventosDia(
   def diaSemanaFmt(): String = data.format(DateTimeFormatter.ofPattern("EEEE"))
   def diaProgramacaoFmt(): String = {
     if (data.isEqual(LocalDate.now())) {
-      "Hoje"
+      "hoje"
     } else if (data.isEqual(LocalDate.now.plusDays(1))) {
-      "Amanhã"
+      "amanhã"
     } else {
       diaSemanaFmt()
     }

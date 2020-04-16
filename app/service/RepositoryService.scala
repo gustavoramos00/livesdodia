@@ -28,7 +28,6 @@ class RepositoryService @Inject()(
   def update(): Future[List[Evento]] = {
     ws.url(urlSpreadSheet)
       .addQueryStringParameters("key" -> apiKey)
-      .withRequestFilter(AhcCurlRequestLogger())
       .get()
       .map { response =>
         val valuesList = (response.json \ "values").as[List[List[String]]]
@@ -38,7 +37,7 @@ class RepositoryService @Inject()(
             case List(nome, info, dia, hora, horaFim, youtube, instagram, imagem, "S", _*) =>
               val data = Evento.parseData(dia, hora)
               val dataFim = Evento.parseData(dia, horaFim)
-              val dataFimAjustado = if (dataFim.isAfter(data)) dataFim else data.plusDays(1) // Termina no dia seguinte
+              val dataFimAjustado = if (dataFim.isAfter(data)) dataFim else dataFim.plusDays(1) // Termina no dia seguinte
               val evento = Evento(nome, info, data, dataFimAjustado, Some(youtube), Some(instagram), Some(imagem))
               Some(evento)
             case errList =>

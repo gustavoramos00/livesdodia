@@ -7,7 +7,7 @@
 <div class="testi-item text-center">
   <div class="testi-meta-inner d-flex align-items-center">
     <div class="testi-img mr-2">
-      <i class="far fa-play-circle"></i>
+      <i class="far fa-calendar-alt"></i>
       <!-- @if(evento.linkImagem.isDefined && evento.linkImagem.get.nonEmpty) {
         <img src='@evento.linkImagem.get' alt="">
       } else {
@@ -23,11 +23,19 @@
       }
       <p class="testi-desc mb-0">
         @evento.horarioFmt
+        &nbsp;
         @if(full && evento.linkYoutube.isDefined && evento.linkYoutube.get.nonEmpty){
         <a class="icone" href="@evento.linkYoutube.get" target="_blank">
           <i class="fab fa-youtube"></i>
           Youtube
         </a>
+        }
+
+        @if(full && evento.linkInstagram.isDefined && evento.linkInstagram.get.nonEmpty){
+          <a class="icone" href="@evento.linkInstagram.get" target="_blank">
+            <i class="fab fa-instagram"></i>
+            Instagram
+          </a>
         }
       </p>
     </div>
@@ -43,26 +51,86 @@
   }
 }
 
+@description = { "Agenda das Lives. Veja aqui a programação dos shows e eventos ao vivo na internet." }
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-163795126-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-163795126-1');
+  </script>
   
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!-- META TAGS -->
   <title>Lives do Dia</title>
-  <meta name="description" content="LIVES DO DIA">
+  <meta name="title" content="Lives do Dia">
+  <meta name="description" content=@description>
+
+
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <meta name="keywords" content="agenda live programação guia show evento aovivo vivo">
+
+  <!-- Schema.org markup for Google+ -->
+  <meta itemprop="name" content="Lives do Dia">
+  <meta itemprop="description" content=@description>
+  <meta itemprop="image" content="https://livesdodia.com.br/assets/images/logo-200x200.png">
+
+  <!-- Favicon-->
+  <link rel="shortcut icon" href="/assets/favicon.ico">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/logo-180x180.png">
+  <link rel="icon" type="image/png" href="/assets/images/logo-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="/assets/images/logo-16x16.png" sizes="16x16">
+
+  <!-- Web app -->
+  <meta name="theme-color" content="#4A00E0">
+  <link rel="manifest" href="/assets/manifest.json">
+
+  <!-- Add to home screen for Safari on iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Lives do Dia">
+  <link rel="apple-touch-icon" href="/assets/images/logo-168x168.png">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:title" content="Lives do Dia">
+  <meta property="og:type" content="website">
+  <meta property="og:image:secure_url" content="https://livesdodia.com.br/assets/images/logo-200x200.png">
+  <meta property="og:image" content="https://livesdodia.com.br/assets/images/logo-200x200.png">
+  <meta property="og:url" content="https://livesdodia.com.br">
+  <meta property="og:description" content=@description>
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://livesdodia.com.br/">
+  <meta property="twitter:title" content="Lives do Dia">
+  <meta property="twitter:description" content=@description>
+  <!-- <meta name="twitter:site" content="@@toquecard" /> -->
+  <meta name="twitter:image" content="https://livesdodia.com.br/assets/images/logo-200x200.png">
+
+
 
   <!-- External CSS -->
   <link rel="stylesheet" href='@routes.Assets.versioned("vendor/bootstrap/bootstrap.min.css")'>
   <!--<link rel="stylesheet" href='@routes.Assets.versioned("vendor/select2/select2.min.css")'>-->
   <link rel="stylesheet" href='@routes.Assets.versioned("vendor/owlcarousel/owl.carousel.min.css")'>
+  <link rel="stylesheet" href='@routes.Assets.versioned("vendor/owlcarousel/owl.theme.default.min.css")'>
   <!--<link rel="stylesheet" href='@routes.Assets.versioned("vendor/lightcase/lightcase.css")'>-->
   <!--<link rel="stylesheet" href="https://unpkg.com/aos@@next/dist/aos.css" />-->
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css?family=Lato:300,400|Work+Sans:300,400,700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Lato:300,400|Work+Sans:300,400,700&display=swap" rel="stylesheet">
 
   <!-- CSS -->
   <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/style.min.css")'>
@@ -204,7 +272,7 @@
 </footer>	
 
 <!-- External JS -->
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 <!--<script src='@routes.Assets.versioned("vendor/bootstrap/popper.min.js")'></script>-->
 <script src='@routes.Assets.versioned("vendor/bootstrap/bootstrap.min.js")'></script>
 <!--<script src='@routes.Assets.versioned("vendor/select2/select2.min.js")'></script>-->
