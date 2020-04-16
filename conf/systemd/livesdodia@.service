@@ -1,0 +1,19 @@
+[Unit]
+Description=Lives do Dia App - port 800%i
+After=network.target
+
+[Service]
+# EnvironmentFile=/path/to/app/conf/env
+Environment=PORT=800%i
+PIDFile=/var/play/livesdodia-play-${PORT}.pid
+WorkingDirectory=/var/play/livesdodia
+ExecStart=/var/play/livesdodia/bin/livesdodia -Dhttp.port=${PORT} -Dconfig.resource=application.prod.conf -Dlogger.resource=logback.prod.xml -Dpidfile.path=/var/play/livesdodia-play-${PORT}.pid
+Restart=on-failure
+User=toquecard
+Group=toquecard
+
+# See http://serverfault.com/a/695863
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target
