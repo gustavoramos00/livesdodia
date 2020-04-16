@@ -123,10 +123,6 @@ section {
   padding: 0 5px;
 }
 
-.icone {
-  font-size: 1.3rem;
-}
-
 .icone i.fab {
   vertical-align: text-bottom;
 }
@@ -454,7 +450,7 @@ section {
 =============================*/
 
 .testi-img i {
-  font-size: 32px;
+  font-size: 25px;
 }
 
 .testi-img img {
