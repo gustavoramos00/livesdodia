@@ -4,10 +4,9 @@ import java.time.{LocalDate, LocalDateTime}
 
 import javax.inject.{Inject, Singleton}
 import model.{Evento, EventosDia}
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.cache.AsyncCacheApi
 import play.api.libs.ws.WSClient
-import play.api.libs.ws.ahc.AhcCurlRequestLogger
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -27,6 +26,7 @@ class RepositoryService @Inject()(
   val urlSpreadSheet = s"$endpoint/v4/spreadsheets/${spreadsheetId}/values/$ranges"
   val cacheKey = "eventos"
   val dataAtualizacaoCacheKey = "atualizadoEm"
+  val logger: Logger = Logger(this.getClass())
 
   def update(): Future[List[Evento]] = {
     ws.url(urlSpreadSheet)
@@ -36,20 +36,19 @@ class RepositoryService @Inject()(
         val valuesList = (response.json \ "values").as[List[List[String]]]
         val eventos = valuesList
           .tail // remove cabeçalho
-          .map {
-            case List(nome, info, dia, hora, horaFim, youtube, instagram, imagem, "S", _*) =>
+          .flatMap {
+            case List(nome, info, dia, hora, horaFim, youtube: String, instagram: String, imagem: String, "S", _*) =>
               val data = Evento.parseData(dia, hora)
               val dataFim = Evento.parseData(dia, horaFim)
               val dataFimAjustado = if (dataFim.isAfter(data)) dataFim else dataFim.plusDays(1) // Termina no dia seguinte
-              val evento = Evento(nome, info, data, dataFimAjustado, Some(youtube), Some(instagram), Some(imagem))
+              val optYoutube = if (youtube.isEmpty) None else Some(youtube)
+              val optInstagram = if (instagram.isEmpty) None else Some(instagram)
+              val evento = Evento(nome, info, data, dataFimAjustado, optYoutube, optInstagram, Some(imagem))
               Some(evento)
             case errList =>
-              println(s"### Error: ###")
-              errList.foreach(str => s" $str /")
-              println(s"### Error FIM ###")
+              logger.error(s"### Error ao obter dados: ${errList.mkString(", ")} ###")
               None
           }
-          .flatten
           .sortBy(_.data)
         cache.set(cacheKey, eventos)
         cache.set(dataAtualizacaoCacheKey, LocalDateTime.now)
@@ -70,7 +69,13 @@ class RepositoryService @Inject()(
   private def filtroEventosAgora(evento: Evento) = evento.data.isBefore(LocalDateTime.now) && evento.dataFim.isAfter(LocalDateTime.now)
 
   def eventosAgora() = {
-    getEventos.map(_.filter(filtroEventosAgora))
+    val futureEventos = getEventos.map(_.filter(filtroEventosAgora))
+    futureEventos.map(eventos => {
+      eventos
+        .filter(ev => ev.linkInstagram.isEmpty && ev.linkYoutube.isEmpty)
+        .foreach(ev => logger.error(s"Erro: acontecendo agora sem link: ${ev.nome}"))
+    })
+    futureEventos
   }
 
   def eventosAconteceraoHoje() = {

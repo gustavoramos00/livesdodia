@@ -5,9 +5,7 @@ $(document).ready(function(){
     autoplay:false,
     dots: true,
     nav: false,
-    // autoHeight:true,
-    autoplayHoverPause:true,
-    autoplayTimeout:7000,
+    autoHeight:false,
     center: true,
     rewind: true,
   });
