@@ -6,8 +6,8 @@ $(document).ready(function(){
     dots: true,
     nav: false,
     autoHeight:true,
-    autoplayHoverPause:false,
-    autoplayTimeout:5000,
+    autoplayHoverPause:true,
+    autoplayTimeout:7000,
     center: true,
     rewind: true,
   });

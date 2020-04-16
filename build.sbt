@@ -1,5 +1,6 @@
 name := """livesdodia"""
 organization := "br.com.livesdodia"
+maintainter := "gustavo@livesdodia.com.br"
 
 version := "0.3"
 
