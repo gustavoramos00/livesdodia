@@ -4,6 +4,7 @@ import java.time.{LocalDate, LocalDateTime}
 
 import javax.inject.{Inject, Singleton}
 import model.{Evento, EventosDia}
+import play.api.Configuration
 import play.api.cache.AsyncCacheApi
 import play.api.libs.ws.WSClient
 import play.api.libs.ws.ahc.AhcCurlRequestLogger
@@ -13,17 +14,19 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class RepositoryService @Inject()(
                                    ws: WSClient,
-                                   cache: AsyncCacheApi
+                                   cache: AsyncCacheApi,
+                                   configuration: Configuration
                                  )
                                  (implicit ec: ExecutionContext){
 
   val endpoint = "https://sheets.googleapis.com"
-  val spreadsheetId = "1egI7CxubWSinAekiPf_3ay1_5jIlt_jX5pIVzDXKqXk"
+  val spreadsheetId = configuration.get[String]("spreadsheetId")
   val sheetId = "0"
   val apiKey = "AIzaSyCmcAoK5FG5ZpgeQAuGugdEzMwhfQ-vMdA"
   val ranges = "Eventos"
   val urlSpreadSheet = s"$endpoint/v4/spreadsheets/${spreadsheetId}/values/$ranges"
   val cacheKey = "eventos"
+  val dataAtualizacaoCacheKey = "atualizadoEm"
 
   def update(): Future[List[Evento]] = {
     ws.url(urlSpreadSheet)
@@ -49,6 +52,7 @@ class RepositoryService @Inject()(
           .flatten
           .sortBy(_.data)
         cache.set(cacheKey, eventos)
+        cache.set(dataAtualizacaoCacheKey, LocalDateTime.now)
         eventos
       }
   }
@@ -87,6 +91,12 @@ class RepositoryService @Inject()(
         .sortBy(_._1)
         .map { case (dia: LocalDate, eventos: List[Evento]) => EventosDia(dia, eventos)}
     })
+  }
+
+  def atualizadoEm(): Future[String] = {
+    cache
+      .get[LocalDateTime](dataAtualizacaoCacheKey)
+      .map(_.map(data => Evento.formatDiaHora(data)).getOrElse(""))
   }
 
 }

@@ -1,7 +1,7 @@
 @import model.Evento
 @import model.EventosDia
 
-@(eventosAgora: Seq[Evento], eventosHoje: Seq[Evento], eventosDia: Seq[EventosDia])
+@(eventosAgora: Seq[Evento], eventosHoje: Seq[Evento], eventosDia: Seq[EventosDia], atualizadoEm: String)
 
 @displayEvento(evento: Evento, full: Boolean = false) = {
 <div class="testi-item text-center">
