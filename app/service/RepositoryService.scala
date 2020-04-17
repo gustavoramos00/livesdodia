@@ -3,7 +3,7 @@ package service
 import java.time.{LocalDate, LocalDateTime}
 
 import javax.inject.{Inject, Singleton}
-import model.{Evento, EventosDia}
+import model.{Evento, EventosDia, EventosMes}
 import play.api.{Configuration, Logger}
 import play.api.cache.AsyncCacheApi
 import play.api.libs.ws.WSClient
@@ -71,12 +71,12 @@ class RepositoryService @Inject()(
       .flatten
   }
 
-  private def filtroEventosAgora(evento: Evento) = evento.data.isBefore(LocalDateTime.now) && evento.data.isAfter(LocalDateTime.now.minusHours(12))
+  private def filtroEventoJaComecou(evento: Evento) = evento.data.isBefore(LocalDateTime.now) && evento.data.isAfter(LocalDateTime.now.minusHours(12))
 
   def eventosAgora() = {
     val futureEventos = getEventos.map(eventos => {
       eventos
-        .filter(filtroEventosAgora)
+        .filter(filtroEventoJaComecou)
         .sortBy(_.data)(Ordering[LocalDateTime].reverse) // mais recentes primeiro
     })
     // verifica eventos sem links
@@ -88,12 +88,13 @@ class RepositoryService @Inject()(
     futureEventos
   }
 
-  def eventosAconteceraoHoje() = {
-    def filtroEventosHoje(evento: Evento) = !filtroEventosAgora(evento) &&
-      evento.data.toLocalDate.isEqual(LocalDate.now) &&
-      evento.data.isAfter(LocalDateTime.now)
+  private def filtroProximosEventosHoje(evento: Evento) = !filtroEventoJaComecou(evento) &&
+    evento.data.toLocalDate.isEqual(LocalDate.now) &&
+    evento.data.isAfter(LocalDateTime.now)
 
-    val futureEventos = getEventos.map(_.filter(filtroEventosHoje))
+  def eventosAconteceraoHoje() = {
+
+    val futureEventos = getEventos.map(_.filter(filtroProximosEventosHoje))
     futureEventos.map(eventos => {
       eventos
         .filter(ev => ev.linkInstagram.isEmpty && ev.linkYoutube.isEmpty)
@@ -119,5 +120,13 @@ class RepositoryService @Inject()(
       .get[LocalDateTime](dataAtualizacaoCacheKey)
       .map(_.map(data => Evento.formatDiaHora(data)).getOrElse(""))
   }
+
+//  def historico(): Future[List[EventosMes]] = {
+//    getEventos.map(values => {
+//      values
+//        .filter(ev => ev.data.toLocalDate.isBefore(LocalDate.now) && !filtroEventoJaComecou(ev))
+//    })
+//    null
+//  }
 
 }
