@@ -35,7 +35,7 @@ class HomeController @Inject()(repository: RepositoryService,
 
   def updateCache() = Action.async { implicit request: Request[AnyContent] =>
     repository.update()
-      .map(_ => Ok)
+      .map(_ => Redirect("/"))
   }
 
   def incluir() = Action { implicit request: Request[AnyContent] =>
