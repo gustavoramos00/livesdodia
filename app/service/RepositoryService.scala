@@ -18,11 +18,11 @@ class RepositoryService @Inject()(
                                  )
                                  (implicit ec: ExecutionContext){
 
-  val endpoint = "https://sheets.googleapis.com"
+  val endpoint = configuration.get[String]("endpoint")
   val spreadsheetId = configuration.get[String]("spreadsheetId")
-  val sheetId = "0"
-  val apiKey = "AIzaSyCmcAoK5FG5ZpgeQAuGugdEzMwhfQ-vMdA"
-  val ranges = "Eventos"
+  val sheetId = configuration.get[String]("sheetId")
+  val apiKey = configuration.get[String]("apiKey")
+  val ranges = configuration.get[String]("ranges")
   val urlSpreadSheet = s"$endpoint/v4/spreadsheets/${spreadsheetId}/values/$ranges"
   val cacheKey = "eventos"
   val dataAtualizacaoCacheKey = "atualizadoEm"
@@ -37,19 +37,20 @@ class RepositoryService @Inject()(
         val eventos = valuesList
           .tail // remove cabeçalho
           .flatMap {
-            case List(nome, info, dia, hora, horaFim, youtube: String, instagram: String, imagem: String, "S", _*) =>
+            case List(_, _, nome, info, dia, hora, horaFim, youtube: String, instagram: String, destaque: String, "S", _*) =>
               val data = Evento.parseData(dia, hora)
               val dataFim = Evento.parseData(dia, horaFim)
               val dataFimAjustado = if (dataFim.isAfter(data)) dataFim else dataFim.plusDays(1) // Termina no dia seguinte
               val optYoutube = if (youtube.isEmpty) None else Some(youtube)
               val optInstagram = if (instagram.isEmpty) None else Some(instagram)
-              val evento = Evento(nome, info, data, dataFimAjustado, optYoutube, optInstagram, Some(imagem))
+              val booleanDestaque = if (destaque.isEmpty) false else true
+              val evento = Evento(nome, info, data, dataFimAjustado, optYoutube, optInstagram, booleanDestaque)
               Some(evento)
             case errList =>
               logger.error(s"### Error ao obter dados: ${errList.mkString(", ")} ###")
               None
           }
-          .sortBy(_.data)
+          .sortBy(ev => (!ev.destaque, ev.data))
         cache.set(cacheKey, eventos)
         cache.set(dataAtualizacaoCacheKey, LocalDateTime.now)
         eventos
@@ -83,7 +84,13 @@ class RepositoryService @Inject()(
       evento.data.toLocalDate.isEqual(LocalDate.now) &&
       evento.data.isAfter(LocalDateTime.now)
 
-    getEventos.map(_.filter(filtroEventosHoje))
+    val futureEventos = getEventos.map(_.filter(filtroEventosHoje))
+    futureEventos.map(eventos => {
+      eventos
+        .filter(ev => ev.linkInstagram.isEmpty && ev.linkYoutube.isEmpty)
+        .foreach(ev => logger.warn(s"WARN: Live hoje ainda sem link: ${ev.nome}"))
+    })
+    futureEventos
   }
 
   def eventosProximosDias() = {

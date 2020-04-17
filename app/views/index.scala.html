@@ -26,14 +26,15 @@
       } else {
         <i class="far fa-calendar-alt"></i>
       }
-      <!-- @if(evento.linkImagem.isDefined && evento.linkImagem.get.nonEmpty) {
-        <img src='@evento.linkImagem.get' alt="">
-      } else {
-        <img src='@routes.Assets.versioned("img/microphone.svg")' alt="">
-      } -->
+
     </div>
     <div class="testi-details">
-      <p class="testi-author mb-0">@evento.nome</p>
+      <p class="testi-destaque mb-0">
+        @evento.nome
+        @if(evento.destaque) {
+          <i class="fas fa-star"></i>
+        }
+      </p>      
       @if(evento.info.nonEmpty) {
       <p class="testi-info mb-0">
         @evento.info

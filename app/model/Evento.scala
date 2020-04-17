@@ -11,7 +11,7 @@ case class Evento(
                    dataFim: LocalDateTime,
                    linkYoutube: Option[String],
                    linkInstagram: Option[String],
-                   linkImagem: Option[String]
+                   destaque: Boolean
                  ) {
   def horarioFmt: String = data.format(Evento.horaPattern)
 }
