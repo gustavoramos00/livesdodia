@@ -76,7 +76,12 @@ class RepositoryService @Inject()(
   private def filtroEventosAgora(evento: Evento) = evento.data.isBefore(LocalDateTime.now) && evento.dataFim.isAfter(LocalDateTime.now)
 
   def eventosAgora() = {
-    val futureEventos = getEventos.map(_.filter(filtroEventosAgora))
+    val futureEventos = getEventos.map(eventos => {
+      eventos
+        .filter(filtroEventosAgora)
+        .sortBy(_.data)(Ordering[LocalDateTime].reverse) // mais recentes primeiro
+    })
+    // verifica eventos sem links
     futureEventos.map(eventos => {
       eventos
         .filter(ev => ev.linkInstagram.isEmpty && ev.linkYoutube.isEmpty)
