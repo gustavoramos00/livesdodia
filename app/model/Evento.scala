@@ -13,18 +13,27 @@ case class Evento(
                    linkInstagram: Option[String],
                    destaque: Boolean
                  ) {
-  def horarioFmt: String = data.format(Evento.horaPattern)
+  def horarioFmt: String = data.format(Evento.horaMinFormatter)
 }
 
 object Evento {
 
-  private val horaPattern = DateTimeFormatter.ofPattern("HH:mm")
-  private val datePattern = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-  private val dataHoraPattern = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:SS")
+  private val horaMinPattern = "HH:mm"
+  private val horaMinSegPattern = "HH:mm:SS"
+  private val diaMesAnoPattern = "dd/MM/yyyy"
+  private val horaMinFormatter = DateTimeFormatter.ofPattern(horaMinPattern)
+  private val horaMinSegFormatter = DateTimeFormatter.ofPattern(horaMinSegPattern)
+  private val dataFormatter = DateTimeFormatter.ofPattern(diaMesAnoPattern)
+  private val dataHoraFormatter = DateTimeFormatter.ofPattern(s"$diaMesAnoPattern $horaMinSegFormatter")
 
-  def parseHorario(hora: String) = LocalTime.parse(hora, horaPattern)
+  def parseHorario(hora: String) = {
+    if (hora.size.eq(horaMinPattern.size))
+      LocalTime.parse(hora, horaMinFormatter)
+    else
+      LocalTime.parse(hora, horaMinSegFormatter)
+  }
 
-  def parseData(dia: String, hora: String) = LocalDate.parse(dia, datePattern).atTime(parseHorario(hora))
+  def parseData(dia: String, hora: String) = LocalDate.parse(dia, dataFormatter).atTime(parseHorario(hora))
 
-  def formatDiaHora(data: LocalDateTime) = dataHoraPattern.format(data)
+  def formatDiaHora(data: LocalDateTime) = dataHoraFormatter.format(data)
 }
