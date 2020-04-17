@@ -38,14 +38,20 @@ class RepositoryService @Inject()(
           .tail // remove cabeçalho
           .flatMap {
             case List(_, _, nome, info, dia, hora, horaFim, youtube: String, instagram: String, destaque: String, "S", _*) =>
-              val data = Evento.parseData(dia, hora)
-              val dataFim = Evento.parseData(dia, horaFim)
-              val dataFimAjustado = if (dataFim.isAfter(data)) dataFim else dataFim.plusDays(1) // Termina no dia seguinte
-              val optYoutube = if (youtube.isEmpty) None else Some(youtube)
-              val optInstagram = if (instagram.isEmpty) None else Some(instagram)
-              val booleanDestaque = if (destaque.isEmpty) false else true
-              val evento = Evento(nome, info, data, dataFimAjustado, optYoutube, optInstagram, booleanDestaque)
-              Some(evento)
+              try {
+                val data = Evento.parseData(dia, hora)
+                val dataFim = Evento.parseData(dia, horaFim)
+                val dataFimAjustado = if (dataFim.isAfter(data)) dataFim else dataFim.plusDays(1) // Termina no dia seguinte
+                val optYoutube = if (youtube.isEmpty) None else Some(youtube)
+                val optInstagram = if (instagram.isEmpty) None else Some(instagram)
+                val booleanDestaque = if (destaque.isEmpty) false else true
+                val evento = Evento(nome, info, data, dataFimAjustado, optYoutube, optInstagram, booleanDestaque)
+                Some(evento)
+              } catch {
+                case err: Throwable =>
+                  logger.error(s"### Erro ao converter dados $nome / $dia / $hora", err)
+                  None
+              }
             case errList =>
               logger.error(s"### Error ao obter dados: ${errList.mkString(", ")} ###")
               None

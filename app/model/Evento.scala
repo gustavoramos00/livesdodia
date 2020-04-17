@@ -19,15 +19,15 @@ case class Evento(
 object Evento {
 
   private val horaMinPattern = "HH:mm"
-  private val horaMinSegPattern = "HH:mm:SS"
+  private val horaMinSegPattern = "HH:mm:ss"
   private val diaMesAnoPattern = "dd/MM/yyyy"
   private val horaMinFormatter = DateTimeFormatter.ofPattern(horaMinPattern)
   private val horaMinSegFormatter = DateTimeFormatter.ofPattern(horaMinSegPattern)
   private val dataFormatter = DateTimeFormatter.ofPattern(diaMesAnoPattern)
-  private val dataHoraFormatter = DateTimeFormatter.ofPattern(s"$diaMesAnoPattern $horaMinSegFormatter")
+  private val dataHoraFormatter = DateTimeFormatter.ofPattern(s"$diaMesAnoPattern $horaMinSegPattern")
 
   def parseHorario(hora: String) = {
-    if (hora.size.eq(horaMinPattern.size))
+    if (hora.size == horaMinPattern.size)
       LocalTime.parse(hora, horaMinFormatter)
     else
       LocalTime.parse(hora, horaMinSegFormatter)
