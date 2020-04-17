@@ -1,7 +1,7 @@
 @import model.Evento
 @import model.EventosDia
 
-@(eventosAgora: Seq[Evento], eventosHoje: Seq[Evento], eventosDia: Seq[EventosDia], atualizadoEm: String)
+@(eventosAgora: Seq[Evento], eventosHoje: Seq[Evento], eventosDia: Seq[EventosDia], atualizadoEm: String, proxEventoMiliSec: Option[Long])
 
 @displayEvento(evento: Evento, full: Boolean = false, agora: Boolean = false) = {
 <div class="testi-item text-center">
@@ -50,7 +50,7 @@
 
 @tituloHoje() = {
   @if(eventosAgora.nonEmpty) {
-    Outros hoje
+    Em breve
   } else {
     Hoje
   }
@@ -58,14 +58,22 @@
 
 @base {
 
-  <!-- ACONTECENDO AGORA -->
+  @if(proxEventoMiliSec.isDefined){
+    <script type="text/javascript">
+      setTimeout(function(){
+        location.reload(true);
+      },@proxEventoMiliSec.get)
+    </script>
+  }
+
+  <!-- INICIADAS -->
   @if(eventosAgora.nonEmpty) {
   <section class="section-padding bg-white">
     <div class="container">
       <div class="section-content shadow destaque-box" data-aos="fade-up">
         <div class="heading-section text-center">
           <h2>
-            Acontecendo agora!
+            Já começou
           </h2>
         </div>
         <div class="row">
@@ -80,7 +88,7 @@
     </div>
   </section>
   }
-  <!-- FIM ACONTECENDO AGORA-->
+  <!-- FIM INICIADA -->
 
   @if(eventosHoje.nonEmpty) {
   <section class="section-padding bg-fixed bg-white">

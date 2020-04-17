@@ -37,15 +37,13 @@ class RepositoryService @Inject()(
         val eventos = valuesList
           .tail // remove cabeçalho
           .flatMap {
-            case List(_, _, nome, info, dia, hora, horaFim, youtube: String, instagram: String, destaque: String, "S", _*) =>
+            case List(_, _, nome, info, dia, hora, _, youtube: String, instagram: String, destaque: String, "S", _*) =>
               try {
                 val data = Evento.parseData(dia, hora)
-                val dataFim = Evento.parseData(dia, horaFim)
-                val dataFimAjustado = if (dataFim.isAfter(data)) dataFim else dataFim.plusDays(1) // Termina no dia seguinte
                 val optYoutube = if (youtube.isEmpty) None else Some(youtube)
                 val optInstagram = if (instagram.isEmpty) None else Some(instagram)
                 val booleanDestaque = if (destaque.isEmpty) false else true
-                val evento = Evento(nome, info, data, dataFimAjustado, optYoutube, optInstagram, booleanDestaque)
+                val evento = Evento(nome, info, data, optYoutube, optInstagram, booleanDestaque)
                 Some(evento)
               } catch {
                 case err: Throwable =>
@@ -73,7 +71,7 @@ class RepositoryService @Inject()(
       .flatten
   }
 
-  private def filtroEventosAgora(evento: Evento) = evento.data.isBefore(LocalDateTime.now) && evento.dataFim.isAfter(LocalDateTime.now)
+  private def filtroEventosAgora(evento: Evento) = evento.data.isBefore(LocalDateTime.now) && evento.data.isAfter(LocalDateTime.now.minusHours(12))
 
   def eventosAgora() = {
     val futureEventos = getEventos.map(eventos => {

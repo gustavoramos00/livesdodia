@@ -1,19 +1,29 @@
 package model
 
 
-import java.time.{LocalDate, LocalDateTime, LocalTime}
+import java.time.{Duration, LocalDate, LocalDateTime, LocalTime}
 import java.time.format.DateTimeFormatter
+import java.time.temporal.{ChronoUnit, TemporalUnit}
 
 case class Evento(
                    nome: String,
                    info: String,
                    data: LocalDateTime,
-                   dataFim: LocalDateTime,
                    linkYoutube: Option[String],
                    linkInstagram: Option[String],
                    destaque: Boolean
                  ) {
-  def horarioFmt: String = data.format(Evento.horaMinFormatter)
+  def horarioFmt: String = {
+    val duration = Duration.between(data, LocalDateTime.now)
+    val horas = duration.toHours
+    val minutos = duration.minusHours(horas).toMinutes
+    if (duration.isNegative)
+      data.format(Evento.horaMinFormatter)
+    else if (horas > 0)
+      f"Há ${horas}h ${minutos}%02dmin"
+    else
+      f"Há ${minutos}%02dmin"
+  }
 }
 
 object Evento {

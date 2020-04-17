@@ -1,5 +1,8 @@
 package controllers
 
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+
 import javax.inject._
 import play.api.mvc._
 import service.RepositoryService
@@ -29,7 +32,10 @@ class HomeController @Inject()(repository: RepositoryService,
       eventosHoje <- repository.eventosAconteceraoHoje()
       eventosProgramacao <- repository.eventosProximosDias()
       atualizadoEm <- repository.atualizadoEm()
-    } yield Ok(views.html.index(eventosAgora, eventosHoje, eventosProgramacao, atualizadoEm))
+    } yield {
+      val proxEventoMiliSec = eventosHoje.headOption.map(ev => LocalDateTime.now.until(ev.data, ChronoUnit.MILLIS))
+      Ok(views.html.index(eventosAgora, eventosHoje, eventosProgramacao, atualizadoEm, proxEventoMiliSec))
+    }
 
   }
 
