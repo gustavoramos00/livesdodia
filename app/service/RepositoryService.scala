@@ -29,6 +29,7 @@ class RepositoryService @Inject()(
   val logger: Logger = Logger(this.getClass())
 
   def update(): Future[List[Evento]] = {
+    logger.warn(s"Atualizando cache")
     ws.url(urlSpreadSheet)
       .addQueryStringParameters("key" -> apiKey)
       .get()
@@ -37,23 +38,23 @@ class RepositoryService @Inject()(
         val eventos = valuesList
           .tail // remove cabeçalho
           .flatMap {
-            case List(_, _, nome, info, dia, hora, _, youtube: String, instagram: String, destaque: String, "S", _*) =>
-              try {
-                val data = Evento.parseData(dia, hora)
-                val optYoutube = if (youtube.isEmpty) None else Some(youtube)
-                val optInstagram = if (instagram.isEmpty) None else Some(instagram)
-                val booleanDestaque = if (destaque.isEmpty) false else true
-                val evento = Evento(nome, info, data, optYoutube, optInstagram, booleanDestaque)
-                Some(evento)
-              } catch {
-                case err: Throwable =>
-                  logger.error(s"### Erro ao converter dados $nome / $dia / $hora", err)
-                  None
-              }
-            case errList =>
-              logger.error(s"### Error ao obter dados: ${errList.mkString(", ")} ###")
-              None
-          }
+          case List(_, _, nome, info, dia, hora, _, youtube: String, instagram: String, destaque: String, "S", _*) =>
+            try {
+              val data = Evento.parseData(dia, hora)
+              val optYoutube = if (youtube.isEmpty) None else Some(youtube)
+              val optInstagram = if (instagram.isEmpty) None else Some(instagram)
+              val booleanDestaque = if (destaque.isEmpty) false else true
+              val evento = Evento(nome, info, data, optYoutube, optInstagram, booleanDestaque)
+              Some(evento)
+            } catch {
+              case err: Throwable =>
+                logger.error(s"### Erro ao converter dados $nome / $dia / $hora", err)
+                None
+            }
+          case errList =>
+            logger.error(s"### Error ao obter dados: ${errList.mkString(", ")} ###")
+            None
+        }
           .sortBy(ev => (!ev.destaque, ev.data))
         cache.set(cacheKey, eventos)
         cache.set(dataAtualizacaoCacheKey, LocalDateTime.now)

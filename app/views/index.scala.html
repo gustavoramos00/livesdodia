@@ -1,7 +1,12 @@
 @import model.Evento
 @import model.EventosDia
 
-@(eventosAgora: Seq[Evento], eventosHoje: Seq[Evento], eventosDia: Seq[EventosDia], atualizadoEm: String, proxEventoMiliSec: Option[Long])
+@(eventosAgora: Seq[Evento],
+  eventosHoje: Seq[Evento],
+  eventosDia: Seq[EventosDia],
+  atualizadoEm: String,
+  proxEventoMiliSec: Option[Long],
+  jsonld: String)
 
 @displayEvento(evento: Evento, full: Boolean = false, agora: Boolean = false) = {
 <div class="testi-item text-center">
@@ -146,4 +151,4 @@
       </div>
     </div>
   </section>
-}
+}(Some(jsonld))

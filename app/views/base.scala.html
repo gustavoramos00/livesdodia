@@ -1,4 +1,4 @@
-@(content: Html)
+@(content: Html)(jsonld: Option[String] = None)
 
 @description = { "Confira a programação das Lives! Agenda dos shows e eventos ao vivo na internet." }
 
@@ -16,7 +16,13 @@
 
     gtag('config', 'UA-163795126-1');
   </script>
-  
+
+
+  @if(jsonld.isDefined){
+    <script type="application/ld+json">
+      @Html(jsonld.get)
+    </script>
+  }
 
   <!-- META TAGS -->
   <title>Lives do Dia</title>

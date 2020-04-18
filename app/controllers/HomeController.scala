@@ -1,9 +1,11 @@
 package controllers
 
-import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.{LocalDateTime, ZoneId}
 import java.time.temporal.ChronoUnit
 
 import javax.inject._
+import model.{Evento, EventosDia}
 import play.api.mvc._
 import service.RepositoryService
 
@@ -34,7 +36,8 @@ class HomeController @Inject()(repository: RepositoryService,
       atualizadoEm <- repository.atualizadoEm()
     } yield {
       val proxEventoMiliSec = eventosHoje.headOption.map(ev => LocalDateTime.now.until(ev.data, ChronoUnit.MILLIS))
-      Ok(views.html.index(eventosAgora, eventosHoje, eventosProgramacao, atualizadoEm, proxEventoMiliSec))
+      val jsonld = jsonLdSchemaLivesDoDia(eventosAgora, eventosHoje, eventosProgramacao)
+      Ok(views.html.index(eventosAgora, eventosHoje, eventosProgramacao, atualizadoEm, proxEventoMiliSec, jsonld))
     }
 
   }
@@ -46,5 +49,46 @@ class HomeController @Inject()(repository: RepositoryService,
 
   def incluir() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.incluir())    
+  }
+
+  private def jsonLdSchemaLivesDoDia(eventosAgora: List[Evento], eventosHoje: List[Evento], eventosProgramacao: List[EventosDia]) = {
+    s"""[{
+       |  "@context": "http://schema.org",
+       |  "@type": "Guide",
+       |  "name": "Lives acontecendo agora",
+       |  "about": "${jsonldSchemaEventos((eventosAgora))}"
+       |},
+       |{
+       |  "@context": "http://schema.org",
+       |  "@type": "Guide",
+       |  "name": "Lives de hoje",
+       |  "about": ${jsonldSchemaEventos((eventosHoje))}
+       |},
+       |{
+       |  "@context": "http://schema.org",
+       |  "@type": "Guide",
+       |  "name": "Agenda das lives",
+       |  "about": ${jsonldSchemaEventos((eventosProgramacao.flatMap(_.eventos)))}
+       |
+       |}
+       |]""".stripMargin
+  }
+
+  private def jsonldSchemaEventos(eventos: List[Evento]): String = {
+    val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+    val values = eventos.map(evento => {
+      s"""{
+         |  "@context": "http://schema.org",
+         |  "@type": "BroadcastEvent",
+         |  "name": "${evento.nome}",
+         |  "description": "${evento.info}",
+         |  "isAccessibleForFree": "true",
+         |  "isLiveBroadcast": "true",
+         |  "startDate": "${evento.data.atZone(ZoneId.systemDefault()).format(formatter)}",
+         |  "endDate": "${evento.data.plusHours(3).atZone(ZoneId.systemDefault()).format(formatter)}"
+         |}""".stripMargin
+    }).mkString(",")
+
+    s"[$values]"
   }
 }
