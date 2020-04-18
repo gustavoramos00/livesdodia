@@ -56,19 +56,19 @@ class HomeController @Inject()(repository: RepositoryService,
        |  "@context": "http://schema.org",
        |  "@type": "Guide",
        |  "name": "Lives acontecendo agora",
-       |  "about": "${jsonldSchemaEventos((eventosAgora))}"
+       |  "about": [${jsonldSchemaEventos((eventosAgora))}]
        |},
        |{
        |  "@context": "http://schema.org",
        |  "@type": "Guide",
        |  "name": "Lives de hoje",
-       |  "about": ${jsonldSchemaEventos((eventosHoje))}
+       |  "about": [${jsonldSchemaEventos((eventosHoje))}]
        |},
        |{
        |  "@context": "http://schema.org",
        |  "@type": "Guide",
        |  "name": "Agenda das lives",
-       |  "about": ${jsonldSchemaEventos((eventosProgramacao.flatMap(_.eventos)))}
+       |  "about": [${jsonldSchemaEventos((eventosProgramacao.flatMap(_.eventos)))}]
        |
        |}
        |]""".stripMargin
@@ -76,9 +76,8 @@ class HomeController @Inject()(repository: RepositoryService,
 
   private def jsonldSchemaEventos(eventos: List[Evento]): String = {
     val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
-    val values = eventos.map(evento => {
+    eventos.map(evento => {
       s"""{
-         |  "@context": "http://schema.org",
          |  "@type": "BroadcastEvent",
          |  "name": "${evento.nome}",
          |  "description": "${evento.info}",
@@ -88,7 +87,5 @@ class HomeController @Inject()(repository: RepositoryService,
          |  "endDate": "${evento.data.plusHours(3).atZone(ZoneId.systemDefault()).format(formatter)}"
          |}""".stripMargin
     }).mkString(",")
-
-    s"[$values]"
   }
 }
