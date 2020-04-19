@@ -61,6 +61,12 @@
   }
 }
 
+@buscanaoencontrada() = {
+  <div class="testi-item busca-nao-encontrada" style="display: none">
+    Live não encontrada nessa seção, refaça a busca ou <a href="/incluir">cadastre uma nova</a>.
+  </div>
+}
+
 @base {
 
   <!-- INICIADAS -->
@@ -74,10 +80,11 @@
           </h2>
         </div>
         <div class="row">
-          <div class="testi-content" data-jplist-group="search-group">
+          <div class="testi-content search-not-found-container" data-jplist-group="search-group">
             @for(evento <- eventosAgora) {
               @displayEvento(evento, true, true)
             }
+            @buscanaoencontrada
           </div>
         </div>
       </div>
@@ -96,12 +103,11 @@
           </h2>
         </div>
         <div class="row">
-          <div class="testi-content" data-jplist-group="search-group">
-
+          <div class="testi-content search-not-found-container" data-jplist-group="search-group">
             @for(evento <- eventosHoje) {
               @displayEvento(evento, true)
             }
-
+            @buscanaoencontrada
           </div>
         </div>
       </div>
@@ -112,17 +118,15 @@
   <section id="client" class="overlay bg-fixed" style='background-image: url(@routes.Assets.versioned("img/bg.jpg"));'>
     <div class="container">
       <div class="section-content" data-aos="fade-up">
-        <div class="row ">
+        <div class="row">
           <div class="col-md-12">
             <div class="title-wrap">
               <h2>Programação</h2>
             </div>
           </div>
-
-          
-
           <!-- Client Holder -->
-          <div class="col-md-12 client-holder">
+          <div class="col-md-12 client-holder search-not-found-container">
+            @buscanaoencontrada
             <div class="client-slider">
               @for(item <- eventosDia){
               <div class="shadow dia-box">
@@ -141,10 +145,24 @@
                 </div>
               </div>
               }
-
             </div>
             <!-- End of Client Holder -->
           </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <section class="bg-white">
+    <div class="container">
+      <div class="section-content">
+        <div class="title-wrap">
+          <h2 class="section-title">
+            Tem alguma que ainda <b>não está na nossa agenda?</b> Você pode cadastrar <a class="" href="/incluir">aqui</a>.
+          </h2>
+          <p class="section-sub-title">
+            Valorize o artista, assista nos canais oficiais
+          </p>
         </div>
       </div>
     </div>
@@ -158,4 +176,4 @@
     </script>
   }
 
-}(Some(jsonld))
+}(Some(jsonld), true)

@@ -1,4 +1,4 @@
-@(content: Html)(jsonld: Option[String] = None)
+@(content: Html)(jsonld: Option[String] = None, showSearch: Boolean)
 
 @description = { "Confira a programação das Lives! Agenda dos shows e eventos ao vivo na internet." }
 
@@ -79,7 +79,7 @@
   <!-- External CSS -->
   <link rel="stylesheet" href='@routes.Assets.versioned("vendor/bootstrap/bootstrap.min.css")'>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.2/tiny-slider.css">
-  <!-- <link rel="stylesheet" href='@routes.Assets.versioned("vendor/jplist.styles.css")'> -->
+  <link rel="stylesheet" href='@routes.Assets.versioned("vendor/jplist.styles.css")'>
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Lato:300,400|Work+Sans:300,400,700&display=swap" rel="stylesheet">
@@ -101,15 +101,16 @@
         <div class="text-center">
           <h1 class="">LIVES<br>DO DIA</h1>
         </div>
-
       </a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-nav-header" aria-controls="navbar-nav-header" aria-expanded="false" aria-label="Toggle navigation">
+      <!-- <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-nav-header" aria-controls="navbar-nav-header" aria-expanded="false" aria-label="Toggle navigation">
         <span class="lnr lnr-menu"></span>
-      </button>
+      </button> -->
 
       <!-- text filter control -->
-      <!-- <div>
-        <input
+      @if(showSearch) {
+        <div class="input-group input-group-sm input-group-busca">
+          <input
+            class="form-control"
             id="jplist-control-element"
             data-jplist-control="textbox-filter"
             data-group="search-group"
@@ -118,19 +119,23 @@
             type="text"
             value=""
             data-clear-btn-id="name-clear-btn"
-            placeholder="Filter by Name" />
-        
-         <button type="button" id="name-clear-btn">Clear</button>
-      </div> -->
+            placeholder="Buscar" />
+          <!-- <span class="search-icon">
+            <i class="fas fa-search"></i>  
+          </span> -->
+          <!-- <button class="button-clear-search" type="button" id="name-clear-btn">
+            <i class="fas fa-times-circle"></i>
+          </button> -->
+        </div>
+      }
 
-
-      <div class="collapse navbar-collapse" id="navbar-nav-header">
+      <!-- <div class="collapse navbar-collapse" id="navbar-nav-header">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
-            <a class="nav-link" href="/incluir">Incluir evento</a>
+            <a class="nav-link" href="/incluir">Novo evento</a>
           </li>
         </ul>
-      </div>
+      </div> -->
     </div>
   </nav>
   <div class="rectangle-1"></div>
@@ -142,14 +147,16 @@
 @content
 
 <!-- RODAPÉ -->
-<footer class="my-3">
+<footer class="">
   <div class="inner container">
     <div class="row">      
       <div class="col-lg-4 col-md-12 d-flex align-items-center">
       </div>
       
       <div class="col-lg-4 col-md-12 d-flex align-items-center">
-        <p class="mx-auto text-center mb-0">&copy; 2020 Lives do Dia</p>
+        <p class="mx-auto text-center mb-0">
+          &copy; 2020 Lives do Dia
+        </p>
         <a class="nav-link" href="https://instagram.com/livesdodiaoficial" target="_blank">
           <i class="fab fa-instagram"></i>
         </a>
@@ -164,7 +171,7 @@
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 <script src='@routes.Assets.versioned("vendor/bootstrap/bootstrap.min.js")'></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.2/min/tiny-slider.js"></script>
-<!-- <script src='@routes.Assets.versioned("vendor/jplist.min.js")'></script> -->
+<script src='@routes.Assets.versioned("vendor/jplist.min.js")'></script>
 
 <!-- Main JS -->
 <script src='@routes.Assets.versioned("js/main.js")'></script>
