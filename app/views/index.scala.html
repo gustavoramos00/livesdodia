@@ -9,7 +9,7 @@
   jsonld: String)
 
 @displayEvento(evento: Evento, full: Boolean = false, agora: Boolean = false) = {
-<div class="testi-item text-center">
+<div class="testi-item text-center" data-jplist-item>
   <div class="testi-meta-inner d-flex">
     <div class="testi-img mr-2">
       @if(agora) {
@@ -34,14 +34,14 @@
 
     </div>
     <div class="testi-details">
-      <p class="testi-destaque mb-0">
+      <p class="testi-destaque mb-0 searchable">
         @evento.nome
         @if(evento.destaque) {
           <i class="fas fa-star"></i>
         }
       </p>      
       @if(evento.info.nonEmpty) {
-      <p class="testi-info mb-0">
+      <p class="testi-info mb-0 searchable">
         @evento.info
       </p>
       }
@@ -63,14 +63,6 @@
 
 @base {
 
-  @if(proxEventoMiliSec.isDefined){
-    <script type="text/javascript">
-      setTimeout(function(){
-        location.reload(true);
-      },@proxEventoMiliSec.get)
-    </script>
-  }
-
   <!-- INICIADAS -->
   @if(eventosAgora.nonEmpty) {
   <section class="section-padding bg-white">
@@ -82,11 +74,10 @@
           </h2>
         </div>
         <div class="row">
-          <div class="testi-content">
+          <div class="testi-content" data-jplist-group="search-group">
             @for(evento <- eventosAgora) {
               @displayEvento(evento, true, true)
             }
-            
           </div>
         </div>
       </div>
@@ -105,7 +96,7 @@
           </h2>
         </div>
         <div class="row">
-          <div class="testi-content">
+          <div class="testi-content" data-jplist-group="search-group">
 
             @for(evento <- eventosHoje) {
               @displayEvento(evento, true)
@@ -123,24 +114,31 @@
       <div class="section-content" data-aos="fade-up">
         <div class="row ">
           <div class="col-md-12">
-            <div class="title-wrap mb-5">
+            <div class="title-wrap">
               <h2>Programação</h2>
             </div>
           </div>
+
+          
+
           <!-- Client Holder -->
           <div class="col-md-12 client-holder">
-            <div class="client-slider owl-carousel">
+            <div class="client-slider">
               @for(item <- eventosDia){
-              <div class="p-3 shadow dia-box">
+              <div class="shadow dia-box">
                 <div class="heading-section text-center">
-                  <p>@item.diaProgramacaoFmt</p>
+                  <p>
+                    @item.diaProgramacaoFmt
+                  </p>
                   <h2 class="mb-4">
                     @item.diaFmt
                   </h2>
                 </div>
-                @for(evento <- item.eventos){
-                  @displayEvento(evento, false)
-                }
+                <div data-jplist-group="search-group">
+                  @for(evento <- item.eventos){
+                    @displayEvento(evento, false)
+                  }
+                </div>
               </div>
               }
 
@@ -151,4 +149,13 @@
       </div>
     </div>
   </section>
+
+  @if(proxEventoMiliSec.isDefined){
+    <script type="text/javascript">
+      setTimeout(function(){
+        location.reload(true);
+      },@proxEventoMiliSec.get)
+    </script>
+  }
+
 }(Some(jsonld))

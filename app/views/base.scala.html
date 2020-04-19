@@ -78,9 +78,9 @@
 
   <!-- External CSS -->
   <link rel="stylesheet" href='@routes.Assets.versioned("vendor/bootstrap/bootstrap.min.css")'>
-    <link rel="stylesheet" href='@routes.Assets.versioned("vendor/owlcarousel/owl.carousel.min.css")'>
-  <link rel="stylesheet" href='@routes.Assets.versioned("vendor/owlcarousel/owl.theme.default.min.css")'>
-  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.2/tiny-slider.css">
+  <!-- <link rel="stylesheet" href='@routes.Assets.versioned("vendor/jplist.styles.css")'> -->
+
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Lato:300,400|Work+Sans:300,400,700&display=swap" rel="stylesheet">
 
@@ -94,18 +94,36 @@
 
 </head>
 <body data-spy="scroll" data-target="#navbar" class="static-layout not-on-top">
-<div class="header-container">
+<div class="header-container shadow">
   <nav id="header-navbar" class="navbar navbar-expand py-4">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center text-white" href="/">
         <div class="text-center">
           <h1 class="">LIVES<br>DO DIA</h1>
         </div>
-        
+
       </a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-nav-header" aria-controls="navbar-nav-header" aria-expanded="false" aria-label="Toggle navigation">
         <span class="lnr lnr-menu"></span>
       </button>
+
+      <!-- text filter control -->
+      <!-- <div>
+        <input
+            id="jplist-control-element"
+            data-jplist-control="textbox-filter"
+            data-group="search-group"
+            data-name="filtro-eventos"
+            data-path=".searchable"
+            type="text"
+            value=""
+            data-clear-btn-id="name-clear-btn"
+            placeholder="Filter by Name" />
+        
+         <button type="button" id="name-clear-btn">Clear</button>
+      </div> -->
+
+
       <div class="collapse navbar-collapse" id="navbar-nav-header">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
@@ -132,7 +150,7 @@
       
       <div class="col-lg-4 col-md-12 d-flex align-items-center">
         <p class="mx-auto text-center mb-0">&copy; 2020 Lives do Dia</p>
-        <a class="nav-link" href="https://instagram.com/livesdodiaoficial" target="obj_triangle">
+        <a class="nav-link" href="https://instagram.com/livesdodiaoficial" target="_blank">
           <i class="fab fa-instagram"></i>
         </a>
       </div>
@@ -145,7 +163,8 @@
 <!-- External JS -->
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 <script src='@routes.Assets.versioned("vendor/bootstrap/bootstrap.min.js")'></script>
-<script src='@routes.Assets.versioned("vendor/owlcarousel/owl.carousel.min.js")'></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.2/min/tiny-slider.js"></script>
+<!-- <script src='@routes.Assets.versioned("vendor/jplist.min.js")'></script> -->
 
 <!-- Main JS -->
 <script src='@routes.Assets.versioned("js/main.js")'></script>
