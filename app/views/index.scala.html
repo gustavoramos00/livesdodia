@@ -14,12 +14,12 @@
     <div class="testi-img mr-2">
       @if(agora) {
         @if(evento.linkYoutube.isDefined) {
-          <a class="icone" href="@evento.linkYoutube.get" target="_blank">
+          <a class="icone" rel="nofollow" href="@evento.linkYoutube.get" target="_blank">
             <i class="fab fa-youtube"></i>
           </a>
         }
         @if(evento.linkInstagram.isDefined){
-          <a class="icone" href="@evento.linkInstagram.get" target="_blank">
+          <a class="icone" rel="nofollow" href="@evento.linkInstagram.get" target="_blank">
             <i class="fab fa-instagram"></i>
           </a>
         }
