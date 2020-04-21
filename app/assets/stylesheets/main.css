@@ -170,7 +170,7 @@ section {
   text-align: center;
 }
 
-.icone i.fab {
+.icone span.icon {
   vertical-align: text-bottom;
 }
 
@@ -501,11 +501,11 @@ footer i.fab {
 =            TESTI            =
 =============================*/
 
-.testi-img i {
-  font-size: 25px;
+.testi-img span.icon-calendar {
+  font-size: 20px;
 }
 
-.testi-img .fa-youtube, .testi-img .fa-instagram {
+.testi-img span.icon-youtube, .testi-img span.icon-instagram, .testi-img span.icon-asterisk {
   font-size: 40px;
 }
 

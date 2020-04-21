@@ -15,21 +15,21 @@
       @if(agora) {
         @if(evento.linkYoutube.isDefined) {
           <a class="icone" rel="nofollow" href="@evento.linkYoutube.get" target="_blank">
-            <i class="fab fa-youtube"></i>
+            <span class="icon-youtube"></span>
           </a>
         }
         @if(evento.linkInstagram.isDefined){
           <a class="icone" rel="nofollow" href="@evento.linkInstagram.get" target="_blank">
-            <i class="fab fa-instagram"></i>
+            <span class="icon-instagram"></span>
           </a>
         }
         @if(evento.linkYoutube.isEmpty && evento.linkInstagram.isEmpty) {
           <div class="icone">
-            <i class="fas fa-asterisk"></i>
+            <span class="icon-asterisk"></span>
           </div>
         }
       } else {
-        <i class="far fa-calendar-alt"></i>
+        <span class="icon-calendar"></span>
       }
 
     </div>
@@ -37,7 +37,7 @@
       <p class="testi-destaque mb-0 searchable">
         @evento.nome
         @if(evento.destaque) {
-          <i class="fas fa-star"></i>
+          <span class="icon-star"></span>
         }
       </p>      
       @if(evento.info.nonEmpty) {
