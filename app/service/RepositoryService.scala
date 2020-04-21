@@ -28,14 +28,13 @@ class RepositoryService @Inject()(
   val dataAtualizacaoCacheKey = "atualizadoEm"
   val logger: Logger = Logger(this.getClass())
 
-  def update(): Future[List[Evento]] = {
-    logger.warn(s"Atualizando cache")
+  private def dataFromSheets(): Future[List[Evento]] = {
     ws.url(urlSpreadSheet)
       .addQueryStringParameters("key" -> apiKey)
       .get()
       .map { response =>
         val valuesList = (response.json \ "values").as[List[List[String]]]
-        val eventos = valuesList
+        valuesList
           .tail // remove cabeçalho
           .flatMap {
           case List(_, _, nome, info, dia, hora, _, youtube: String, instagram: String, destaque: String, "S", _*) =>
@@ -54,23 +53,20 @@ class RepositoryService @Inject()(
           case errList =>
             logger.error(s"### Error ao obter dados: ${errList.mkString(", ")} ###")
             None
-        }
-          .sortBy(ev => (!ev.destaque, ev.data))
-        cache.set(cacheKey, eventos)
-        cache.set(dataAtualizacaoCacheKey, LocalDateTime.now)
-        eventos
+        }.sortBy(ev => (!ev.destaque, ev.data))
       }
   }
 
-  private def getEventos = {
-    cache
-      .get[List[Evento]](cacheKey)
-      .map {
-        case Some(values) => Future.successful(values)
-        case None => update()
-      }
-      .flatten
+  def forceUpdate() = {
+    val eventos = dataFromSheets()
+    logger.warn(s"Atualizando cache")
+    cache.set(cacheKey, eventos)
+    cache.set(dataAtualizacaoCacheKey, LocalDateTime.now)
   }
+
+  private def getEventos =
+    cache.getOrElseUpdate[List[Evento]](cacheKey) (dataFromSheets())
+
 
   private def filtroEventoJaComecou(evento: Evento) = evento.data.isBefore(LocalDateTime.now) && evento.data.isAfter(LocalDateTime.now.minusHours(12))
 

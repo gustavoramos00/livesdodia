@@ -6,10 +6,13 @@ import java.time.temporal.ChronoUnit
 
 import javax.inject._
 import model.{Evento, EventosDia}
+import play.api.cache.Cached
 import play.api.mvc._
 import service.RepositoryService
 
 import scala.concurrent.ExecutionContext
+import scala.concurrent.duration._
+
 
 /**
  * This controller creates an `Action` to handle HTTP requests to the
@@ -17,8 +20,11 @@ import scala.concurrent.ExecutionContext
  */
 @Singleton
 class HomeController @Inject()(repository: RepositoryService,
+                               cached: Cached,
                                 val controllerComponents: ControllerComponents
                               )(implicit ec: ExecutionContext) extends BaseController {
+
+
 
 
   /**
@@ -28,28 +34,33 @@ class HomeController @Inject()(repository: RepositoryService,
    * will be called when the application receives a `GET` request with
    * a path of `/`.
    */
-  def index() = Action.async { implicit request: Request[AnyContent] =>
-    for {
-      eventosAgora <- repository.eventosAgora()
-      eventosHoje <- repository.eventosAconteceraoHoje()
-      eventosProgramacao <- repository.eventosProximosDias()
-      atualizadoEm <- repository.atualizadoEm()
-    } yield {
-      val proxEventoMiliSec = eventosHoje.headOption.map(ev => LocalDateTime.now.until(ev.data, ChronoUnit.MILLIS))
-      val jsonld = jsonLdSchemaLivesDoDia(eventosAgora, eventosHoje, eventosProgramacao)
-      Ok(views.html.index(eventosAgora, eventosHoje, eventosProgramacao, atualizadoEm, proxEventoMiliSec, jsonld))
-    }
+  def index() = cached(_ => "index", 1.minute) {
 
+    Action.async { implicit request: Request[AnyContent] =>
+      for {
+        eventosAgora <- repository.eventosAgora()
+        eventosHoje <- repository.eventosAconteceraoHoje()
+        eventosProgramacao <- repository.eventosProximosDias()
+        atualizadoEm <- repository.atualizadoEm()
+      } yield {
+        val proxEventoMiliSec = eventosHoje.headOption.map(ev => LocalDateTime.now.until(ev.data, ChronoUnit.MILLIS))
+        val jsonld = jsonLdSchemaLivesDoDia(eventosAgora, eventosHoje, eventosProgramacao)
+        Ok(views.html.index(eventosAgora, eventosHoje, eventosProgramacao, atualizadoEm, proxEventoMiliSec, jsonld))
+      }
+    }
   }
 
   def updateCache() = Action.async { implicit request: Request[AnyContent] =>
-    repository.update()
+    repository.forceUpdate()
       .map(_ => Redirect("/"))
   }
 
-  def incluir() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.incluir())    
-  }
+  def incluir() =
+    cached(_ => "incluir", 1.minute) {
+      Action { implicit request: Request[AnyContent] =>
+        Ok(views.html.incluir())
+      }
+    }
 
   private def jsonLdSchemaLivesDoDia(eventosAgora: List[Evento], eventosHoje: List[Evento], eventosProgramacao: List[EventosDia]) = {
     s"""[{
