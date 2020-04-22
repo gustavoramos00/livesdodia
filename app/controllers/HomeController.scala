@@ -8,7 +8,7 @@ import javax.inject._
 import model.{Evento, EventosDia}
 import play.api.cache.Cached
 import play.api.mvc._
-import service.RepositoryService
+import service.{RepositoryService, YoutubeService}
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
@@ -21,10 +21,11 @@ import scala.concurrent.duration._
 @Singleton
 class HomeController @Inject()(repository: RepositoryService,
                                cached: Cached,
+                               ytService: YoutubeService,
                                 val controllerComponents: ControllerComponents
                               )(implicit ec: ExecutionContext) extends BaseController {
 
-
+  val cacheDuration = 20.seconds
 
 
   /**
@@ -34,7 +35,7 @@ class HomeController @Inject()(repository: RepositoryService,
    * will be called when the application receives a `GET` request with
    * a path of `/`.
    */
-  def index() = cached(_ => "index", 1.minute) {
+  def index() = cached(_ => "index", cacheDuration) {
 
     Action.async { implicit request: Request[AnyContent] =>
       for {
@@ -43,7 +44,7 @@ class HomeController @Inject()(repository: RepositoryService,
         eventosProgramacao <- repository.eventosProximosDias()
         atualizadoEm <- repository.atualizadoEm()
       } yield {
-        val proxEventoMiliSec = eventosHoje.headOption.map(ev => LocalDateTime.now.until(ev.data, ChronoUnit.MILLIS))
+        val proxEventoMiliSec = eventosHoje.headOption.map(ev => LocalDateTime.now.until(ev.data.plusSeconds(cacheDuration.toSeconds), ChronoUnit.MILLIS))
         val jsonld = jsonLdSchemaLivesDoDia(eventosAgora, eventosHoje, eventosProgramacao)
         Ok(views.html.index(eventosAgora, eventosHoje, eventosProgramacao, atualizadoEm, proxEventoMiliSec, jsonld))
       }
@@ -56,11 +57,15 @@ class HomeController @Inject()(repository: RepositoryService,
   }
 
   def incluir() =
-    cached(_ => "incluir", 1.minute) {
+    cached(_ => "incluir", cacheDuration) {
       Action { implicit request: Request[AnyContent] =>
         Ok(views.html.incluir())
       }
     }
+
+  def youtubeFetch() = Action.async { implicit request: Request[AnyContent] =>
+    ytService.fetch().map(body => Ok(body))
+  }
 
   private def jsonLdSchemaLivesDoDia(eventosAgora: List[Evento], eventosHoje: List[Evento], eventosProgramacao: List[EventosDia]) = {
     s"""[{

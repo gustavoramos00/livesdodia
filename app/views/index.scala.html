@@ -9,7 +9,7 @@
   jsonld: String)
 
 @displayEvento(evento: Evento, full: Boolean = false, agora: Boolean = false) = {
-<div class="testi-item text-center" data-jplist-item>
+<div class="testi-item" data-jplist-item>
   <div class="testi-meta-inner d-flex">
     <div class="testi-img mr-2">
       @if(agora) {
@@ -34,20 +34,43 @@
 
     </div>
     <div class="testi-details">
-      <p class="testi-destaque mb-0 searchable">
-        @evento.nome
-        @if(evento.destaque) {
-          <span class="icon-star"></span>
+      <a class="link-no-decoration" data-toggle="collapse" 
+        href='#@evento.generatedId' 
+        role="button" aria-expanded="false" 
+        aria-controls='@evento.generatedId'>
+        <p class="testi-destaque mb-0 searchable">
+          @evento.nome
+          @if(evento.destaque) {
+            <span class="icon-star"></span>
+          }
+          <span class="icon-caret-down"></span>
+          <span class="icon-caret-up"></span>
+        </p>      
+        @if(evento.info.nonEmpty) {
+        <p class="testi-info mb-0 searchable">
+          @evento.info
+        </p>
         }
-      </p>      
-      @if(evento.info.nonEmpty) {
-      <p class="testi-info mb-0 searchable">
-        @evento.info
-      </p>
-      }
-      <p class="testi-desc mb-0">
-        @evento.horarioFmt
-      </p>
+        <p class="testi-desc mb-0">
+          @evento.horarioFmt
+        </p>
+      </a>
+    </div>
+  </div>
+  <div class="collapse multi-collapse" id='@evento.generatedId'>
+    <div class="card card-body bg-transparent">
+      <span class="h6">
+        Compartilhar 
+        <a class="link-no-decoration" href='https://wa.me/?text=@evento.urlEncodedShare' target="_blank">
+          <span class="icon-whatsapp"></span>
+        </a>
+        <a class="link-no-decoration" href='https://twitter.com/intent/tweet?text=@evento.urlEncodedShare' target="_blank">
+          <span class="icon-twitter"></span>
+        </a>
+        <a class="link-no-decoration" href='https://www.facebook.com/sharer/sharer.php?u=livesdodia.com.br&quote=@evento.urlEncodedShareFacebook' target="_blank">
+          <span class="icon-facebook-square"></span>
+        </a>
+      </span>
     </div>
   </div>
 </div>

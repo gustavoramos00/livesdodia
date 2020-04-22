@@ -1,9 +1,9 @@
 package model
 
 
+import java.net.URLEncoder
 import java.time.{Duration, LocalDate, LocalDateTime, LocalTime}
 import java.time.format.DateTimeFormatter
-import java.time.temporal.{ChronoUnit, TemporalUnit}
 
 case class Evento(
                    nome: String,
@@ -24,6 +24,23 @@ case class Evento(
     else
       f"Há ${minutos}%02dmin"
   }
+
+  def generatedId: String = nome.replaceAll("[^a-zA-Z]+", "") + data.toLocalDate
+
+  def urlEncodedShare: String = {
+    val horario = data.format(Evento.horaMinFormatter)
+    val link = linkYoutube.orElse(linkInstagram).map(url => "\uD83C\uDFA6" + url)
+    val text = s"Veja essa live que achei em https://livesdodia.com.br\n\n▶ *$nome*\n️🗓️ *${Evento.formatDia(data)}*\n🕒 *$horario*\n${info}\n\n${link.getOrElse("")}"
+    URLEncoder.encode(text, "UTF-8")
+  }
+
+  def urlEncodedShareFacebook = {
+    val horario = data.format(Evento.horaMinFormatter)
+    val link = linkYoutube.orElse(linkInstagram)
+    val text = s"Veja essa live que achei em https://livesdodia.com.br\n\n$nome\n${Evento.formatDia(data)}\n$horario*\n${info}\n\n${link.getOrElse("")}"
+    URLEncoder.encode(text, "UTF-8")
+  }
+
 }
 
 object Evento {
@@ -34,7 +51,7 @@ object Evento {
   private val horaMinFormatter = DateTimeFormatter.ofPattern(horaMinPattern)
   private val horaMinSegFormatter = DateTimeFormatter.ofPattern(horaMinSegPattern)
   private val dataFormatter = DateTimeFormatter.ofPattern(diaMesAnoPattern)
-  private val dataHoraFormatter = DateTimeFormatter.ofPattern(s"$diaMesAnoPattern $horaMinSegPattern")
+  private val dataHoraFormatter = DateTimeFormatter.ofPattern(s"$diaMesAnoPattern $horaMinPattern")
 
   def parseHorario(hora: String) = {
     if (hora.size == horaMinPattern.size)
@@ -46,4 +63,6 @@ object Evento {
   def parseData(dia: String, hora: String) = LocalDate.parse(dia, dataFormatter).atTime(parseHorario(hora))
 
   def formatDiaHora(data: LocalDateTime) = dataHoraFormatter.format(data)
+
+  def formatDia(data: LocalDateTime): String = dataFormatter.format(data)
 }

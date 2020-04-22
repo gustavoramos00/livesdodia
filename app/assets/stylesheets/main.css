@@ -170,16 +170,13 @@ section {
   text-align: center;
 }
 
-.icone span.icon {
-  vertical-align: text-bottom;
-}
-
 footer {
   border-top: 1px solid lightgray;
 }
 
 footer span.icon-instagram {
   font-size: 32px;
+  vertical-align: bottom;
 }
 
 .col-center {
@@ -501,12 +498,27 @@ footer span.icon-instagram {
 =            TESTI            =
 =============================*/
 
+a[aria-expanded=true] span.icon-caret-down {
+  display: none;
+}
+a[aria-expanded=false] span.icon-caret-up {
+  display: none;
+}
+
+.icon-whatsapp, .icon-twitter, .icon-facebook-square {
+  font-size: 25px;
+  vertical-align: text-bottom;
+  padding-left: 5px;
+}
+
 .testi-img span.icon-calendar {
   font-size: 20px;
+  vertical-align: bottom;
 }
 
 .testi-img span.icon-youtube, .testi-img span.icon-instagram, .testi-img span.icon-asterisk {
   font-size: 40px;
+  vertical-align: bottom;
 }
 
 .testi-img img {
@@ -547,8 +559,12 @@ footer span.icon-instagram {
   color: #ff00cc; }
 
 .testi-content {
-  margin: 30px auto 10px auto;
+  width: 100%;
   padding: 10px; }
+
+a.link-no-decoration {
+  color: inherit;
+}  
 
 .testi-item {
   padding-bottom: 30px;

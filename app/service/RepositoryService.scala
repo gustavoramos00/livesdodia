@@ -18,7 +18,7 @@ class RepositoryService @Inject()(
                                  )
                                  (implicit ec: ExecutionContext){
 
-  val endpoint = configuration.get[String]("endpoint")
+  val endpoint = configuration.get[String]("sheetsEndpoint")
   val spreadsheetId = configuration.get[String]("spreadsheetId")
   val sheetId = configuration.get[String]("sheetId")
   val apiKey = configuration.get[String]("apiKey")
