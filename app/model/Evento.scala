@@ -29,8 +29,18 @@ case class Evento(
 
   def urlEncodedShare: String = {
     val horario = data.format(Evento.horaMinFormatter)
+    val prefixo =
+      if (Duration.between(data, LocalDateTime.now).isNegative) "Não perca essa live!"
+      else "Veja essa live, já começou!"
     val link = linkYoutube.orElse(linkInstagram).map(url => "\uD83C\uDFA6" + url)
-    val text = s"Veja essa live que achei em https://livesdodia.com.br\n\n▶ *$nome*\n️🗓️ *${Evento.formatDia(data)}*\n🕒 *$horario*\n${info}\n\n${link.getOrElse("")}"
+    val text =
+      s"$prefixo\n\n" +
+      s"▶ *$nome*\n" +
+      s"️🗓️ *${Evento.formatDia(data)}*\n" +
+      s"🕒 *$horario*\n" +
+      s"${info}\n" +
+      s"${link.getOrElse("")}\n\n" +
+      s"*Programação completa em https://livesdodia.com.br*"
     URLEncoder.encode(text, "UTF-8")
   }
 
