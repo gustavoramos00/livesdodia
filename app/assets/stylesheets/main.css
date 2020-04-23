@@ -94,7 +94,7 @@ section {
   background-position: 50% 50%;
   position: fixed;
   width: 100%;
-  height: 120px;
+  height: 95px;
   border-radius: 0;
   margin-bottom: 0;
   overflow: hidden;
@@ -109,7 +109,7 @@ section {
 }
 
 .header-container + * {
-  margin-top: 150px;
+  margin-top: 125px;
 }
 
 .header-container .container {
@@ -118,7 +118,7 @@ section {
 
 .header-container .navbar-brand {
   z-index: 1;
-  border: 3px solid #fff;
+  /* border: 3px solid #fff; */
   font-size: 3rem;
 
   opacity: 0;
@@ -126,12 +126,8 @@ section {
   animation-delay: .8s;
 }
 
-.header-container h1 {
-  font-size: 2rem;
-  font-weight: bold;
-  line-height: 0.9;
-  margin: 0;
-  padding: 0 5px;
+.navbar-brand img {
+  width: 150px;
 }
 
 .icone {
@@ -805,13 +801,14 @@ a.link-no-decoration {
     margin-top: 100px;
   }
 
-  .header-container h1 {
-    font-size: 1rem;
+  .navbar-brand img {
+    width: 100px;
   }
+  
 
-  #header-navbar {
+  /* #header-navbar {
     padding-top: 15px !important;
-    padding-bottom: 15px !important; }
+    padding-bottom: 15px !important; } */
   .navbar-transparent .navbar-collapse {
     background: #ff00cc;
     /* fallback for old browsers */

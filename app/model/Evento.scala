@@ -32,7 +32,7 @@ case class Evento(
     val prefixo =
       if (Duration.between(data, LocalDateTime.now).isNegative) "Não perca essa live!"
       else "Veja essa live, já começou!"
-    val link = linkYoutube.orElse(linkInstagram).map(url => "\uD83C\uDFA6" + url)
+    val link = linkYoutube.orElse(linkInstagram).map(url => "\uD83C\uDFA6 " + url)
     val text =
       s"$prefixo\n\n" +
       s"▶ *$nome*\n" +
