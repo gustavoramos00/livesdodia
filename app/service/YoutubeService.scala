@@ -1,5 +1,7 @@
 package service
 
+import java.time.LocalDateTime
+
 import javax.inject.{Inject, Singleton}
 import model.{Evento, YoutubeData}
 import play.api.cache.AsyncCacheApi
@@ -44,7 +46,9 @@ class YoutubeService @Inject()(
   }
 
   private def liveVideoId(evento: Evento): Future[Evento] = {
-    if (evento.youtubeData.flatMap(_.channelId).isDefined && !evento.youtubeData.flatMap(_.videoId).isDefined) {
+    if (evento.youtubeData.flatMap(_.channelId).isDefined &&
+      !evento.youtubeData.flatMap(_.videoId).isDefined &&
+      evento.data.isAfter(LocalDateTime.now.minusHours(3))) {
       logger.warn(s"fetch videoId ${evento.nome}")
       ws.url(searchUrl) // TODO usar com cautela, alto uso de quota API Youtube
 //        .withRequestFilter(AhcCurlRequestLogger())
