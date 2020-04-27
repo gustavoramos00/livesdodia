@@ -38,7 +38,7 @@ class RepositoryService @Inject()(
         valuesList
           .tail // remove cabeçalho
           .flatMap {
-          case List(_, _, nome, info, dia, hora, _, youtubeLink: String, instagramProfile: String, destaque: String, "S", linkLive: String, _*) =>
+          case List(_, _, nome, info, dia, hora, _, youtubeLink: String, instagramProfile: String, destaque: String, "S", _*) =>
             try {
               val data = Evento.parseData(dia, hora)
               val optYoutube = if (youtubeLink.isEmpty) None else Some(youtubeLink)
