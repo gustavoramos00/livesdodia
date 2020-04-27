@@ -4,9 +4,9 @@ import java.time.{LocalDate, LocalDateTime}
 
 import javax.inject.{Inject, Singleton}
 import model.{Evento, EventosDia, YoutubeData}
-import play.api.{Configuration, Logger}
 import play.api.cache.AsyncCacheApi
 import play.api.libs.ws.WSClient
+import play.api.{Configuration, Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
 

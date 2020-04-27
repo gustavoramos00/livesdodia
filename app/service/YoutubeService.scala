@@ -1,7 +1,5 @@
 package service
 
-import java.time.Duration
-
 import javax.inject.{Inject, Singleton}
 import model.{Evento, YoutubeData}
 import play.api.cache.AsyncCacheApi

@@ -1,7 +1,7 @@
 package service
 
-import akka.actor.{ActorRef, ActorSystem, Props}
-import javax.inject.{Inject, Named}
+import akka.actor.ActorSystem
+import javax.inject.Inject
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.ExecutionContext

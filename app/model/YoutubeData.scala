@@ -1,7 +1,6 @@
 package model
 
 import java.net.URL
-import java.time.Duration
 
 case class YoutubeData(
                         linkRegistrado: Option[String] = None,
