@@ -47,6 +47,9 @@
           @evento.info
         </p>
         }
+        @for(tag <- evento.tags){
+          <span class="badge badge-live">@tag</span>
+        }
         <p class="testi-desc mb-0">
           @evento.horarioFmt
           <span class="icon-caret-square-o-down"></span>

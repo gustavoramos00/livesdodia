@@ -503,6 +503,12 @@ a[aria-expanded=false] span.icon-caret-square-o-up {
 
 .testi-destaque {
   font-weight: bolder;
+  font-size: 18px;
+}
+
+.badge-live {
+  color: #fff;
+  background-color: #7728e3;
 }
 
 .testi-text {

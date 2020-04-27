@@ -9,11 +9,13 @@ case class Evento(
                    nome: String,
                    info: String,
                    data: LocalDateTime,
+                   tags: Seq[String] = Seq.empty,
                    youtubeLink: Option[String] = None,
                    instagramProfile: Option[String] = None,
                    destaque: Boolean,
                    youtubeData: Option[YoutubeData] = None,
-                   encerrado: Option[Boolean] = None
+                   encerrado: Option[Boolean] = None,
+                   origem: Option[String] = None
                  ) {
   def horarioFmt: String = {
     val duration = Duration.between(data, LocalDateTime.now)

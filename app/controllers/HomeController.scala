@@ -1,14 +1,15 @@
 package controllers
 
 import java.time.format.DateTimeFormatter
-import java.time.{LocalDateTime, ZoneId}
 import java.time.temporal.ChronoUnit
+import java.time.{LocalDate, LocalDateTime, ZoneId}
 
 import javax.inject._
 import model.{Evento, EventosDia}
 import play.api.cache.Cached
+import play.api.libs.json.Json
 import play.api.mvc._
-import service.{RepositoryService, YoutubeService}
+import service.RepositoryService
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
@@ -62,6 +63,31 @@ class HomeController @Inject()(repository: RepositoryService,
       }
     }
 
+
+  def livesJson() = Action.async { implicit request: Request[AnyContent] =>
+    for {
+      eventos <- repository.getEventos
+    } yield {
+      val json = eventos
+        .filter(!_.data.toLocalDate.isBefore(LocalDate.now))
+        .sortBy(_.data)
+        .map(ev => Json.obj(
+          "nome" -> ev.nome,
+          "info" -> ev.info,
+          "data" -> ev.data.toLocalDate.toString,
+          "horario" -> ev.data.toLocalTime.toString,
+          "tags" -> ev.tags.mkString(","),
+          "youtube" -> ev.youtubeData.flatMap(_.link).getOrElse("").toString,
+          "instagram" -> ev.instagramProfile.getOrElse("").toString,
+          "destaque" -> ev.destaque,
+          "publicar" -> "S"
+        ))
+
+
+      Ok(Json.toJson(json))
+    }
+  }
+
   private def jsonLdSchemaLivesDoDia(eventosAgora: List[Evento], eventosHoje: List[Evento], eventosProgramacao: List[EventosDia]) = {
     s"""[{
        |  "@context": "http://schema.org",
@@ -99,4 +125,5 @@ class HomeController @Inject()(repository: RepositoryService,
          |}""".stripMargin
     }).mkString(",")
   }
+
 }

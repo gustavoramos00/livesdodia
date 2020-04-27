@@ -38,17 +38,19 @@ class RepositoryService @Inject()(
         valuesList
           .tail // remove cabeçalho
           .flatMap {
-          case List(_, _, nome, info, dia, hora, _, youtubeLink: String, instagramProfile: String, destaque: String, "S", _*) =>
+          case List(_, _, nome, info, dia, hora, tags: String, youtubeLink: String, instagramProfile: String, destaque: String, "S", _*) =>
             try {
               val data = Evento.parseData(dia, hora)
               val optYoutube = if (youtubeLink.isEmpty) None else Some(youtubeLink)
               val optInstagram = if (instagramProfile.isEmpty) None else Some(instagramProfile)
               val booleanDestaque = if (destaque.isEmpty) false else true
               val optYoutubeData = optYoutube.map(YoutubeData.fromYoutubeLink)
+              val tagList = tags.split(",").toSeq
               val evento = Evento(
                 nome = nome,
                 info = info,
                 data = data,
+                tags = tagList,
                 youtubeLink = optYoutube,
                 instagramProfile = optInstagram,
                 destaque = booleanDestaque,
@@ -102,7 +104,7 @@ class RepositoryService @Inject()(
     }
   }
 
-  private def getEventos: Future[List[Evento]] =
+  def getEventos: Future[List[Evento]] =
     cache.getOrElseUpdate[List[Evento]](cacheKey) (dataFromSheets())
 
 
