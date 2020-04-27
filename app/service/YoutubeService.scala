@@ -27,7 +27,7 @@ class YoutubeService @Inject()(
 
   private def channelId(evento: Evento): Future[Evento] = {
     if (evento.youtubeData.flatMap(_.userName).isDefined && !evento.youtubeData.flatMap(_.channelId).isDefined) {
-      println(s"fetch channelId ${evento.nome}")
+      logger.warn(s"fetch channelId ${evento.nome}")
       ws.url(channelUrl)
 //        .withRequestFilter(AhcCurlRequestLogger())
         .addQueryStringParameters("key" -> apiKey, "part" -> "id", "forUsername" -> evento.youtubeData.get.userName.get)
@@ -45,7 +45,7 @@ class YoutubeService @Inject()(
 
   private def liveVideoId(evento: Evento): Future[Evento] = {
     if (evento.youtubeData.flatMap(_.channelId).isDefined && !evento.youtubeData.flatMap(_.videoId).isDefined) {
-      println(s"fetch videoId ${evento.nome}")
+      logger.warn(s"fetch videoId ${evento.nome}")
       ws.url(searchUrl) // TODO usar com cautela, alto uso de quota API Youtube
 //        .withRequestFilter(AhcCurlRequestLogger())
         .addQueryStringParameters(
@@ -68,8 +68,8 @@ class YoutubeService @Inject()(
   }
 
   private def videoDetails(evento: Evento) = {
-    if (evento.youtubeData.flatMap(_.videoId).isDefined) {
-      println(s"fetch videoDetails ${evento.nome}")
+    if (evento.youtubeData.flatMap(_.videoId).isDefined && !evento.encerrado.getOrElse(false)) {
+      logger.warn(s"fetch videoDetails ${evento.nome}")
       ws.url(videosUrl)
         //        .withRequestFilter(AhcCurlRequestLogger())
         .addQueryStringParameters(

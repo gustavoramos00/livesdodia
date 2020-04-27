@@ -15,14 +15,14 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
   val logger = Logger(getClass)
 
   if (isMainServer) {
-    println(s"is main server")
+    logger.warn(s"is main server")
     actorSystem.scheduler.scheduleAtFixedRate(initialDelay = 10.seconds, interval = 1.hour) { () =>
       // the block of code that will be executed
       actorSystem.log.info("Schedule forcing update...")
       repositoryService.forceUpdate()
     }
   } else {
-    println(s"NOT main server")
+    logger.warn(s"NOT main server")
   }
 
   def isMainServer: Boolean =
