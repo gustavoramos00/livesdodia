@@ -9,9 +9,11 @@ case class Evento(
                    nome: String,
                    info: String,
                    data: LocalDateTime,
-                   linkYoutube: Option[String],
-                   linkInstagram: Option[String],
-                   destaque: Boolean
+                   youtubeLink: Option[String] = None,
+                   instagramProfile: Option[String] = None,
+                   destaque: Boolean,
+                   youtubeData: Option[YoutubeData] = None,
+                   encerrado: Option[Boolean] = None
                  ) {
   def horarioFmt: String = {
     val duration = Duration.between(data, LocalDateTime.now)
@@ -25,6 +27,19 @@ case class Evento(
       f"Há ${minutos}%02dmin"
   }
 
+  def linkLive: Option[String] = youtubeData.flatMap(_.link).orElse(instagramProfile)
+
+  def linkRegistrado: Option[String] = youtubeLink.orElse(instagramProfile)
+
+  def iconeLive: String = {
+    val default = "icon-asterisk"
+    linkLive.map {
+      case str if str.contains("youtu.be") || str.contains("youtube") => "icon-youtube"
+      case str if str.contains("instagram") => "icon-instagram"
+      case _ => default
+    }.getOrElse(default)
+  }
+
   def generatedId: String = nome.replaceAll("[^a-zA-Z]+", "") + data.toLocalDate
 
   def urlEncodedShare: String = {
@@ -32,7 +47,7 @@ case class Evento(
     val prefixo =
       if (Duration.between(data, LocalDateTime.now).isNegative) "Não perca essa live!"
       else "Veja essa live, já começou!"
-    val link = linkYoutube.orElse(linkInstagram).map(url => "\uD83C\uDFA6 " + url)
+    val link = linkLive.map(url => "\uD83C\uDFA6 " + url)
     val text =
       s"$prefixo\n\n" +
       s"▶ *$nome*\n" +
@@ -46,7 +61,7 @@ case class Evento(
 
   def urlEncodedShareFacebook = {
     val horario = data.format(Evento.horaMinFormatter)
-    val link = linkYoutube.orElse(linkInstagram)
+    val link = linkLive
     val text = s"Veja essa live que achei em https://livesdodia.com.br\n\n$nome\n${Evento.formatDia(data)}\n$horario*\n${info}\n\n${link.getOrElse("")}"
     URLEncoder.encode(text, "UTF-8")
   }

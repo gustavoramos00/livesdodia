@@ -130,6 +130,15 @@ section {
   width: 150px;
 }
 
+.icones-previa a.icone {
+  display: inline;
+}
+
+.icones-previa span.icon {
+  font-size: 40px;
+  display: inline;
+}
+
 .icone {
   display: block;
   min-width: 45px;
@@ -449,10 +458,10 @@ footer span.icon-instagram {
 =            TESTI            =
 =============================*/
 
-a[aria-expanded=true] span.icon-caret-down {
+a[aria-expanded=true] span.icon-caret-square-o-down {
   display: none;
 }
-a[aria-expanded=false] span.icon-caret-up {
+a[aria-expanded=false] span.icon-caret-square-o-up {
   display: none;
 }
 

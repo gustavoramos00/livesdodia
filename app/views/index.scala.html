@@ -13,19 +13,13 @@
   <div class="testi-meta-inner d-flex">
     <div class="testi-img mr-2">
       @if(agora) {
-        @if(evento.linkYoutube.isDefined) {
-          <a class="icone" rel="nofollow" href="@evento.linkYoutube.get" target="_blank">
-            <span class="icon-youtube"></span>
+        @if(evento.linkLive.isDefined) {
+          <a class="icone" rel="nofollow" href="@evento.linkLive.get" target="_blank">
+            <span class="@evento.iconeLive"></span>
           </a>
-        }
-        @if(evento.linkInstagram.isDefined){
-          <a class="icone" rel="nofollow" href="@evento.linkInstagram.get" target="_blank">
-            <span class="icon-instagram"></span>
-          </a>
-        }
-        @if(evento.linkYoutube.isEmpty && evento.linkInstagram.isEmpty) {
+        } else {
           <div class="icone">
-            <span class="icon-asterisk"></span>
+            <span class="@evento.iconeLive"></span>
           </div>
         }
       } else {
@@ -43,8 +37,10 @@
           @if(evento.destaque) {
             <span class="icon-star"></span>
           }
-          <span class="icon-caret-down"></span>
-          <span class="icon-caret-up"></span>
+          @if(evento.encerrado.getOrElse(false)){
+            (Encerrado)
+          }
+          
         </p>      
         @if(evento.info.nonEmpty) {
         <p class="testi-info mb-0 searchable">
@@ -53,14 +49,29 @@
         }
         <p class="testi-desc mb-0">
           @evento.horarioFmt
+          <span class="icon-caret-square-o-down"></span>
+          <span class="icon-caret-square-o-up"></span>
         </p>
       </a>
     </div>
   </div>
   <div class="collapse multi-collapse" id='@evento.generatedId'>
     <div class="card card-body bg-transparent">
+      <div class="icones-previa">
+        @if(evento.youtubeLink.isDefined) {
+          <a class="icone" rel="nofollow" href="@evento.youtubeLink.get" target="_blank">
+            <span class="icon icon-youtube1"></span>
+          </a>
+        }
+        @if(evento.instagramProfile.isDefined && (!agora || (agora && evento.youtubeData.flatMap(_.link).isDefined)))  {
+          <a class="icone" rel="nofollow" href="@evento.instagramProfile.get" target="_blank">
+            <span class="icon icon-instagram"></span>
+          </a>
+        }
+      </div>
+      
       <span class="h6">
-        Compartilhar 
+        Compartilhar live
         <a class="link-no-decoration" href='https://wa.me/?text=@evento.urlEncodedShare' target="_blank">
           <span class="icon-whatsapp"></span>
         </a>

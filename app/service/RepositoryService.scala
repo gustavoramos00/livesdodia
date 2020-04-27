@@ -3,7 +3,7 @@ package service
 import java.time.{LocalDate, LocalDateTime}
 
 import javax.inject.{Inject, Singleton}
-import model.{Evento, EventosDia, EventosMes}
+import model.{Evento, EventosDia, YoutubeData}
 import play.api.{Configuration, Logger}
 import play.api.cache.AsyncCacheApi
 import play.api.libs.ws.WSClient
@@ -12,6 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class RepositoryService @Inject()(
+                                   youtubeService: YoutubeService,
                                    ws: WSClient,
                                    cache: AsyncCacheApi,
                                    configuration: Configuration
@@ -37,13 +38,21 @@ class RepositoryService @Inject()(
         valuesList
           .tail // remove cabeçalho
           .flatMap {
-          case List(_, _, nome, info, dia, hora, _, youtube: String, instagram: String, destaque: String, "S", _*) =>
+          case List(_, _, nome, info, dia, hora, _, youtubeLink: String, instagramProfile: String, destaque: String, "S", linkLive: String, _*) =>
             try {
               val data = Evento.parseData(dia, hora)
-              val optYoutube = if (youtube.isEmpty) None else Some(youtube)
-              val optInstagram = if (instagram.isEmpty) None else Some(instagram)
+              val optYoutube = if (youtubeLink.isEmpty) None else Some(youtubeLink)
+              val optInstagram = if (instagramProfile.isEmpty) None else Some(instagramProfile)
               val booleanDestaque = if (destaque.isEmpty) false else true
-              val evento = Evento(nome, info, data, optYoutube, optInstagram, booleanDestaque)
+              val optYoutubeData = optYoutube.map(YoutubeData.fromYoutubeLink)
+              val evento = Evento(
+                nome = nome,
+                info = info,
+                data = data,
+                youtubeLink = optYoutube,
+                instagramProfile = optInstagram,
+                destaque = booleanDestaque,
+                youtubeData = optYoutubeData)
               Some(evento)
             } catch {
               case err: Throwable =>
@@ -51,24 +60,53 @@ class RepositoryService @Inject()(
                 None
             }
           case errList =>
-            logger.error(s"### Error ao obter dados: ${errList.mkString(", ")} ###")
+            if (errList.nonEmpty) {
+              logger.error(s"### Error ao obter dados: ${errList} ==> ${errList.mkString(", ")} ###")
+            }
             None
         }.sortBy(ev => (!ev.destaque, ev.data))
       }
   }
 
-  def forceUpdate() = {
-    val eventos = dataFromSheets()
-    logger.warn(s"Atualizando cache")
-    cache.set(cacheKey, eventos)
-    cache.set(dataAtualizacaoCacheKey, LocalDateTime.now)
+  private def recuperaDadosYoutubeCache(novosEventos: List[Evento]): Future[List[Evento]] = {
+    cache.get[List[Evento]](cacheKey).map {
+      case Some(eventosCache) =>
+        novosEventos.map(novoEvento => {
+          val maybeEventoExistente = eventosCache.find(ev => ev.nome == novoEvento.nome &&
+            ev.data == novoEvento.data &&
+            ev.linkRegistrado == novoEvento.linkRegistrado)
+          if (maybeEventoExistente.isDefined) {
+            novoEvento.copy(youtubeData = maybeEventoExistente.get.youtubeData)
+          }
+          else {
+            novoEvento
+          }
+        })
+      case None => novosEventos
+    }
   }
 
-  private def getEventos =
+  def forceUpdate() = {
+    logger.warn(s"Forçando atualização de dados")
+    for {
+      eventosSheet <- dataFromSheets()
+      eventosDadosCache <- recuperaDadosYoutubeCache(eventosSheet)
+      _ <- cache.set(cacheKey, eventosDadosCache)
+      _ <- cache.set(dataAtualizacaoCacheKey, LocalDateTime.now)
+      (eventosComecou, outrosEventos) <- Future.successful(eventosDadosCache.partition(ev => filtroEventoJaComecou(ev)))
+      eventosComecouAtualizados <- youtubeService.fetch(eventosComecou)
+    } yield {
+      val todosEventos = eventosComecouAtualizados ++ outrosEventos
+      cache.set(cacheKey, todosEventos)
+      cache.set(dataAtualizacaoCacheKey, LocalDateTime.now)
+    }
+  }
+
+  private def getEventos: Future[List[Evento]] =
     cache.getOrElseUpdate[List[Evento]](cacheKey) (dataFromSheets())
 
 
-  private def filtroEventoJaComecou(evento: Evento) = evento.data.isBefore(LocalDateTime.now) && evento.data.isAfter(LocalDateTime.now.minusHours(12))
+  private def filtroEventoJaComecou(evento: Evento): Boolean = evento.data.isBefore(LocalDateTime.now) && evento.data.isAfter(LocalDateTime.now.minusHours(12))
 
   def eventosAgora() = {
     val futureEventos = getEventos.map(eventos => {
@@ -79,7 +117,7 @@ class RepositoryService @Inject()(
     // verifica eventos sem links
     futureEventos.map(eventos => {
       eventos
-        .filter(ev => ev.linkInstagram.isEmpty && ev.linkYoutube.isEmpty)
+        .filter(_.linkLive.isEmpty)
         .foreach(ev => logger.error(s"Erro: acontecendo agora sem link: ${ev.nome}"))
     })
     futureEventos
@@ -94,7 +132,7 @@ class RepositoryService @Inject()(
     val futureEventos = getEventos.map(_.filter(filtroProximosEventosHoje))
     futureEventos.map(eventos => {
       eventos
-        .filter(ev => ev.linkInstagram.isEmpty && ev.linkYoutube.isEmpty)
+        .filter(_.linkLive.isEmpty)
         .foreach(ev => logger.warn(s"WARN: Live hoje ainda sem link: ${ev.nome}"))
     })
     futureEventos

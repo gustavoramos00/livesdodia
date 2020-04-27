@@ -21,7 +21,6 @@ import scala.concurrent.duration._
 @Singleton
 class HomeController @Inject()(repository: RepositoryService,
                                cached: Cached,
-                               ytService: YoutubeService,
                                 val controllerComponents: ControllerComponents
                               )(implicit ec: ExecutionContext) extends BaseController {
 
@@ -62,10 +61,6 @@ class HomeController @Inject()(repository: RepositoryService,
         Ok(views.html.incluir())
       }
     }
-
-  def youtubeFetch() = Action.async { implicit request: Request[AnyContent] =>
-    ytService.fetch().map(body => Ok(body))
-  }
 
   private def jsonLdSchemaLivesDoDia(eventosAgora: List[Evento], eventosHoje: List[Evento], eventosProgramacao: List[EventosDia]) = {
     s"""[{
