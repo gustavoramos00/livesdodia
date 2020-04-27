@@ -76,7 +76,7 @@ class RepositoryService @Inject()(
             ev.data == novoEvento.data &&
             ev.linkRegistrado == novoEvento.linkRegistrado)
           if (maybeEventoExistente.isDefined) {
-            novoEvento.copy(youtubeData = maybeEventoExistente.get.youtubeData)
+            novoEvento.copy(youtubeData = maybeEventoExistente.get.youtubeData, encerrado = maybeEventoExistente.get.encerrado)
           }
           else {
             novoEvento
