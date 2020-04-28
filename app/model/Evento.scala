@@ -80,6 +80,8 @@ object Evento {
   private val dataFormatter = DateTimeFormatter.ofPattern(diaMesAnoPattern)
   private val dataHoraFormatter = DateTimeFormatter.ofPattern(s"$diaMesAnoPattern $horaMinPattern")
 
+  def tagsCategoria = Set("Música", "Humor", "Saúde", "Educação")
+
   def parseHorario(hora: String) = {
     if (hora.size == horaMinPattern.size)
       LocalTime.parse(hora, horaMinFormatter)

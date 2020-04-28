@@ -95,7 +95,7 @@ class RepositoryService @Inject()(
         .flatMap(_.tags)
         .filter(_.nonEmpty)
         .distinct
-        .sortBy(identity)
+        .sortBy(t => (Evento.tagsCategoria.contains(t), t))(Ordering.Tuple2(Ordering.Boolean.reverse, Ordering.String))
     })
   }
 

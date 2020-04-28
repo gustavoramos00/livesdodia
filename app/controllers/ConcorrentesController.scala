@@ -20,6 +20,7 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
   val agendalives = "https://agendalives.info/api"
   val livesdodia = "https://livesdodia.com.br/livesjson"
   val livesbrasil = "https://api.livesbrasil.com/lives"
+  val regexRemoveChars = "(\\r\\n|\\r|\\n|\\t|\u21b5)"
 
   def dadosLivesDoDia = {
     ws.url(livesdodia)
@@ -36,16 +37,16 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
             val horario = (event \ "horario").as[LocalTime]
             val instagram = (event \ "instagram").asOpt[String]
             val youtubeChannel = (event \ "youtube").asOpt[String]
-//            val categorias = (event \ "categories").as[JsArray].value.map(cat => (cat \ "name").as[String]).toSeq
+            val tags = (event \ "tags").asOpt[String].map(_.split(",").toSeq).getOrElse(Seq.empty)
             Evento(
               nome = artista,
               info = info,
               data = data.atTime(horario),
               youtubeLink = youtubeChannel,
               instagramProfile = instagram,
+              tags = tags,
               destaque = true,
               origem = Some("Lives do Dia"))
-            //            s"$artista\t$titulo\t${data.toLocalDate}\t${data.toLocalTime}\t${categorias.mkString(",")}\t$youtubeChannel\t$instagram"
           })
           .toSeq
       })
@@ -78,7 +79,9 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
             .map(band => {
               val id = (band \ "id").as[Int]
               val genre = (band \ "genre").asOpt[Int]
-              (id, genre)
+              val youtube = (band \ "link_youtube").asOpt[String]
+              val instagram = (band \ "link_instagram").asOpt[String]
+              (id, BandaAgendaLives(id, youtube, instagram, genre))
             })
             .toMap
         })
@@ -93,8 +96,8 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
             .value
             .filter(event => !(event \ "when").as[ZonedDateTime].withZoneSameInstant(ZoneId.systemDefault()).toLocalDate.isBefore(LocalDate.now)) // exclui antigos
             .map(event => {
-            val artista = (event \ "title").asOpt[String].getOrElse("")
-            val info = (event \ "description").asOpt[String].getOrElse("")
+            val artista = (event \ "title").asOpt[String].getOrElse("").replaceAll(regexRemoveChars, "").trim
+            val info = (event \ "description").asOpt[String].getOrElse("").replaceAll(regexRemoveChars, "").trim
             val data = (event \ "when").as[ZonedDateTime].withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime
             val instagram = (event \ "link_instagram").asOpt[String]
             val youtubeChannel = (event \ "link_youtube").asOpt[String]
@@ -120,10 +123,13 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
     } yield {
       eventos.map {
         case (evento, bandaId) =>
-          val optGeneroId = bandasGenero.get(bandaId).flatten
+          val optBanda = bandasGenero.get(bandaId)
+          val optGeneroId = optBanda.flatMap(_.genero)
           val genero = optGeneroId.map(generoId => generos.getOrElse(generoId, ""))
           val categorias = if (genero.isDefined) Seq(genero.get) else Seq.empty
-          evento.copy(tags = categorias)
+          val youtubeLink = evento.youtubeLink.orElse(optBanda.flatMap(_.youtube))
+          val instagramProfile = evento.instagramProfile.orElse(optBanda.flatMap(_.instagram))
+          evento.copy(tags = categorias, youtubeLink = youtubeLink, instagramProfile = instagramProfile)
       }
     }
   }
@@ -138,8 +144,8 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
           .filter(event => (event \ "active").as[Boolean]) // filtra os ativos
           .filter(event => !(event \ "datetime").as[ZonedDateTime].withZoneSameInstant(ZoneId.systemDefault()).toLocalDate.isBefore(LocalDate.now)) // exclui antigos
           .map(event => {
-            val artista = (event \ "artists").asOpt[String].getOrElse("")
-            val info = (event \ "title").asOpt[String].getOrElse("")
+            val artista = (event \ "artists").asOpt[String].getOrElse("").replaceAll(regexRemoveChars, "").trim
+            val info = (event \ "title").asOpt[String].getOrElse("").replaceAll(regexRemoveChars, "").trim
             val data = (event \ "datetime").as[ZonedDateTime].withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime
             val instagram = (event \ "instagram").asOpt[String]
             val youtubeChannel = (event \ "youtube_channel").asOpt[String]
@@ -171,8 +177,8 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
           .value
           .filter(event => !(event \ "startsAt").as[ZonedDateTime].withZoneSameInstant(ZoneId.systemDefault()).toLocalDate.isBefore(LocalDate.now)) // exclui antigos
           .map(event => {
-            val artista = (event \ "title").asOpt[String].getOrElse("")
-            val info = (event \ "description").asOpt[String].getOrElse("").replaceAll("[^a-zA-Z0-9 -]", "")
+            val artista = (event \ "title").asOpt[String].getOrElse("").replaceAll(regexRemoveChars, "").trim
+            val info = (event \ "description").asOpt[String].getOrElse("").replaceAll(regexRemoveChars, "").trim
             val data = (event \ "startsAt").as[ZonedDateTime].withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime
             val url = (event \ "url").asOpt[String]
             val youtubeLink = if (url.isDefined && url.get.contains("youtube")) url else None
@@ -199,7 +205,10 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
       livesbrasil <- dadosLivesBrasil
       agendaLives <- dadosAgendaLives
     } yield {
-      val eventos = (livesdodia ++ livesmusbr ++ livesbrasil ++ agendaLives).sortBy(ev => (ev.data, ev.nome))
+      val filtrado = (livesmusbr ++ livesbrasil ++ agendaLives).filter(ev => {
+        livesdodia.find(evld => evld.nome.toLowerCase() == ev.nome.toLowerCase() && evld.data.isEqual(ev.data) && evld.tags.nonEmpty).isEmpty
+      })
+      val eventos = (livesdodia ++ filtrado).sortBy(ev => (ev.data, ev.nome))
       val result = eventos.map(ev => {
         s"${ev.nome}\t${ev.info}\t${ev.data.toLocalDate}\t${ev.data.toLocalTime}\t${ev.tags.mkString(",")}\t" +
         s"${ev.youtubeLink.getOrElse("")}\t${ev.instagramProfile.getOrElse("")}\t${ev.origem.get}\t"
@@ -209,3 +218,5 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
   }
 
 }
+
+case class BandaAgendaLives(id: Int, youtube: Option[String], instagram: Option[String], genero: Option[Int])
