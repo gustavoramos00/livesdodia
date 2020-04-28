@@ -49,7 +49,11 @@
         </p>
         }
         @for(tag <- evento.tags){
-          <span class="badge badge-live @tag">@tag</span>
+          @if(tag == "Música"){
+            <span class="badge badge-live @tag" hidden>@tag</span>
+          } else {
+            <span class="badge badge-live @tag">@tag</span>
+          }
         }
         <p class="testi-desc mb-0">
           @evento.horarioFmt
