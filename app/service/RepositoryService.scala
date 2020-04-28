@@ -88,6 +88,17 @@ class RepositoryService @Inject()(
     }
   }
 
+  def tags() = {
+    getEventos.map(eventos => {
+      eventos
+        .filter(_.data.toLocalDate.isAfter(LocalDate.now.minusDays(1)))
+        .flatMap(_.tags)
+        .filter(_.nonEmpty)
+        .distinct
+        .sortBy(identity)
+    })
+  }
+
   def forceUpdate() = {
     logger.warn(s"Forçando atualização de dados")
     for {

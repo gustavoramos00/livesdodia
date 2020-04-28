@@ -6,7 +6,8 @@
   eventosDia: Seq[EventosDia],
   atualizadoEm: String,
   proxEventoMiliSec: Option[Long],
-  jsonld: String)
+  jsonld: String,
+  tags: Seq[String])
 
 @displayEvento(evento: Evento, full: Boolean = false, agora: Boolean = false) = {
 <div class="testi-item" data-jplist-item>
@@ -38,9 +39,9 @@
             <span class="icon-star"></span>
           }
           @if(evento.encerrado.getOrElse(false)){
-            (Encerrado)
+            <i>(Encerrado)</i>
           }
-          
+
         </p>      
         @if(evento.info.nonEmpty) {
         <p class="testi-info mb-0 searchable">
@@ -48,7 +49,7 @@
         </p>
         }
         @for(tag <- evento.tags){
-          <span class="badge badge-live">@tag</span>
+          <span class="badge badge-live @tag">@tag</span>
         }
         <p class="testi-desc mb-0">
           @evento.horarioFmt
@@ -151,6 +152,19 @@
     </div>
   </section>
   }
+
+  <div class="tags">
+    <button type="button" data-jplist-control="buttons-text-filter" data-path=".badge" data-group="search-group"
+      data-mode="radio" data-selected="true" data-text="" class="badge badge-live jplist-selected" data-name="buttons-text-filter">
+      Todos
+    </button>
+    @for(tag <- tags) {
+    <button type="button" data-jplist-control="buttons-text-filter" data-path=".badge" data-group="search-group" 
+      data-mode="radio" data-text="@tag" class="badge badge-live" data-name="buttons-text-filter">
+      @tag
+    </button>
+    }
+  </div>
 
   <section id="client" class="overlay bg-fixed" style='background-image: url(@routes.Assets.versioned("img/bg.jpg"));'>
     <div class="container">

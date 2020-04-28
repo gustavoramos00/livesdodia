@@ -43,10 +43,11 @@ class HomeController @Inject()(repository: RepositoryService,
         eventosHoje <- repository.eventosAconteceraoHoje()
         eventosProgramacao <- repository.eventosProximosDias()
         atualizadoEm <- repository.atualizadoEm()
+        tags <- repository.tags()
       } yield {
         val proxEventoMiliSec = eventosHoje.headOption.map(ev => LocalDateTime.now.until(ev.data.plusSeconds(cacheDuration.toSeconds), ChronoUnit.MILLIS))
         val jsonld = jsonLdSchemaLivesDoDia(eventosAgora, eventosHoje, eventosProgramacao)
-        Ok(views.html.index(eventosAgora, eventosHoje, eventosProgramacao, atualizadoEm, proxEventoMiliSec, jsonld))
+        Ok(views.html.index(eventosAgora, eventosHoje, eventosProgramacao, atualizadoEm, proxEventoMiliSec, jsonld, tags))
       }
     }
   }

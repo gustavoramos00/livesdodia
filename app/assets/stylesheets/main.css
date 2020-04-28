@@ -4,7 +4,7 @@
  */
 html, body {
   width: 100%;
-  overflow-x: hidden; }
+}
 
 body {
   font-family: 'Lato', sans-serif;
@@ -109,7 +109,7 @@ section {
 }
 
 .header-container + * {
-  margin-top: 125px;
+  padding-top: 125px;
 }
 
 .header-container .container {
@@ -509,6 +509,38 @@ a[aria-expanded=false] span.icon-caret-square-o-up {
 .badge-live {
   color: #fff;
   background-color: #7728e3;
+  border: none;
+}
+
+.badge-live.jplist-selected{
+  background-color: #f103c9;
+}
+
+.tags {
+  scrollbar-width: none;
+  text-align: center;
+  height: 40px;
+  padding: 10px 10px 0px 10px;
+  position: sticky;
+  bottom: 0;
+  white-space: nowrap;
+  overflow-x: scroll;
+  background: rgb(83,62,165);
+  background: linear-gradient(0deg, rgba(83,62,165,1) 10%, rgba(255,255,255,0) 86%, rgba(255,255,255,0) 100%);
+}
+
+.tags::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE and Edge */
+.tags {
+  -ms-overflow-style: none;
+}
+
+.tags button {
+  font-size: 15px;
+  display: inline;
 }
 
 .testi-text {
@@ -813,7 +845,7 @@ a.link-no-decoration {
   }
 
   .header-container + * {
-    margin-top: 100px;
+    padding-top: 100px;
   }
 
   .navbar-brand img {
