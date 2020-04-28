@@ -512,6 +512,11 @@ a[aria-expanded=false] span.icon-caret-square-o-up {
   border: none;
 }
 
+.testi-details .badge-live {
+  color: #565656;
+  background-color: #ec05c733;
+}
+
 .badge-live.jplist-selected{
   background-color: #f103c9;
 }
