@@ -7,7 +7,8 @@ After=network.target
 Environment=PORT=800%i
 PIDFile=/var/play/livesdodia-play-${PORT}.pid
 WorkingDirectory=/var/play/livesdodia
-ExecStart=/var/play/livesdodia/bin/livesdodia -Dhttp.port=${PORT} -Dconfig.resource=application.prod.conf -Dlogger.resource=logback.prod.xml -Dpidfile.path=/var/play/livesdodia-play-${PORT}.pid
+#ExecStart=/var/play/livesdodia/bin/livesdodia -Dhttp.port=${PORT} -Dconfig.resource=application.prod.conf -Dlogger.resource=logback.prod.xml -Dpidfile.path=/var/play/livesdodia-play-${PORT}.pid
+ExecStart=/var/play/livesdodia/bin/livesdodia -Dhttp.port=${PORT} -Dconfig.resource=application.prod.conf -Dlogger.resource=logback.prod.xml -Dpidfile.path=/dev/null
 Restart=on-failure
 User=toquecard
 Group=toquecard
