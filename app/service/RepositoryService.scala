@@ -38,10 +38,16 @@ class RepositoryService @Inject()(
         valuesList
           .tail // remove cabeçalho
           .flatMap {
-          case List(_, _, nome, info, dia, hora, tags: String, youtubeLink: String, instagramProfile: String, destaque: String, "S", _*) =>
+          case List(_, _, nome, info, dia, hora, tags: String, liveLink: String, instagramProfile: String, destaque: String, "S", _*) =>
             try {
               val data = Evento.parseData(dia, hora)
-              val optYoutube = if (youtubeLink.isEmpty) None else Some(youtubeLink)
+              val (optYoutube, optOutroLink) =
+                if(liveLink.contains("youtube") || liveLink.contains("youtu.be"))
+                  (Some(liveLink), None)
+                else if (liveLink.nonEmpty)
+                  (None, Some(liveLink))
+                else
+                  (None, None)
               val optInstagram = if (instagramProfile.isEmpty) None else Some(instagramProfile)
               val booleanDestaque = if (destaque.isEmpty) false else true
               val optYoutubeData = optYoutube.map(YoutubeData.fromYoutubeLink)
@@ -52,6 +58,7 @@ class RepositoryService @Inject()(
                 data = data,
                 tags = tagList,
                 youtubeLink = optYoutube,
+                outroLink = optOutroLink,
                 instagramProfile = optInstagram,
                 destaque = booleanDestaque,
                 youtubeData = optYoutubeData)

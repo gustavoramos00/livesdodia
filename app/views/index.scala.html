@@ -76,6 +76,11 @@
             <span class="icon icon-instagram"></span>
           </a>
         }
+        @if(evento.outroLink.isDefined && !agora)  {
+          <a class="icone" rel="nofollow" href="@evento.outroLink.get" target="_blank">
+            <span class="icon icon-external-link-square"></span>
+          </a>
+        }
       </div>
       
       <span class="h6">
@@ -102,6 +107,8 @@
     Hoje
   }
 }
+
+@tagSelected(tag: String) = {@tag.equals("Música") && @eventosAgora.filter(_.tags.contains("Música")).nonEmpty)}
 
 @buscanaoencontrada() = {
   <div class="testi-item busca-nao-encontrada" style="display: none">
@@ -166,7 +173,7 @@
       <button type="button"
               data-jplist-control="buttons-text-filter" data-path=".badge" data-group="search-group"
               data-mode="radio" data-text="@tag" class="badge badge-live" data-name="buttons-text-filter"
-              data-selected='@tag.equals("Música")'>
+              data-selected='@tagSelected(tag)'>
         @tag
       </button>
     }

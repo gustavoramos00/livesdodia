@@ -206,7 +206,9 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
       agendaLives <- dadosAgendaLives
     } yield {
       val filtrado = (livesmusbr ++ livesbrasil ++ agendaLives).filter(ev => {
-        livesdodia.find(evld => evld.nome.toLowerCase() == ev.nome.toLowerCase() && evld.data.isEqual(ev.data) && evld.tags.nonEmpty).isEmpty
+        livesdodia.find(evld => evld.nome.toLowerCase() == ev.nome.toLowerCase() &&
+          evld.data.isEqual(ev.data) &&
+          evld.tags.length > 1).isEmpty
       })
       val eventos = (livesdodia ++ filtrado).sortBy(ev => (ev.data, ev.nome))
       val result = eventos.map(ev => {

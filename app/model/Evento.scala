@@ -12,6 +12,7 @@ case class Evento(
                    tags: Seq[String] = Seq.empty,
                    youtubeLink: Option[String] = None,
                    instagramProfile: Option[String] = None,
+                   outroLink: Option[String] = None,
                    destaque: Boolean,
                    youtubeData: Option[YoutubeData] = None,
                    encerrado: Option[Boolean] = None,
@@ -29,17 +30,16 @@ case class Evento(
       f"Há ${minutos}%02dmin"
   }
 
-  def linkLive: Option[String] = youtubeData.flatMap(_.link).orElse(instagramProfile)
+  def linkLive: Option[String] = youtubeData.flatMap(_.link).orElse(instagramProfile).orElse(outroLink)
 
-  def linkRegistrado: Option[String] = youtubeLink.orElse(instagramProfile)
+  def linkRegistrado: Option[String] = youtubeLink.orElse(instagramProfile).orElse(outroLink)
 
   def iconeLive: String = {
-    val default = "icon-asterisk"
     linkLive.map {
       case str if str.contains("youtu.be") || str.contains("youtube") => "icon-youtube"
       case str if str.contains("instagram") => "icon-instagram"
-      case _ => default
-    }.getOrElse(default)
+      case _ => "icon-play-circle"
+    }.getOrElse("icon-asterisk")
   }
 
   def generatedId: String = nome.replaceAll("[^a-zA-Z]+", "") + data.toLocalDate
