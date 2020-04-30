@@ -16,7 +16,8 @@ case class Evento(
                    destaque: Boolean,
                    youtubeData: Option[YoutubeData] = None,
                    encerrado: Option[Boolean] = None,
-                   origem: Option[String] = None
+                   origem: Option[String] = None,
+                   linkImagem: Option[String] = None
                  ) {
   def horarioFmt: String = {
     val duration = Duration.between(data, LocalDateTime.now)
@@ -29,6 +30,8 @@ case class Evento(
     else
       f"Há ${minutos}%02dmin"
   }
+
+  def thumbnailUrl: Option[String] = linkImagem.orElse(youtubeData.flatMap(_.channelImg))
 
   def linkLive: Option[String] = youtubeData.flatMap(_.link).orElse(instagramProfile).orElse(outroLink)
 

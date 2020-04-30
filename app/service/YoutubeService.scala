@@ -32,12 +32,35 @@ class YoutubeService @Inject()(
       logger.warn(s"fetch channelId ${evento.nome}")
       ws.url(channelUrl)
 //        .withRequestFilter(AhcCurlRequestLogger())
-        .addQueryStringParameters("key" -> apiKey, "part" -> "id", "forUsername" -> evento.youtubeData.get.userName.get)
+        .addQueryStringParameters("key" -> apiKey, "part" -> "snippet", "forUsername" -> evento.youtubeData.get.userName.get)
         .get()
         .map { response =>
           if (response.status != 200) logger.error(s"Erro ao fazer requisição ${response.json}")
-          val id = (response.json \ "items" \ 0 \ "id").asOpt[String]
-          val newYoutubeData = evento.youtubeData.map(_.copy(channelId = id))
+          val item = (response.json \ "items" \ 0)
+          val id = (item \ "id").asOpt[String]
+          val channelImg = (item \ "snippet" \ "thumbnails" \ "default" \ "url").asOpt[String]
+          println(s"channel [${evento.nome}] img [${channelImg}]")
+          val newYoutubeData = evento.youtubeData.map(_.copy(channelId = id, channelImg = channelImg))
+          evento.copy(youtubeData = newYoutubeData)
+        }
+    } else {
+      Future.successful(evento)
+    }
+  }
+
+  private def channelThumbnail(evento: Evento): Future[Evento] = {
+    if (enabled && evento.youtubeData.flatMap(_.channelId).isDefined &&
+      evento.youtubeData.flatMap(ev => ev.channelImg.orElse(ev.videoImg)).isEmpty) {
+      logger.warn(s"fetch thumbnail ${evento.nome}")
+      ws.url(channelUrl)
+        .addQueryStringParameters("key" -> apiKey, "part" -> "snippet", "id" -> evento.youtubeData.get.channelId.get)
+        .get()
+        .map { response =>
+          if (response.status != 200) logger.error(s"Erro ao fazer requisição ${response.json}")
+          val item = (response.json \ "items" \ 0)
+          val channelImg = (item \ "snippet" \ "thumbnails" \ "default" \ "url").asOpt[String]
+          println(s"channel [${evento.nome}] img [${channelImg}]")
+          val newYoutubeData = evento.youtubeData.map(_.copy(channelImg = channelImg))
           evento.copy(youtubeData = newYoutubeData)
         }
     } else {
@@ -121,7 +144,8 @@ class YoutubeService @Inject()(
       for {
         eventoUrlUnshorten <- urlUnshorten(evento)
         eventoChannel <- channelId(eventoUrlUnshorten)
-        eventoVideo <- liveVideoId(eventoChannel)
+        eventoChannelThumnail <- channelThumbnail(eventoChannel)
+        eventoVideo <- liveVideoId(eventoChannelThumnail)
         eventoVideoDetails <- videoDetails(eventoVideo)
       } yield {
         eventoVideoDetails

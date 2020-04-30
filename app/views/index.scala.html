@@ -7,21 +7,19 @@
   atualizadoEm: String,
   proxEventoMiliSec: Option[Long],
   jsonld: String,
-  tags: Seq[String])
+  tags: Seq[(String, String)])
+
+@colorByTag(tag: String) = {@tags.find(t => t._1 == tag).map(_._2).getOrElse("#f103c9")}
 
 @displayEvento(evento: Evento, full: Boolean = false, agora: Boolean = false) = {
 <div class="testi-item" data-jplist-item>
-  <div class="testi-meta-inner d-flex">
+  <div class="testi-meta-inner d-flex" collapse-control="@evento.generatedId">
     <div class="testi-img mr-2">
       @if(agora) {
-        @if(evento.linkLive.isDefined) {
-          <a class="icone" rel="nofollow" href="@evento.linkLive.get" target="_blank">
-            <span class="@evento.iconeLive"></span>
-          </a>
+        @if(evento.thumbnailUrl.isDefined) {
+          <img class="thumbnail" src='@evento.thumbnailUrl.get'>
         } else {
-          <div class="icone">
-            <span class="@evento.iconeLive"></span>
-          </div>
+          <img class="thumbnail" src='@routes.Assets.versioned("img/microfone.jpg")'>
         }
       } else {
         <span class="icon-calendar"></span>
@@ -29,46 +27,41 @@
 
     </div>
     <div class="testi-details">
-      <a class="link-no-decoration" data-toggle="collapse"
-        href='#@evento.generatedId' 
-        role="button" aria-expanded="false" 
-        aria-controls='@evento.generatedId'>
-        <p class="testi-destaque mb-0 searchable">
-          @evento.nome
-          @if(evento.destaque) {
-            <span class="icon-star"></span>
-          }
-          @if(evento.encerrado.getOrElse(false)){
-            <i>(Encerrado)</i>
-          }
+      <p class="testi-destaque mb-0 searchable">
+        @evento.nome
+        @if(evento.destaque) {
+          <span class="icon-star"></span>
+        }
+        @if(evento.encerrado.getOrElse(false)){
+          <i>(Encerrado)</i>
+        }
 
-        </p>      
-        @if(evento.info.nonEmpty) {
-        <p class="testi-info mb-0 searchable">
-          @evento.info
-        </p>
+      </p>      
+      @if(evento.info.nonEmpty) {
+      <p class="testi-info mb-0 searchable">
+        @evento.info
+      </p>
+      }
+      @for(tag <- evento.tags){
+        @if(tag == "Música"){
+          <span class="badge badge-live @tag" hidden>@tag</span>
+        } else {
+          <span class="badge badge-live @tag" style='background-color: @colorByTag(tag)'>@tag</span>
         }
-        @for(tag <- evento.tags){
-          @if(tag == "Música"){
-            <span class="badge badge-live @tag" hidden>@tag</span>
-          } else {
-            <span class="badge badge-live @tag">@tag</span>
-          }
-        }
-        <p class="testi-desc mb-0">
-          @evento.horarioFmt
-          <span class="icon-caret-square-o-down"></span>
-          <span class="icon-caret-square-o-up"></span>
-        </p>
-      </a>
+      }
+      <p class="testi-desc mb-0">
+        @evento.horarioFmt
+        <!-- <span class="icon-caret-square-o-down"></span>
+        <span class="icon-caret-square-o-up"></span> -->
+      </p>
     </div>
   </div>
   <div class="collapse multi-collapse" id='@evento.generatedId'>
     <div class="card card-body bg-transparent">
       <div class="icones-previa">
-        @if(evento.youtubeLink.isDefined) {
-          <a class="icone" rel="nofollow" href="@evento.youtubeLink.get" target="_blank">
-            <span class="icon icon-youtube1"></span>
+        @if(evento.linkLive.isDefined) {
+          <a class="icone" rel="nofollow" href="@evento.linkLive.get" target="_blank">
+            <span class="icon @evento.iconeLive"></span>
           </a>
         }
         @if(evento.instagramProfile.isDefined && (!agora || (agora && evento.youtubeData.flatMap(_.link).isDefined)))  {
@@ -177,9 +170,11 @@
     @for(tag <- tags) {
       <button type="button"
               data-jplist-control="buttons-text-filter" data-path=".badge" data-group="search-group"
-              data-mode="radio" data-text="@tag" class="badge badge-live" data-name="buttons-text-filter"
-              data-selected='@tagSelected(tag)'>
-        @tag
+              data-mode="radio" data-text="@tag._1" class="badge badge-live" data-name="buttons-text-filter"
+              data-selected='@tagSelected(tag._1)'
+              style='background-color: @tag._2'
+              >
+        @tag._1
       </button>
     }
   </div>

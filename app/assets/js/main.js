@@ -2,6 +2,14 @@ $(document).ready(function(){
 
   jplist.init();
 
+
+  $('.testi-meta-inner').on('click touch', function () {
+    var control = '#' + $(this).attr('collapse-control');
+    $(this).attr('aria-expanded',true);
+    var collapse = $(control).collapse('toggle');
+    console.log(collapse);
+  });
+
   var slider = tns({
     container: '.client-slider',
     controls: false,

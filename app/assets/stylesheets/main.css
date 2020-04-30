@@ -458,10 +458,11 @@ footer span.icon-instagram {
 =            TESTI            =
 =============================*/
 
-a[aria-expanded=true] span.icon-caret-square-o-down {
+div[aria-expanded=true] span.icon-caret-square-o-down {
   display: none;
 }
-a[aria-expanded=false] span.icon-caret-square-o-up {
+
+div[aria-expanded=false] span.icon-caret-square-o-up {
   display: none;
 }
 
@@ -473,7 +474,8 @@ a[aria-expanded=false] span.icon-caret-square-o-up {
 
 .testi-img span.icon-calendar {
   font-size: 20px;
-  vertical-align: bottom;
+  vertical-align: middle;
+  line-height: 1.8;
 }
 
 .testi-img span.icon-youtube, .testi-img span.icon-instagram, .testi-img span.icon-asterisk, .testi-img span.icon-play-circle {
@@ -493,7 +495,7 @@ a[aria-expanded=false] span.icon-caret-square-o-up {
 }
 
 .destaque-box {
-  max-width: 335px;
+  max-width: 400px;
   margin: 0 auto 30px auto;
   padding: 30px 10px 0 10px;
 }
@@ -503,7 +505,7 @@ a[aria-expanded=false] span.icon-caret-square-o-up {
 
 .testi-destaque {
   font-weight: bolder;
-  font-size: 18px;
+  font-size: 24px;
 }
 
 .badge-live {
@@ -566,9 +568,14 @@ a[aria-expanded=false] span.icon-caret-square-o-up {
 
 a.link-no-decoration {
   color: inherit;
-}  
+}
+
+.testi-meta-inner {
+  cursor: pointer;
+}
 
 .testi-item {
+  
   padding-bottom: 30px;
   margin-left: 15px;
   margin-right: 15px; }

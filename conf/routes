@@ -9,6 +9,8 @@ GET     /upcache                    controllers.HomeController.updateCache
 GET     /incluir                    controllers.HomeController.incluir
 GET     /livesjson                  controllers.HomeController.livesJson
 #GET     /extrair                    controllers.ConcorrentesController.extrairDados
+#GET     /hojexls                    controllers.ConcorrentesController.livesHojeXls
+#GET     /amanhaxls                  controllers.ConcorrentesController.livesAmanhaXls
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

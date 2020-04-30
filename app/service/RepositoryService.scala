@@ -51,7 +51,7 @@ class RepositoryService @Inject()(
               val optInstagram = if (instagramProfile.isEmpty) None else Some(instagramProfile)
               val booleanDestaque = if (destaque.isEmpty) false else true
               val optYoutubeData = optYoutube.map(YoutubeData.fromYoutubeLink)
-              val tagList = tags.split(",").toSeq
+              val tagList = tags.split(",").toSeq.map(_.trim)
               val evento = Evento(
                 nome = nome,
                 info = info,
@@ -68,6 +68,8 @@ class RepositoryService @Inject()(
                 logger.error(s"### Erro ao converter dados $nome / $dia / $hora", err)
                 None
             }
+          case List(_, _, _, _, _, _, _, _, _, _, "N", _*) =>
+            None
           case errList =>
             if (errList.nonEmpty) {
               logger.error(s"### Error ao obter dados: ${errList} ==> ${errList.mkString(", ")} ###")
@@ -95,7 +97,7 @@ class RepositoryService @Inject()(
     }
   }
 
-  def tags() = {
+  def tagsColor() = {
     getEventos.map(eventos => {
       eventos
         .filter(_.data.toLocalDate.isAfter(LocalDate.now.minusDays(1)))
@@ -103,8 +105,16 @@ class RepositoryService @Inject()(
         .filter(_.nonEmpty)
         .distinct
         .sortBy(t => (Evento.tagsCategoria.contains(t), t))(Ordering.Tuple2(Ordering.Boolean.reverse, Ordering.String))
+        .zip(colorList)
     })
   }
+
+  // obtido em https://medialab.github.io/iwanthue/
+  def colorList = Seq("#794b1e","#6530be","#4dad39","#bb4ee2","#839f31","#5d5ad4","#3e812d",
+    "#da44bb","#4ea264","#e74285","#3ea792","#e24720","#5692cc","#db8227",
+    "#827edd","#b6902b","#933996","#486823","#d172bb","#2a714c","#da4248",
+    "#474f95","#85761e","#75366f","#989a50","#a62a5f","#424b14","#a87db8",
+    "#685f1d","#d7737d","#817b45","#90445b","#b88352","#903328","#c3663a")
 
   def forceUpdate() = {
     logger.warn(s"Forçando atualização de dados")
@@ -123,7 +133,12 @@ class RepositoryService @Inject()(
   }
 
   def getEventos: Future[List[Evento]] =
-    cache.getOrElseUpdate[List[Evento]](cacheKey) (dataFromSheets())
+    try {
+      cache.getOrElseUpdate[List[Evento]](cacheKey) (dataFromSheets())
+    } catch {
+      case ex: Throwable => logger.error(s"Erro ao obter do cache", ex)
+        throw ex
+    }
 
 
   private def filtroEventoJaComecou(evento: Evento): Boolean = evento.data.isBefore(LocalDateTime.now) && evento.data.isAfter(LocalDateTime.now.minusHours(12))

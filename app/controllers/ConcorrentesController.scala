@@ -3,7 +3,7 @@ package controllers
 import java.time._
 
 import javax.inject.Inject
-import model.Evento
+import model.{Evento, YoutubeData}
 import play.api.libs.json.{JsArray, Json}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AnyContent, BaseController, ControllerComponents, Request}
@@ -148,15 +148,19 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
             val info = (event \ "title").asOpt[String].getOrElse("").replaceAll(regexRemoveChars, "").trim
             val data = (event \ "datetime").as[ZonedDateTime].withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime
             val instagram = (event \ "instagram").asOpt[String]
-            val youtubeChannel = (event \ "youtube_channel").asOpt[String]
+            val youtubeChannel = (event \ "youtube_channel").asOpt[String].filter(_.nonEmpty)
+            val youtubeVideoId = (event \ "youtube_video").asOpt[String].filter(_.nonEmpty).map(videoId => s"https://youtube.com/watch?v=$videoId")
+            val externalLink = (event \ "external_url").asOpt[String].filter(_.nonEmpty)
             val categorias = (event \ "categories").as[JsArray].value.map(cat => (cat \ "name").as[String]).toSeq
+            val youtubeData = youtubeChannel.orElse(youtubeVideoId).orElse(externalLink).map(YoutubeData.fromYoutubeLink)
             Evento(
               nome = artista,
               info = info,
               data = data,
               tags = categorias,
-              youtubeLink = youtubeChannel,
+              youtubeLink = youtubeData.flatMap(_.link),
               instagramProfile = instagram,
+              youtubeData = youtubeData,
               destaque = false,
               origem = Some("Lives.mus.br"))
           })
@@ -168,12 +172,8 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
     ws.url(livesbrasil)
       .get()
       .map(response => {
-        val current = (response.json \ "current").as[JsArray]
-        val upcomingIndexSeq = Json.toJson(response.json \ "upcoming" \\ "items")
-          .as[JsArray]
-          .value.flatMap(up => up.as[JsArray].value)
-        val upcoming = Json.toJson(upcomingIndexSeq).as[JsArray]
-        (current ++ upcoming)
+        val lives = (response.json \ "lives").as[JsArray]
+        (lives)
           .value
           .filter(event => !(event \ "startsAt").as[ZonedDateTime].withZoneSameInstant(ZoneId.systemDefault()).toLocalDate.isBefore(LocalDate.now)) // exclui antigos
           .map(event => {
@@ -216,6 +216,34 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
         s"${ev.youtubeLink.getOrElse("")}\t${ev.instagramProfile.getOrElse("")}\t${ev.origem.get}\t"
       })
       Ok(result.mkString("\n"))
+    }
+  }
+
+  def mkLivesXls(livesdodia: Seq[Evento]) = {
+    val eventosByTag = livesdodia
+      .sortBy(ev => (ev.data, ev.nome)).groupBy(_.tags).toSeq
+    val lista = eventosByTag.map {
+      case (tags, eventos) =>
+        val strTags = s"${tags.mkString(",")}"
+        val strEventos = eventos.map(ev => {
+          s"${ev.nome}\t${ev.data.toLocalTime}\t${ev.data.toLocalDate}"
+        }).mkString("\n")
+        strTags + "\n" + strEventos + "\n"
+    }
+    Ok(lista.mkString("\n"))
+  }
+
+  def livesHojeXls() = Action.async { implicit request: Request[AnyContent] =>
+    for {
+      livesdodia <- dadosLivesDoDia
+    } yield mkLivesXls(livesdodia.filter(ev => ev.data.toLocalDate.isEqual(LocalDate.now)))
+  }
+
+  def livesAmanhaXls() = Action.async { implicit request: Request[AnyContent] =>
+    for {
+      livesdodia <- dadosLivesDoDia
+    } yield {
+      mkLivesXls(livesdodia.filter(ev => ev.data.toLocalDate.isEqual(LocalDate.now.plusDays(1))))
     }
   }
 

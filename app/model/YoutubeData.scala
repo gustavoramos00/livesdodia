@@ -8,7 +8,9 @@ case class YoutubeData(
                         userName: Option[String] = None,
                         customUrl: Option[String] = None,
                         videoId: Option[String] = None,
-                        liveBroadcastContent: Option[String] = None
+                        liveBroadcastContent: Option[String] = None,
+                        channelImg: Option[String] = None,
+                        videoImg: Option[String] = None
                       ) {
   def link =
     linkVideoId
@@ -26,7 +28,10 @@ object YoutubeData {
   val broadcastLive = "live"
 
   def fromYoutubeLink(youtubeLink: String) = {
-    val url = new URL(youtubeLink)
+    val safeLink = "https://" + youtubeLink
+      .replaceFirst("https://", "")
+      .replaceFirst("http://", "")
+    val url = new URL(safeLink)
     if (Seq("youtube.com", "www.youtube.com").contains(url.getHost)) {
       val path = url.getPath
         .tail // remove primeiro caracter - sempre uma barra "/"
