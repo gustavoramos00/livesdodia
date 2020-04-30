@@ -18,9 +18,9 @@ class YoutubeService @Inject()(
                                  )
                               (implicit ec: ExecutionContext){
 
+  val enabled = configuration.get[Boolean]("enableYoutubeFetch")
   val endpoint = configuration.get[String]("youtubeEndpoint")
   val apiKey = configuration.get[String]("apiKey")
-  val cacheKey = "eventos"
   val logger: Logger = Logger(this.getClass())
   val channelUrl = s"$endpoint/channels"
   val searchUrl = s"$endpoint/search"
@@ -28,7 +28,7 @@ class YoutubeService @Inject()(
   val liveBroadcastUrl = s"$endpoint/liveBroadcasts"
 
   private def channelId(evento: Evento): Future[Evento] = {
-    if (evento.youtubeData.flatMap(_.userName).isDefined && !evento.youtubeData.flatMap(_.channelId).isDefined) {
+    if (enabled && evento.youtubeData.flatMap(_.userName).isDefined && !evento.youtubeData.flatMap(_.channelId).isDefined) {
       logger.warn(s"fetch channelId ${evento.nome}")
       ws.url(channelUrl)
 //        .withRequestFilter(AhcCurlRequestLogger())
@@ -46,7 +46,7 @@ class YoutubeService @Inject()(
   }
 
   private def liveVideoId(evento: Evento): Future[Evento] = {
-    if (evento.youtubeData.flatMap(_.channelId).isDefined &&
+    if (enabled && evento.youtubeData.flatMap(_.channelId).isDefined &&
       !evento.youtubeData.flatMap(_.videoId).isDefined &&
       evento.data.isAfter(LocalDateTime.now.minusHours(3))) {
       logger.warn(s"fetch videoId ${evento.nome}")
@@ -72,7 +72,7 @@ class YoutubeService @Inject()(
   }
 
   private def videoDetails(evento: Evento) = {
-    if (evento.youtubeData.flatMap(_.videoId).isDefined && !evento.encerrado.getOrElse(false)) {
+    if (enabled && evento.youtubeData.flatMap(_.videoId).isDefined && !evento.encerrado.getOrElse(false)) {
       logger.warn(s"fetch videoDetails ${evento.nome}")
       ws.url(videosUrl)
         //        .withRequestFilter(AhcCurlRequestLogger())
@@ -96,7 +96,7 @@ class YoutubeService @Inject()(
   }
 
   private def urlUnshorten(evento: Evento) = {
-    if (evento.linkLive.map(_.contains("youtu.be")).getOrElse(false)) {
+    if (enabled && evento.linkLive.map(_.contains("youtu.be")).getOrElse(false)) {
       ws.url(evento.linkLive.get)
         //        .withRequestFilter(AhcCurlRequestLogger())
         .withFollowRedirects(false)

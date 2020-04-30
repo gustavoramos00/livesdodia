@@ -29,7 +29,7 @@
 
     </div>
     <div class="testi-details">
-      <a class="link-no-decoration" data-toggle="collapse" 
+      <a class="link-no-decoration" data-toggle="collapse"
         href='#@evento.generatedId' 
         role="button" aria-expanded="false" 
         aria-controls='@evento.generatedId'>
@@ -108,7 +108,12 @@
   }
 }
 
-@tagSelected(tag: String) = {@tag.equals("Música") && @eventosAgora.filter(_.tags.contains("Música")).nonEmpty)}
+@*
+*<!--@tagSelected(tag: String) = {@(tag.equals("Música") && eventosAgora.flatMap(_.tags).contains("Música"))}-->
+*@
+
+@tagSelected(tag: String) = {false}
+
 
 @buscanaoencontrada() = {
   <div class="testi-item busca-nao-encontrada" style="display: none">

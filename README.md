@@ -24,3 +24,7 @@ Ver aqui: https://certbot.eff.org/lets-encrypt/ubuntubionic-nginx
 
 
 ### Configura Locale
+
+### Localmente subir REDIS com DOCKER
+
+    $ docker run -p 6379:6379 redis:3.0.6
