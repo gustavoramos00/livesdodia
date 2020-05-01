@@ -71,7 +71,7 @@ class RepositoryService @Inject()(
                 logger.error(s"### Erro ao converter dados $nome / $dia / $hora", err)
                 None
             }
-          case List(_, _, _, _, _, _, _, _, _, _, "N", _*) =>
+          case List(_, _, _, _, _, _, _, _, _, _, _, "N", _*) =>
             None
           case errList =>
             if (errList.nonEmpty) {

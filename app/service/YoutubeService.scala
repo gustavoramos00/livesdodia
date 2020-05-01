@@ -49,7 +49,7 @@ class YoutubeService @Inject()(
   }
 
   private def channelThumbnail(evento: Evento): Future[Evento] = {
-    if (enabled && evento.youtubeData.flatMap(_.channelId).isDefined &&
+    if (enabled && evento.thumbnailUrl.isEmpty && evento.youtubeData.flatMap(_.channelId).isDefined &&
       evento.youtubeData.flatMap(ev => ev.thumbnail.orElse(ev.videoImg)).isEmpty) {
       logger.warn(s"fetch thumbnail ${evento.nome}")
       ws.url(channelUrl)
