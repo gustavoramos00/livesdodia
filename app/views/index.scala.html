@@ -150,7 +150,7 @@
       $('.rectangle-transparent-1').hide();
       $('.rectangle-transparent-2').hide();
       $('.header-container').css('background', 'transparent').removeClass('shadow');
-      $('section').first().removeClass('first-section');
+      $('section').first().removeClass('maybe-first-section');
     }
 
     function showElementsPlayVideo() {
@@ -159,7 +159,7 @@
       $('.rectangle-transparent-1').show();
       $('.rectangle-transparent-2').show();
       $('.header-container').css('background', 'linear-gradient(to right, #333399, #ff00cc)').addClass('shadow');
-      $('section').first().addClass('first-section');
+      $('section').first().addClass('maybe-first-section');
     }
 
     function closeVideo() {
@@ -192,7 +192,7 @@
 
   <!-- INICIADAS -->
   @if(eventosAgora.nonEmpty) {
-  <section class="first-section section-padding bg-white">
+  <section class="maybe-first-section section-padding bg-white">
     <div class="container">
       <div class="section-content shadow destaque-box" data-aos="fade-up">
         <div class="heading-section text-center">
@@ -215,7 +215,7 @@
   <!-- FIM INICIADA -->
 
   @if(eventosHoje.nonEmpty) {
-  <section class="section-padding bg-fixed bg-white">
+  <section class="maybe-first-section section-padding bg-fixed bg-white">
     <div class="container">
       <div class="section-content shadow destaque-box" data-aos="fade-up">
         <div class="heading-section text-center">

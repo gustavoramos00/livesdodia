@@ -116,8 +116,13 @@ section {
   transition: top 0.4s ease; /* Transition effect when sliding down (and up) */
 }
 
-.first-section {
+.maybe-maybe-first-section {
   padding-top: 125px;
+}
+
+/* Remove da segunda possível seção */
+.maybe-first-section + .maybe-first-section {
+  padding-top: 0;
 }
 
 .header-container .container {
@@ -880,7 +885,7 @@ a.link-no-decoration {
     height: 70px;
   }
 
-  .first-section {
+  .maybe-first-section {
     padding-top: 100px;
   }
 

@@ -16,7 +16,7 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
 
   if (isMainServer) {
     logger.warn(s"is main server")
-    actorSystem.scheduler.scheduleAtFixedRate(initialDelay = 10.seconds, interval = 1.hour) { () =>
+    actorSystem.scheduler.scheduleAtFixedRate(initialDelay = 1.hour, interval = 2.hour) { () =>
       // the block of code that will be executed
       actorSystem.log.info("Schedule forcing update...")
       repositoryService.forceUpdate()

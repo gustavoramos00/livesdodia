@@ -96,7 +96,9 @@ class YoutubeService @Inject()(
   }
 
   private def videoDetails(evento: Evento) = {
-    if (enabled && evento.youtubeData.flatMap(_.videoId).isDefined && !evento.encerrado.getOrElse(false)) {
+    if (enabled && evento.youtubeData.flatMap(_.videoId).isDefined &&
+      !evento.encerrado.getOrElse(false) &&
+      evento.data.isAfter(LocalDateTime.now.minusHours(3))) {
       logger.warn(s"fetch videoDetails ${evento.nome}")
       ws.url(videosUrl)
         //        .withRequestFilter(AhcCurlRequestLogger())
