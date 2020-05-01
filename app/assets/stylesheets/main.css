@@ -548,7 +548,7 @@ div[aria-expanded=false] span.icon-caret-square-o-up {
 }
 
 .badge-live.jplist-selected{
-  background-color: #f103c9;
+  font-size: 18px;
 }
 
 .tags {
