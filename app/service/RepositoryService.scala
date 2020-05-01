@@ -38,8 +38,9 @@ class RepositoryService @Inject()(
         valuesList
           .tail // remove cabeçalho
           .flatMap {
-          case List(_, _, nome, info, dia, hora, tags: String, liveLink: String, instagramProfile: String, destaque: String, "S", _*) =>
+          case List(_, _, nome, info, dia, hora, tags: String, liveLink: String, instagramProfile: String, destaque: String, thumbnail: String, "S", _*) =>
             try {
+              println(s"thumbnail for [$nome] ==> [${thumbnail}]")
               val data = Evento.parseData(dia, hora)
               val (optYoutube, optOutroLink) =
                 if(liveLink.contains("youtube") || liveLink.contains("youtu.be"))
@@ -51,6 +52,7 @@ class RepositoryService @Inject()(
               val optInstagram = if (instagramProfile.isEmpty) None else Some(instagramProfile)
               val booleanDestaque = if (destaque.isEmpty) false else true
               val optYoutubeData = optYoutube.map(YoutubeData.fromYoutubeLink)
+              val optThumbnail = if (thumbnail.isEmpty) None else Some(thumbnail)
               val tagList = tags.split(",").toSeq.map(_.trim)
               val evento = Evento(
                 nome = nome,
@@ -61,7 +63,8 @@ class RepositoryService @Inject()(
                 outroLink = optOutroLink,
                 instagramProfile = optInstagram,
                 destaque = booleanDestaque,
-                youtubeData = optYoutubeData)
+                youtubeData = optYoutubeData,
+                linkImagem = optThumbnail)
               Some(evento)
             } catch {
               case err: Throwable =>

@@ -116,7 +116,7 @@ section {
   transition: top 0.4s ease; /* Transition effect when sliding down (and up) */
 }
 
-.maybe-maybe-first-section {
+.maybe-first-section {
   padding-top: 125px;
 }
 
