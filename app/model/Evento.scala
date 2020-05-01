@@ -31,7 +31,7 @@ case class Evento(
       f"Há ${minutos}%02dmin"
   }
 
-  def thumbnailUrl: Option[String] = linkImagem.orElse(youtubeData.flatMap(_.channelImg))
+  def thumbnailUrl: Option[String] = linkImagem.orElse(youtubeData.flatMap(_.thumbnail))
 
   def linkLive: Option[String] = youtubeData.flatMap(_.link).orElse(instagramProfile).orElse(outroLink)
 
@@ -41,7 +41,7 @@ case class Evento(
     linkLive.map {
       case str if str.contains("youtu.be") || str.contains("youtube") => "icon-youtube"
       case str if str.contains("instagram") => "icon-instagram"
-      case _ => "icon-play-circle"
+      case _ => "icon-external-link-square"
     }.getOrElse("icon-asterisk")
   }
 

@@ -1,13 +1,36 @@
 $(document).ready(function(){
 
+/***
+ * Show and Hide header container
+ */
+var prevScrollpos = window.pageYOffset;
+window.onscroll = function() {
+  var currentScrollPos = window.pageYOffset;
+  var containerTop = $(".yt-player");
+  var containerBottom = $('.tags');
+  
+  if (prevScrollpos > currentScrollPos) {
+    containerTop.css('top', 0);
+    containerBottom.css('bottom', -containerBottom.height());
+  } else {
+    if (player) {
+      containerTop.css('top', -(containerTop.height()*0.6));
+    }
+    containerBottom.css('bottom', 0);
+  }
+  
+
+  prevScrollpos = currentScrollPos;
+} 
+
+
   jplist.init();
 
 
   $('.testi-meta-inner').on('click touch', function () {
     var control = '#' + $(this).attr('collapse-control');
     $(this).attr('aria-expanded',true);
-    var collapse = $(control).collapse('toggle');
-    console.log(collapse);
+    $(control).collapse('toggle');
   });
 
   var slider = tns({

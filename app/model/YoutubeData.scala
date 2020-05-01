@@ -8,8 +8,9 @@ case class YoutubeData(
                         userName: Option[String] = None,
                         customUrl: Option[String] = None,
                         videoId: Option[String] = None,
+                        embeddable: Option[Boolean] = None,
                         liveBroadcastContent: Option[String] = None,
-                        channelImg: Option[String] = None,
+                        thumbnail: Option[String] = None,
                         videoImg: Option[String] = None
                       ) {
   def link =

@@ -40,7 +40,7 @@ class YoutubeService @Inject()(
           val id = (item \ "id").asOpt[String]
           val channelImg = (item \ "snippet" \ "thumbnails" \ "default" \ "url").asOpt[String]
           println(s"channel [${evento.nome}] img [${channelImg}]")
-          val newYoutubeData = evento.youtubeData.map(_.copy(channelId = id, channelImg = channelImg))
+          val newYoutubeData = evento.youtubeData.map(_.copy(channelId = id, thumbnail = channelImg))
           evento.copy(youtubeData = newYoutubeData)
         }
     } else {
@@ -50,7 +50,7 @@ class YoutubeService @Inject()(
 
   private def channelThumbnail(evento: Evento): Future[Evento] = {
     if (enabled && evento.youtubeData.flatMap(_.channelId).isDefined &&
-      evento.youtubeData.flatMap(ev => ev.channelImg.orElse(ev.videoImg)).isEmpty) {
+      evento.youtubeData.flatMap(ev => ev.thumbnail.orElse(ev.videoImg)).isEmpty) {
       logger.warn(s"fetch thumbnail ${evento.nome}")
       ws.url(channelUrl)
         .addQueryStringParameters("key" -> apiKey, "part" -> "snippet", "id" -> evento.youtubeData.get.channelId.get)
@@ -60,7 +60,7 @@ class YoutubeService @Inject()(
           val item = (response.json \ "items" \ 0)
           val channelImg = (item \ "snippet" \ "thumbnails" \ "default" \ "url").asOpt[String]
           println(s"channel [${evento.nome}] img [${channelImg}]")
-          val newYoutubeData = evento.youtubeData.map(_.copy(channelImg = channelImg))
+          val newYoutubeData = evento.youtubeData.map(_.copy(thumbnail = channelImg))
           evento.copy(youtubeData = newYoutubeData)
         }
     } else {
@@ -71,6 +71,7 @@ class YoutubeService @Inject()(
   private def liveVideoId(evento: Evento): Future[Evento] = {
     if (enabled && evento.youtubeData.flatMap(_.channelId).isDefined &&
       !evento.youtubeData.flatMap(_.videoId).isDefined &&
+      evento.data.isBefore(LocalDateTime.now) &&
       evento.data.isAfter(LocalDateTime.now.minusHours(3))) {
       logger.warn(s"fetch videoId ${evento.nome}")
       ws.url(searchUrl) // TODO usar com cautela, alto uso de quota API Youtube
@@ -101,14 +102,21 @@ class YoutubeService @Inject()(
         //        .withRequestFilter(AhcCurlRequestLogger())
         .addQueryStringParameters(
         "key" -> apiKey,
-        "part" -> " snippet",
+        "part" -> " snippet,status",
         "id" -> evento.youtubeData.get.videoId.get)
         .get()
         .map { response =>
           if (response.status != 200) logger.error(s"Erro ao fazer requisição ${response.json}")
-          val liveBroadcastContent = (response.json \ "items" \ 0 \ "snippet" \ "liveBroadcastContent").asOpt[String]
+          val item = response.json \ "items" \ 0
+          println(s"response json [${response.json}]")
+          val liveBroadcastContent = (item \ "snippet" \ "liveBroadcastContent").asOpt[String]
+          val embeddable = (item \ "status" \ "embeddable").asOpt[Boolean]
+          val thumbnail = evento.thumbnailUrl.orElse((item \ "snippet" \ "thumbnails" \ "default").asOpt[String])
+
           val newYoutubeData = evento.youtubeData.map(_.copy(
-            liveBroadcastContent = liveBroadcastContent
+            liveBroadcastContent = liveBroadcastContent,
+            embeddable = embeddable,
+            thumbnail = thumbnail
           ))
           val encerrado = liveBroadcastContent.map(eventStatus => eventStatus == YoutubeData.broadcastEncerrado)
           evento.copy(youtubeData = newYoutubeData, encerrado = encerrado)

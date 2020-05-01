@@ -123,11 +123,9 @@ class RepositoryService @Inject()(
       eventosDadosCache <- recuperaDadosYoutubeCache(eventosSheet)
       _ <- cache.set(cacheKey, eventosDadosCache)
       _ <- cache.set(dataAtualizacaoCacheKey, LocalDateTime.now)
-      (eventosComecou, outrosEventos) <- Future.successful(eventosDadosCache.partition(ev => filtroEventoJaComecou(ev)))
-      eventosComecouAtualizados <- youtubeService.fetch(eventosComecou)
+      eventosAtualizados <- youtubeService.fetch(eventosDadosCache)
     } yield {
-      val todosEventos = eventosComecouAtualizados ++ outrosEventos
-      cache.set(cacheKey, todosEventos)
+      cache.set(cacheKey, eventosAtualizados)
       cache.set(dataAtualizacaoCacheKey, LocalDateTime.now)
     }
   }

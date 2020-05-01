@@ -85,6 +85,13 @@ section {
   margin: 20px auto 0 auto;
 }
 
+.yt-player {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  transition: top 0.4s ease; /* Transition effect when sliding down (and up) */
+}
+
 .header-container {
   color: #fff;
   /* padding-top: 80px;
@@ -106,9 +113,10 @@ section {
   background: linear-gradient(to right, #333399, #ff00cc);
   /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
   z-index: 11;
+  transition: top 0.4s ease; /* Transition effect when sliding down (and up) */
 }
 
-.header-container + * {
+.first-section {
   padding-top: 125px;
 }
 
@@ -152,6 +160,22 @@ section {
   background: rgb(255, 255, 255,0.8);
   outline: none;
   border-radius: 50px !important;
+}
+
+.button-clear {
+  background: initial;
+  border: none;
+  color: #ff00cc;
+  padding: 0;
+}
+
+.yt-close-button {
+  float: right;
+  margin-top: -7px;
+  background: #000;
+  border: none;
+  cursor: pointer;
+  color: #fff;
 }
 
 .button-clear-search {
@@ -533,6 +557,7 @@ div[aria-expanded=false] span.icon-caret-square-o-up {
   overflow-x: scroll;
   background: rgb(83,62,165);
   background: linear-gradient(0deg, rgba(83,62,165,1) 10%, rgba(255,255,255,0) 86%, rgba(255,255,255,0) 100%);
+  transition: bottom 0.4s ease; /* Transition effect when sliding down (and up) */
 }
 
 .tags::-webkit-scrollbar {
@@ -855,7 +880,7 @@ a.link-no-decoration {
     height: 70px;
   }
 
-  .header-container + * {
+  .first-section {
     padding-top: 100px;
   }
 

@@ -15,16 +15,11 @@
 <div class="testi-item" data-jplist-item>
   <div class="testi-meta-inner d-flex" collapse-control="@evento.generatedId">
     <div class="testi-img mr-2">
-      @if(agora) {
-        @if(evento.thumbnailUrl.isDefined) {
-          <img class="thumbnail" src='@evento.thumbnailUrl.get'>
-        } else {
-          <img class="thumbnail" src='@routes.Assets.versioned("img/microfone.jpg")'>
-        }
+      @if(evento.thumbnailUrl.isDefined) {
+        <img class="thumbnail" src='@evento.thumbnailUrl.get'>
       } else {
-        <span class="icon-calendar"></span>
+        <img class="thumbnail" src='@routes.Assets.versioned("img/microfone.jpg")'>
       }
-
     </div>
     <div class="testi-details">
       <p class="testi-destaque mb-0 searchable">
@@ -59,6 +54,11 @@
   <div class="collapse multi-collapse" id='@evento.generatedId'>
     <div class="card card-body bg-transparent">
       <div class="icones-previa">
+        @if(evento.youtubeData.flatMap(_.embeddable).contains(true)){
+          <button type="button" class="button-clear" onclick='playYoutubeVideoId("@evento.youtubeData.flatMap(_.videoId).get")'>
+            <span class="icon icon-play-circle"></span>
+          </button>
+        }
         @if(evento.linkLive.isDefined) {
           <a class="icone" rel="nofollow" href="@evento.linkLive.get" target="_blank">
             <span class="icon @evento.iconeLive"></span>
@@ -115,10 +115,84 @@
 }
 
 @base {
+  <div  class="yt-player">
+    <div id="player"></div>
+    <button type="button" class="yt-close-button" onclick="closeVideo()">
+      <span class="icon-close"></span>
+    </button>
+  </div>
+
+  <script>
+    // 2. This code loads the IFrame Player API code asynchronously.
+    var tag = document.createElement('script');
+
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    // 3. This function creates an <iframe> (and YouTube player)
+    //    after the API code downloads.
+    var player;
+    // function onYouTubeIframeAPIReady() {
+      // player = new YT.Player('player', {
+      //   width: '100%',
+      //   videoId: 'M7lc1UVf-VE',
+      //   events: {
+      //     'onReady': onPlayerReady,
+      //     'onStateChange': onPlayerStateChange
+      //   }
+      // });
+    // }
+
+    function hideElementsPlayVideo() {
+      $('.rectangle-1').hide();
+      $('.rectangle-2').hide();
+      $('.rectangle-transparent-1').hide();
+      $('.rectangle-transparent-2').hide();
+      $('.header-container').css('background', 'transparent').removeClass('shadow');
+      $('section').first().removeClass('first-section');
+    }
+
+    function showElementsPlayVideo() {
+      $('.rectangle-1').show();
+      $('.rectangle-2').show();
+      $('.rectangle-transparent-1').show();
+      $('.rectangle-transparent-2').show();
+      $('.header-container').css('background', 'linear-gradient(to right, #333399, #ff00cc)').addClass('shadow');
+      $('section').first().addClass('first-section');
+    }
+
+    function closeVideo() {
+      showElementsPlayVideo();
+      player.destroy();
+      player = undefined;
+    }
+
+    function playYoutubeVideoId(videoId) {
+      hideElementsPlayVideo();
+      if (!player) {
+        player = new YT.Player('player', {
+        videoId: videoId,
+        width: '100%',
+        events: {
+          'onReady': onPlayerReady
+        }
+      });
+      } else {
+        player.loadVideoById(videoId);
+      }
+    }
+
+    // 4. The API will call this function when the video player is ready.
+    function onPlayerReady(event) {
+      event.target.playVideo();
+    }
+
+  </script>
 
   <!-- INICIADAS -->
   @if(eventosAgora.nonEmpty) {
-  <section class="section-padding bg-white">
+  <section class="first-section section-padding bg-white">
     <div class="container">
       <div class="section-content shadow destaque-box" data-aos="fade-up">
         <div class="heading-section text-center">
