@@ -39,7 +39,6 @@ class YoutubeService @Inject()(
           val item = (response.json \ "items" \ 0)
           val id = (item \ "id").asOpt[String]
           val channelImg = (item \ "snippet" \ "thumbnails" \ "default" \ "url").asOpt[String]
-          println(s"channel [${evento.nome}] img [${channelImg}]")
           val newYoutubeData = evento.youtubeData.map(_.copy(channelId = id, thumbnail = channelImg))
           evento.copy(youtubeData = newYoutubeData)
         }
@@ -59,7 +58,6 @@ class YoutubeService @Inject()(
           if (response.status != 200) logger.error(s"Erro ao fazer requisição ${response.json}")
           val item = (response.json \ "items" \ 0)
           val channelImg = (item \ "snippet" \ "thumbnails" \ "default" \ "url").asOpt[String]
-          println(s"channel [${evento.nome}] img [${channelImg}]")
           val newYoutubeData = evento.youtubeData.map(_.copy(thumbnail = channelImg))
           evento.copy(youtubeData = newYoutubeData)
         }
@@ -110,7 +108,6 @@ class YoutubeService @Inject()(
         .map { response =>
           if (response.status != 200) logger.error(s"Erro ao fazer requisição ${response.json}")
           val item = response.json \ "items" \ 0
-          println(s"response json [${response.json}]")
           val liveBroadcastContent = (item \ "snippet" \ "liveBroadcastContent").asOpt[String]
           val embeddable = (item \ "status" \ "embeddable").asOpt[Boolean]
           val thumbnail = evento.thumbnailUrl.orElse((item \ "snippet" \ "thumbnails" \ "default").asOpt[String])

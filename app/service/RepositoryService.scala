@@ -40,7 +40,6 @@ class RepositoryService @Inject()(
           .flatMap {
           case List(_, _, nome, info, dia, hora, tags: String, liveLink: String, instagramProfile: String, destaque: String, thumbnail: String, "S", _*) =>
             try {
-              println(s"thumbnail for [$nome] ==> [${thumbnail}]")
               val data = Evento.parseData(dia, hora)
               val (optYoutube, optOutroLink) =
                 if(liveLink.contains("youtube") || liveLink.contains("youtu.be"))
