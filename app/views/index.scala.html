@@ -55,7 +55,7 @@
     <div class="card card-body bg-transparent">
       <div class="icones-previa">
         @if(evento.youtubeData.flatMap(_.embeddable).contains(true)){
-          <button type="button" class="button-clear" onclick='playYoutubeVideoId("@evento.youtubeData.flatMap(_.videoId).get")'>
+          <button type="button" class="button-clear" onclick='playYoutubeVideoId("@evento.youtubeData.flatMap(_.videoId).get", "@evento.nome")'>
             <span class="icon icon-play-circle"></span>
           </button>
         }
@@ -166,9 +166,14 @@
       showElementsPlayVideo();
       player.destroy();
       player = undefined;
+      ga('send', {
+        hitType: 'event',
+        eventCategory: 'Lives',
+        eventAction: 'video-stop'
+      });
     }
 
-    function playYoutubeVideoId(videoId) {
+    function playYoutubeVideoId(videoId, nome) {
       hideElementsPlayVideo();
       if (!player) {
         player = new YT.Player('player', {
@@ -181,6 +186,12 @@
       } else {
         player.loadVideoById(videoId);
       }
+      ga('send', {
+        hitType: 'event',
+        eventCategory: 'Lives',
+        eventAction: 'video-play',
+        eventLabel: nome
+      });
     }
 
     // 4. The API will call this function when the video player is ready.
