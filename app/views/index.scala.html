@@ -59,19 +59,19 @@
             <span class="icon icon-play-circle"></span>
           </button>
         }
+        @if(evento.outroLink.isDefined && !agora)  {
+        <a class="icone" rel="nofollow" href="@evento.outroLink.get" target="_blank">
+          <span class="icon icon-external-link-square"></span>
+        </a>
+        }
         @if(evento.linkLive.isDefined) {
           <a class="icone" rel="nofollow" href="@evento.linkLive.get" target="_blank">
             <span class="icon @evento.iconeLive"></span>
           </a>
         }
-        @if(evento.instagramProfile.isDefined && (!agora || (agora && evento.youtubeData.flatMap(_.link).isDefined)))  {
+        @if(evento.instagramProfile.isDefined && evento.instagramProfile != evento.linkLive)  {
           <a class="icone" rel="nofollow" href="@evento.instagramProfile.get" target="_blank">
             <span class="icon icon-instagram"></span>
-          </a>
-        }
-        @if(evento.outroLink.isDefined && !agora)  {
-          <a class="icone" rel="nofollow" href="@evento.outroLink.get" target="_blank">
-            <span class="icon icon-external-link-square"></span>
           </a>
         }
       </div>

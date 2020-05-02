@@ -21,7 +21,7 @@ window.onscroll = function() {
   
 
   prevScrollpos = currentScrollPos;
-} 
+}
 
 
 jplist.init();
