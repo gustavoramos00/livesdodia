@@ -12,6 +12,7 @@ import play.api.{Configuration, Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
+import scala.util.Random
 
 class LiveScheduler @Inject() (actorSystem: ActorSystem,
                                cache: AsyncCacheApi,
@@ -34,13 +35,14 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
           .filter(_.data.isBefore(LocalDateTime.now.plusDays(1)))
           .groupBy(_.data).toSeq.flatMap {
         case (data, eventos) =>
+          val randSeconds = Random.between(0,240) // para evitar fetches no mesmo instante
           Seq(
             scheduleEventosDetails(data, eventos), // fetch eventos na hora agendada
             scheduleEventosDetails(data.plusMinutes(5), eventos), // fetch 5 minutos depois
             scheduleEventosDetails(data.plusMinutes(20), eventos), // fetch 20 minutos depois
-            scheduleEventosDetails(data.plusHours(2), eventos), // fetch 2h depois
-            scheduleEventosDetails(data.plusHours(4), eventos), // fetch 4h depois
-            scheduleEventosDetails(data.plusHours(6), eventos) // fetch 6h depois
+            scheduleEventosDetails(data.plusHours(2).plusSeconds(randSeconds), eventos), // fetch ~2h depois
+            scheduleEventosDetails(data.plusHours(4).plusSeconds(randSeconds), eventos), // fetch ~4h depois
+            scheduleEventosDetails(data.plusHours(6).plusSeconds(randSeconds), eventos) // fetch ~6h depois
           ).flatten
       }
     } else {
