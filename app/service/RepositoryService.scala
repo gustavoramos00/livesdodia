@@ -130,9 +130,9 @@ class RepositoryService @Inject()(
       eventosDadosCache <- recuperaDadosYoutubeCache(eventosSheet)
       _ <- cache.set(Evento.cacheKey, eventosDadosCache)
       _ <- cache.set(dataAtualizacaoCacheKey, LocalDateTime.now)
-      _ <- Future.successful(liveScheduler.reSchedule(eventosDadosCache))
       eventosAtualizados <- youtubeService.fetch(eventosDadosCache)
     } yield {
+      liveScheduler.reSchedule(eventosAtualizados)
       cache.set(Evento.cacheKey, eventosAtualizados)
       cache.set(dataAtualizacaoCacheKey, LocalDateTime.now)
     }

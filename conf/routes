@@ -8,6 +8,7 @@ GET     /                           controllers.HomeController.index
 GET     /upcache                    controllers.HomeController.updateCache
 GET     /incluir                    controllers.HomeController.incluir
 GET     /livesjson                  controllers.HomeController.livesJson
+GET     /schedulecount              controllers.HomeController.scheduleCount
 GET     /extrair                    controllers.ConcorrentesController.extrairDados
 GET     /hoje                       controllers.ConcorrentesController.livesHoje
 GET     /amanha                     controllers.ConcorrentesController.livesAmanha

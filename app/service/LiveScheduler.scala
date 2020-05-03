@@ -22,12 +22,17 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
   var jobs = Seq.empty[Cancellable]
   val logger = Logger(getClass)
 
+  def scheduleCount = jobs.length
+
   def reSchedule(eventos: Seq[Evento]) = {
     if (isMainServer) {
       // cancela todos os jobs
       jobs.foreach(job => job.cancel())
       // agenda novamente
-      jobs = eventos.groupBy(_.data).toSeq.flatMap {
+      jobs = eventos
+          .filter(_.data.isAfter(LocalDateTime.now.minusHours(8)))
+          .filter(_.data.isBefore(LocalDateTime.now.plusDays(1)))
+          .groupBy(_.data).toSeq.flatMap {
         case (data, eventos) =>
           Seq(
             scheduleEventosDetails(data, eventos), // fetch eventos na hora agendada
@@ -36,7 +41,7 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
             scheduleEventosDetails(data.plusHours(2), eventos), // fetch 2h depois
             scheduleEventosDetails(data.plusHours(4), eventos), // fetch 4h depois
             scheduleEventosDetails(data.plusHours(6), eventos) // fetch 6h depois
-          )
+          ).flatten
       }
     } else {
       logger.warn(s"NOT main server")
@@ -45,21 +50,26 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
 
   private def scheduleEventosDetails(data: LocalDateTime, eventos: Seq[Evento]) = {
     val seconds = LocalDateTime.now.until(data, ChronoUnit.SECONDS)
-    val duration = Duration(seconds, TimeUnit.SECONDS)
-    // não funcionou com scheduleOnce.
-    // Usando fixedDelay com valor alto suficiente para não executar novamente
-    actorSystem.scheduler.scheduleWithFixedDelay(duration, 10.hours) { () =>
-      println(s"running schedule for [${eventos.map(_.nome).mkString(", ")}]")
-      Future.sequence(eventos.map(evento =>
-        for {
-          eventoVideo <- youtubeService.fetchLiveVideoId(evento)
-          eventoVideoDetails <- youtubeService.fetchVideoDetails(eventoVideo)
-        } yield eventoVideoDetails
-      )).map(eventosAtualizados => {
-        updateEventosCache(eventosAtualizados)
-      })
+    if (seconds > 0) {
+      val duration = Duration(seconds, TimeUnit.SECONDS)
+
+      // não funcionou com scheduleOnce.
+      // Usando fixedDelay com valor alto suficiente para não executar novamente
+      val cancellable = actorSystem.scheduler.scheduleWithFixedDelay(duration, 10.hours) { () =>
+        logger.warn(s"running schedule for [${eventos.map(_.nome).mkString(", ")}]")
+        Future.sequence(eventos.map(evento =>
+          for {
+            eventoVideo <- youtubeService.fetchLiveVideoId(evento)
+            eventoVideoDetails <- youtubeService.fetchVideoDetails(eventoVideo)
+          } yield eventoVideoDetails
+        )).map(eventosAtualizados => {
+          updateEventosCache(eventosAtualizados)
+        })
+      }
+      Some(cancellable)
+    } else {
+      None
     }
-//    jobs = jobs :+ cancellable
   }
 
 
@@ -69,6 +79,7 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
     } yield {
       val (_, eventosNoMatch) = eventosCache.partition(ev => eventos.exists(_.id == ev.id))
       val eventosFinal = eventos ++ eventosNoMatch
+      logger.warn(s"Atualiza cache apos fetch eventos length= [${eventosFinal.length}] ")
       cache.set(Evento.cacheKey, eventosFinal)
     }
   }

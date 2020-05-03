@@ -9,7 +9,7 @@ import model.{Evento, EventosDia}
 import play.api.cache.Cached
 import play.api.libs.json.Json
 import play.api.mvc._
-import service.RepositoryService
+import service.{LiveScheduler, RepositoryService}
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
@@ -22,7 +22,8 @@ import scala.concurrent.duration._
 @Singleton
 class HomeController @Inject()(repository: RepositoryService,
                                cached: Cached,
-                                val controllerComponents: ControllerComponents
+                               liveScheduler: LiveScheduler,
+                               val controllerComponents: ControllerComponents
                               )(implicit ec: ExecutionContext) extends BaseController {
 
   val cacheDuration = 20.seconds
@@ -90,6 +91,10 @@ class HomeController @Inject()(repository: RepositoryService,
 
       Ok(Json.toJson(json))
     }
+  }
+
+  def scheduleCount() = Action { implicit request: Request[AnyContent] =>
+    Ok(liveScheduler.scheduleCount.toString)
   }
 
   private def jsonLdSchemaLivesDoDia(eventosAgora: List[Evento], eventosHoje: List[Evento], eventosProgramacao: List[EventosDia]) = {
