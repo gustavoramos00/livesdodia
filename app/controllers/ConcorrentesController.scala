@@ -39,6 +39,7 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
             val data = (event \ "data").as[LocalDate]
             val horario = (event \ "horario").as[LocalTime]
             val instagram = (event \ "instagram").asOpt[String]
+            val outroLink = (event \ "outroLink").asOpt[String]
             val youtubeChannel = (event \ "youtube").asOpt[String]
             val linkImagem = (event \ "linkImagem").asOpt[String]
             val tags = (event \ "tags").asOpt[String].map(_.split(",").toSeq).getOrElse(Seq.empty)
@@ -47,6 +48,7 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
               info = info,
               data = data.atTime(horario),
               youtubeLink = youtubeChannel,
+              outroLink = outroLink,
               instagramProfile = instagram,
               tags = tags,
               destaque = true,
@@ -222,7 +224,7 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
       val eventos = (livesdodia ++ filtrado).sortBy(ev => (ev.data, ev.nome))
       val result = eventos.map(ev => {
         s"${ev.nome}\t${ev.info}\t${ev.data.toLocalDate}\t${ev.data.toLocalTime}\t${ev.tags.mkString(",")}\t" +
-        s"${ev.youtubeLink.getOrElse("")}\t${ev.instagramProfile.getOrElse("")}\t\t${ev.thumbnailUrl.getOrElse("")}\t${ev.origem.get}\t"
+        s"${ev.youtubeLink.orElse(ev.linkLive).getOrElse("")}\t${ev.instagramProfile.getOrElse("")}\t\t${ev.thumbnailUrl.getOrElse("")}\t${ev.origem.get}\t"
       })
       if (env.mode == Mode.Prod) {
         NotFound
