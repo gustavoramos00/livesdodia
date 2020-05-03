@@ -96,7 +96,7 @@ class YoutubeService @Inject()(
   private def videoDetails(evento: Evento) = {
     if (enabled && evento.youtubeData.flatMap(_.videoId).isDefined &&
       !evento.encerrado.getOrElse(false) &&
-      evento.data.isAfter(LocalDateTime.now.minusHours(3))) {
+      evento.data.isAfter(LocalDateTime.now.minusHours(7))) {
       logger.warn(s"fetch videoDetails ${evento.nome}")
       ws.url(videosUrl)
         //        .withRequestFilter(AhcCurlRequestLogger())
@@ -146,20 +146,20 @@ class YoutubeService @Inject()(
     }
   }
 
-  def fetch(eventos: List[Evento]): Future[List[Evento]] = {
-    val listFuture = eventos.map(evento => {
-      for {
-        eventoUrlUnshorten <- urlUnshorten(evento)
-        eventoChannel <- channelId(eventoUrlUnshorten)
-        eventoChannelThumnail <- channelThumbnail(eventoChannel)
-        eventoVideo <- liveVideoId(eventoChannelThumnail)
-        eventoVideoDetails <- videoDetails(eventoVideo)
-      } yield {
-        eventoVideoDetails
-      }
-    })
-    Future.sequence(listFuture)
+  def fetchEvento(evento: Evento): Future[Evento] = {
+    for {
+      eventoUrlUnshorten <- urlUnshorten(evento)
+      eventoChannel <- channelId(eventoUrlUnshorten)
+      eventoChannelThumnail <- channelThumbnail(eventoChannel)
+      eventoVideo <- liveVideoId(eventoChannelThumnail)
+      eventoVideoDetails <- videoDetails(eventoVideo)
+    } yield {
+      eventoVideoDetails
+    }
   }
+
+  def fetch(eventos: List[Evento]): Future[List[Evento]] = Future.sequence(eventos.map(fetchEvento))
+
 
 
 

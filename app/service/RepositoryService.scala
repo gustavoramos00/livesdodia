@@ -132,6 +132,14 @@ class RepositoryService @Inject()(
     }
   }
 
+//  def updateEventoCache(evento: Evento) = {
+//    for {
+//      eventos <- getEventos
+//    } yield {
+//      eventos.fil
+//    }
+//  }
+
   def getEventos: Future[List[Evento]] =
     try {
       cache.getOrElseUpdate[List[Evento]](cacheKey) (dataFromSheets())

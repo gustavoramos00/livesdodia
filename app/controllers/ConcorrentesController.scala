@@ -1,9 +1,11 @@
 package controllers
 
 import java.time._
+import java.time.format.DateTimeFormatter
 
 import javax.inject.Inject
 import model.{Evento, YoutubeData}
+import play.api.{Environment, Mode}
 import play.api.libs.json.{JsArray, Json}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AnyContent, BaseController, ControllerComponents, Request}
@@ -12,6 +14,7 @@ import service.RepositoryService
 import scala.concurrent.{ExecutionContext, Future}
 
 class ConcorrentesController @Inject()(repository: RepositoryService,
+                                       env: Environment,
                                        ws: WSClient,
                                        val controllerComponents: ControllerComponents
                                       )(implicit ec: ExecutionContext) extends BaseController {
@@ -37,6 +40,7 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
             val horario = (event \ "horario").as[LocalTime]
             val instagram = (event \ "instagram").asOpt[String]
             val youtubeChannel = (event \ "youtube").asOpt[String]
+            val linkImagem = (event \ "linkImagem").asOpt[String]
             val tags = (event \ "tags").asOpt[String].map(_.split(",").toSeq).getOrElse(Seq.empty)
             Evento(
               nome = artista,
@@ -46,6 +50,7 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
               instagramProfile = instagram,
               tags = tags,
               destaque = true,
+              linkImagem = linkImagem,
               origem = Some("Lives do Dia"))
           })
           .toSeq
@@ -148,6 +153,7 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
             val info = (event \ "title").asOpt[String].getOrElse("").replaceAll(regexRemoveChars, "").trim
             val data = (event \ "datetime").as[ZonedDateTime].withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime
             val instagram = (event \ "instagram").asOpt[String]
+            val linkImagem = (event \ "banner").asOpt[String]
             val youtubeChannel = (event \ "youtube_channel").asOpt[String].filter(_.nonEmpty)
             val youtubeVideoId = (event \ "youtube_video").asOpt[String].filter(_.nonEmpty).map(videoId => s"https://youtube.com/watch?v=$videoId")
             val externalLink = (event \ "external_url").asOpt[String].filter(_.nonEmpty)
@@ -162,6 +168,7 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
               instagramProfile = instagram,
               youtubeData = youtubeData,
               destaque = false,
+              linkImagem = linkImagem,
               origem = Some("Lives.mus.br"))
           })
           .toSeq
@@ -181,9 +188,10 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
             val info = (event \ "description").asOpt[String].getOrElse("").replaceAll(regexRemoveChars, "").trim
             val data = (event \ "startsAt").as[ZonedDateTime].withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime
             val url = (event \ "url").asOpt[String]
-            val youtubeLink = if (url.isDefined && url.get.contains("youtube")) url else None
+            val youtubeLink = if (url.isDefined && !url.get.contains("instagram")) url else None
             val instagram = if (url.isDefined && url.get.contains("instagram")) url else None
             val categoria = (event \ "genreName").asOpt[String].getOrElse("")
+            val thumbnail = (event \ "imageUrl").asOpt[String]
             Evento(
               nome = artista,
               info = info,
@@ -192,6 +200,7 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
               youtubeLink = youtubeLink,
               instagramProfile = instagram,
               destaque = false,
+              linkImagem = thumbnail,
               origem = Some("LivesBrasil"))
           })
           .toSeq
@@ -213,37 +222,58 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
       val eventos = (livesdodia ++ filtrado).sortBy(ev => (ev.data, ev.nome))
       val result = eventos.map(ev => {
         s"${ev.nome}\t${ev.info}\t${ev.data.toLocalDate}\t${ev.data.toLocalTime}\t${ev.tags.mkString(",")}\t" +
-        s"${ev.youtubeLink.getOrElse("")}\t${ev.instagramProfile.getOrElse("")}\t${ev.origem.get}\t"
+        s"${ev.youtubeLink.getOrElse("")}\t${ev.instagramProfile.getOrElse("")}\t\t${ev.thumbnailUrl.getOrElse("")}\t${ev.origem.get}\t"
       })
-      Ok(result.mkString("\n"))
+      if (env.mode == Mode.Prod) {
+        NotFound
+      } else {
+        Ok(result.mkString("\n"))
+      }
     }
   }
 
-  def mkLivesXls(livesdodia: Seq[Evento]) = {
-    val eventosByTag = livesdodia
-      .sortBy(ev => (ev.data, ev.nome)).groupBy(_.tags).toSeq
-    val lista = eventosByTag.map {
-      case (tags, eventos) =>
-        val strTags = s"${tags.mkString(",")}"
-        val strEventos = eventos.map(ev => {
-          s"${ev.nome}\t${ev.data.toLocalTime}\t${ev.data.toLocalDate}"
-        }).mkString("\n")
-        strTags + "\n" + strEventos + "\n"
+  private def printLiveSemana(lives: Seq[Evento]) = {
+    val formatter = DateTimeFormatter.ofPattern("dd/MM EEEE HH:mm")
+    val lista = lives.sortBy(ev => (ev.data, ev.nome)).map(ev => {
+      s"${ev.nome} ${ev.data.format(formatter)}"
+    }).mkString("\n")
+    if (env.mode == Mode.Prod) {
+      NotFound
+    } else {
+      Ok(lista)
     }
-    Ok(lista.mkString("\n"))
   }
 
-  def livesHojeXls() = Action.async { implicit request: Request[AnyContent] =>
+  private def printLive(lives: Seq[Evento]) = {
+    val lista = lives.sortBy(ev => (ev.data, ev.nome)).map(ev => {
+      s"${ev.nome} ${ev.data.toLocalTime}"
+    }).mkString("\n")
+    if (env.mode == Mode.Prod) {
+      NotFound
+    } else {
+      Ok(lista)
+    }
+  }
+
+  def livesHoje() = Action.async { implicit request: Request[AnyContent] =>
     for {
       livesdodia <- dadosLivesDoDia
-    } yield mkLivesXls(livesdodia.filter(ev => ev.data.toLocalDate.isEqual(LocalDate.now)))
+    } yield printLive(livesdodia.filter(ev => ev.data.toLocalDate.isEqual(LocalDate.now)))
   }
 
-  def livesAmanhaXls() = Action.async { implicit request: Request[AnyContent] =>
+  def livesAmanha() = Action.async { implicit request: Request[AnyContent] =>
     for {
       livesdodia <- dadosLivesDoDia
     } yield {
-      mkLivesXls(livesdodia.filter(ev => ev.data.toLocalDate.isEqual(LocalDate.now.plusDays(1))))
+      printLive(livesdodia.filter(ev => ev.data.toLocalDate.isEqual(LocalDate.now.plusDays(1))))
+    }
+  }
+
+  def livesSemana() =  Action.async { implicit request: Request[AnyContent] =>
+    for {
+      livesdodia <- dadosLivesDoDia
+    } yield {
+      printLiveSemana(livesdodia.filter(ev => ev.data.toLocalDate.isAfter(LocalDate.now)))
     }
   }
 

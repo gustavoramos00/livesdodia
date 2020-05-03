@@ -81,6 +81,7 @@ class HomeController @Inject()(repository: RepositoryService,
           "youtube" -> ev.youtubeData.flatMap(_.link).getOrElse("").toString,
           "instagram" -> ev.instagramProfile.getOrElse("").toString,
           "destaque" -> ev.destaque,
+          "linkImagem" -> ev.thumbnailUrl,
           "publicar" -> "S"
         ))
 

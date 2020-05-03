@@ -20,15 +20,7 @@ case class Evento(
                    linkImagem: Option[String] = None
                  ) {
   def horarioFmt: String = {
-    val duration = Duration.between(data, LocalDateTime.now)
-    val horas = duration.toHours
-    val minutos = duration.minusHours(horas).toMinutes
-    if (duration.isNegative)
-      data.format(Evento.horaMinFormatter)
-    else if (horas > 0)
-      f"Há ${horas}h ${minutos}%02dmin"
-    else
-      f"Há ${minutos}%02dmin"
+    data.format(Evento.horaMinFormatter)
   }
 
   def thumbnailUrl: Option[String] = linkImagem.orElse(youtubeData.flatMap(_.thumbnail))

@@ -1,7 +1,12 @@
 package service
 
-import akka.actor.ActorSystem
+import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+import java.util.concurrent.TimeUnit
+
+import akka.actor.{ActorSystem, Cancellable}
 import javax.inject.Inject
+import model.Evento
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.ExecutionContext
@@ -9,9 +14,11 @@ import scala.concurrent.duration._
 
 class LiveScheduler @Inject() (actorSystem: ActorSystem,
                                repositoryService: RepositoryService,
+                               youtubeService: YoutubeService,
                                configuration: Configuration)(
   implicit executionContext: ExecutionContext){
 
+  var jobs = Seq.empty[Cancellable]
   val logger = Logger(getClass)
 
   if (isMainServer) {
@@ -23,6 +30,15 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
     }
   } else {
     logger.warn(s"NOT main server")
+  }
+
+  def scheduleEvento(evento: Evento) = {
+    val seconds = evento.data.until(LocalDateTime.now, ChronoUnit.SECONDS)
+    val duration = Duration(seconds, TimeUnit.SECONDS)
+    val cancellable = actorSystem.scheduler.scheduleOnce(duration) { () =>
+      youtubeService.fetchEvento(evento)
+    }
+    jobs = jobs :+ cancellable
   }
 
   def isMainServer: Boolean =
