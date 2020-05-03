@@ -90,7 +90,7 @@ class RepositoryService @Inject()(
     cache.get[List[Evento]](Evento.cacheKey).map {
       case Some(eventosCache) =>
         novosEventos.map(novoEvento => {
-          val maybeEventoExistente = eventosCache.find(ev => ev.id == novoEvento.id)
+          val maybeEventoExistente = eventosCache.find(ev => ev.id == novoEvento.id && ev.linkRegistrado == novoEvento.linkRegistrado)
           if (maybeEventoExistente.isDefined) {
             novoEvento.copy(youtubeData = maybeEventoExistente.get.youtubeData, encerrado = maybeEventoExistente.get.encerrado)
           } else {
