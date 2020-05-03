@@ -35,7 +35,7 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
           .filter(_.data.isBefore(LocalDateTime.now.plusDays(1)))
           .groupBy(_.data).toSeq.flatMap {
         case (data, eventos) =>
-          val randSeconds = Random.between(0,240) // para evitar fetches no mesmo instante
+          val randSeconds = Random.between(15,240) // para evitar fetches no mesmo instante
           Seq(
             scheduleEventosDetails(data, eventos), // fetch eventos na hora agendada
             scheduleEventosDetails(data.plusMinutes(5), eventos), // fetch 5 minutos depois
