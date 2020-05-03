@@ -5,7 +5,9 @@ import java.net.URLEncoder
 import java.time.{Duration, LocalDate, LocalDateTime, LocalTime}
 import java.time.format.DateTimeFormatter
 
-case class Evento( nome: String,
+case class Evento(
+                   id: Option[String],
+                   nome: String,
                    info: String,
                    data: LocalDateTime,
                    tags: Seq[String] = Seq.empty,

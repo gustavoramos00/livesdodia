@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import model.{Evento, YoutubeData}
 import play.api.{Environment, Mode}
-import play.api.libs.json.{JsArray, Json}
+import play.api.libs.json.{JsArray}
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AnyContent, BaseController, ControllerComponents, Request}
 import service.RepositoryService
@@ -34,6 +34,7 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
           .value
           .filter(event => !(event \ "data").as[LocalDate].isBefore(LocalDate.now)) // exclui antigos
           .map(event => {
+            val id = (event \ "id").asOpt[String]
             val artista = (event \ "nome").asOpt[String].getOrElse("")
             val info = (event \ "info").asOpt[String].getOrElse("")
             val data = (event \ "data").as[LocalDate]
@@ -44,6 +45,7 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
             val linkImagem = (event \ "linkImagem").asOpt[String].filter(_.nonEmpty)
             val tags = (event \ "tags").asOpt[String].map(_.split(",").toSeq).getOrElse(Seq.empty)
             Evento(
+              id = id,
               nome = artista,
               info = info,
               data = data.atTime(horario),
@@ -110,6 +112,7 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
             val youtubeChannel = (event \ "link_youtube").asOpt[String]
             val band = (event \ "band").as[Int]
             val evento = Evento(
+              id = None,
               nome = artista,
               info = info,
               data = data,
@@ -162,6 +165,7 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
             val categorias = (event \ "categories").as[JsArray].value.map(cat => (cat \ "name").as[String]).toSeq
             val youtubeData = youtubeChannel.orElse(youtubeVideoId).orElse(externalLink).map(YoutubeData.fromYoutubeLink)
             Evento(
+              id = None,
               nome = artista,
               info = info,
               data = data,
@@ -195,6 +199,7 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
             val categoria = (event \ "genreName").asOpt[String].getOrElse("")
             val thumbnail = (event \ "imageUrl").asOpt[String]
             Evento(
+              id = None,
               nome = artista,
               info = info,
               data = data,

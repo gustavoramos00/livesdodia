@@ -58,6 +58,7 @@ class RepositoryService @Inject()(
                 throw new IllegalArgumentException(s"ID não informado para evento $nome")
               }
               val evento = Evento(
+                id = id,
                 nome = nome,
                 info = info,
                 data = data,

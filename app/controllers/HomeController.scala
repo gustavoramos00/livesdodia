@@ -73,6 +73,7 @@ class HomeController @Inject()(repository: RepositoryService,
         .filter(!_.data.toLocalDate.isBefore(LocalDate.now))
         .sortBy(_.data)
         .map(ev => Json.obj(
+          "id" -> ev.id,
           "nome" -> ev.nome,
           "info" -> ev.info,
           "data" -> ev.data.toLocalDate.toString,
