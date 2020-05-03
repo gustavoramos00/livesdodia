@@ -77,7 +77,7 @@ class YoutubeService @Inject()(
 //        .withRequestFilter(AhcCurlRequestLogger())
         .addQueryStringParameters(
           "key" -> apiKey,
-          "part" -> "id",
+          "part" -> "snippet",
           "eventType" -> "live",
           "channelId" -> evento.youtubeData.get.channelId.get,
           "type" -> "video")
