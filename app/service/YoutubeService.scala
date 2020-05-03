@@ -66,7 +66,7 @@ class YoutubeService @Inject()(
     }
   }
 
-  private def liveVideoId(evento: Evento): Future[Evento] = {
+  def fetchLiveVideoId(evento: Evento): Future[Evento] = {
     if (enabled && evento.youtubeData.flatMap(_.channelId).isDefined &&
       !evento.youtubeData.flatMap(_.videoId).isDefined &&
       evento.data.isBefore(LocalDateTime.now) &&
@@ -92,7 +92,7 @@ class YoutubeService @Inject()(
     }
   }
 
-  private def videoDetails(evento: Evento) = {
+  def fetchVideoDetails(evento: Evento) = {
     if (enabled && evento.youtubeData.flatMap(_.videoId).isDefined &&
       !evento.encerrado.getOrElse(false) &&
       evento.data.isAfter(LocalDateTime.now.minusHours(7))) {
@@ -150,16 +150,13 @@ class YoutubeService @Inject()(
       eventoUrlUnshorten <- urlUnshorten(evento)
       eventoChannel <- channelId(eventoUrlUnshorten)
       eventoChannelThumnail <- channelThumbnail(eventoChannel)
-      eventoVideo <- liveVideoId(eventoChannelThumnail)
-      eventoVideoDetails <- videoDetails(eventoVideo)
+      eventoVideo <- fetchLiveVideoId(eventoChannelThumnail)
+      eventoVideoDetails <- fetchVideoDetails(eventoVideo)
     } yield {
       eventoVideoDetails
     }
   }
 
-  def fetch(eventos: List[Evento]): Future[List[Evento]] = Future.sequence(eventos.map(fetchEvento))
-
-
-
+  def fetch(eventos: Seq[Evento]): Future[Seq[Evento]] = Future.sequence(eventos.map(fetchEvento))
 
 }

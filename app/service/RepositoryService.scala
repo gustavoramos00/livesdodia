@@ -14,6 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class RepositoryService @Inject()(
                                    youtubeService: YoutubeService,
                                    ws: WSClient,
+                                   liveScheduler: LiveScheduler,
                                    cache: AsyncCacheApi,
                                    configuration: Configuration
                                  )
@@ -25,7 +26,6 @@ class RepositoryService @Inject()(
   val apiKey = configuration.get[String]("apiKey")
   val ranges = configuration.get[String]("ranges")
   val urlSpreadSheet = s"$endpoint/v4/spreadsheets/${spreadsheetId}/values/$ranges"
-  val cacheKey = "eventos"
   val dataAtualizacaoCacheKey = "atualizadoEm"
   val logger: Logger = Logger(this.getClass())
 
@@ -87,7 +87,7 @@ class RepositoryService @Inject()(
   }
 
   private def recuperaDadosYoutubeCache(novosEventos: List[Evento]): Future[List[Evento]] = {
-    cache.get[List[Evento]](cacheKey).map {
+    cache.get[List[Evento]](Evento.cacheKey).map {
       case Some(eventosCache) =>
         novosEventos.map(novoEvento => {
           val maybeEventoExistente = eventosCache.find(ev => ev.nome == novoEvento.nome &&
@@ -128,26 +128,19 @@ class RepositoryService @Inject()(
     for {
       eventosSheet <- dataFromSheets()
       eventosDadosCache <- recuperaDadosYoutubeCache(eventosSheet)
-      _ <- cache.set(cacheKey, eventosDadosCache)
+      _ <- cache.set(Evento.cacheKey, eventosDadosCache)
       _ <- cache.set(dataAtualizacaoCacheKey, LocalDateTime.now)
+      _ <- Future.successful(liveScheduler.reSchedule(eventosDadosCache))
       eventosAtualizados <- youtubeService.fetch(eventosDadosCache)
     } yield {
-      cache.set(cacheKey, eventosAtualizados)
+      cache.set(Evento.cacheKey, eventosAtualizados)
       cache.set(dataAtualizacaoCacheKey, LocalDateTime.now)
     }
   }
 
-//  def updateEventoCache(evento: Evento) = {
-//    for {
-//      eventos <- getEventos
-//    } yield {
-//      eventos.fil
-//    }
-//  }
-
   def getEventos: Future[List[Evento]] =
     try {
-      cache.getOrElseUpdate[List[Evento]](cacheKey) (dataFromSheets())
+      cache.getOrElseUpdate[List[Evento]](Evento.cacheKey) (dataFromSheets())
     } catch {
       case ex: Throwable => logger.error(s"Erro ao obter do cache", ex)
         throw ex

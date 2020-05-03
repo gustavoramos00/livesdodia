@@ -68,6 +68,7 @@ case class Evento(
 
 object Evento {
 
+  val cacheKey = "eventos"
   private val horaMinPattern = "HH:mm"
   private val horaMinSegPattern = "HH:mm:ss"
   private val diaMesAnoPattern = "dd/MM/yyyy"
