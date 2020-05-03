@@ -79,8 +79,7 @@ class YoutubeService @Inject()(
           "part" -> "id",
           "eventType" -> "live",
           "channelId" -> evento.youtubeData.get.channelId.get,
-          "type" -> "video",
-          "prettyPrint" -> "true")
+          "type" -> "video")
         .get()
         .map { response =>
           if (response.status != 200) logger.error(s"Erro ao fazer requisição ${response.json}")

@@ -38,7 +38,7 @@ class RepositoryService @Inject()(
         valuesList
           .tail // remove cabeçalho
           .flatMap {
-          case List(_, _, nome, info, dia, hora, tags: String, liveLink: String, instagramProfile: String, destaque: String, thumbnail: String, "S", _*) =>
+          case List(carimboDtHrUuid, _, nome, info, dia, hora, tags: String, liveLink: String, instagramProfile: String, destaque: String, thumbnail: String, "S", _*) =>
             try {
               val data = Evento.parseData(dia, hora)
               val (optYoutube, optOutroLink) =
@@ -53,6 +53,10 @@ class RepositoryService @Inject()(
               val optYoutubeData = optYoutube.map(YoutubeData.fromYoutubeLink)
               val optThumbnail = if (thumbnail.isEmpty) None else Some(thumbnail)
               val tagList = tags.split(",").toSeq.map(_.trim)
+              val id = Some(carimboDtHrUuid)
+              if (id == null || id.isEmpty) {
+                throw new IllegalArgumentException(s"ID não informado para evento $nome")
+              }
               val evento = Evento(
                 nome = nome,
                 info = info,
@@ -149,7 +153,7 @@ class RepositoryService @Inject()(
     }
 
 
-  private def filtroEventoJaComecou(evento: Evento): Boolean = evento.data.isBefore(LocalDateTime.now) && evento.data.isAfter(LocalDateTime.now.minusHours(12))
+  private def filtroEventoJaComecou(evento: Evento): Boolean = evento.data.isBefore(LocalDateTime.now) && evento.data.isAfter(LocalDateTime.now.minusHours(8))
 
   def eventosAgora() = {
     val futureEventos = getEventos.map(eventos => {
