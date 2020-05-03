@@ -26,7 +26,7 @@ case class Evento(
 
   def thumbnailUrl: Option[String] = linkImagem.orElse(youtubeData.flatMap(_.thumbnail))
 
-  def linkLive: Option[String] = youtubeData.flatMap(_.link).orElse(instagramProfile).orElse(outroLink)
+  def linkLive: Option[String] = youtubeData.flatMap(_.link).orElse(outroLink).orElse(instagramProfile)
 
   def linkRegistrado: Option[String] = youtubeLink.orElse(instagramProfile).orElse(outroLink)
 

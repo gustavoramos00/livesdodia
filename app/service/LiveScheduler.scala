@@ -48,7 +48,7 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
     val duration = Duration(seconds, TimeUnit.SECONDS)
     // não funcionou com scheduleOnce.
     // Usando fixedDelay com valor alto suficiente para não executar novamente
-    actorSystem.scheduler.scheduleWithFixedDelay(duration, 72.hours) { () =>
+    actorSystem.scheduler.scheduleWithFixedDelay(duration, 10.hours) { () =>
       println(s"running schedule for [${eventos.map(_.nome).mkString(", ")}]")
       Future.sequence(eventos.map(evento =>
         for {

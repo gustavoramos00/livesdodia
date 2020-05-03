@@ -228,7 +228,7 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
       })
       val eventos = (livesdodia ++ filtrado).sortBy(ev => (ev.data, ev.nome))
       val result = eventos.map(ev => {
-        s"${ev.nome}\t${ev.info}\t${ev.data.toLocalDate}\t${ev.data.toLocalTime}\t${ev.tags.mkString(",")}\t" +
+        s"${ev.id.getOrElse("")}\t\t${ev.nome}\t${ev.info}\t${ev.data.toLocalDate}\t${ev.data.toLocalTime}\t${ev.tags.mkString(",")}\t" +
         s"${ev.youtubeLink.orElse(ev.outroLink).getOrElse("")}\t${ev.instagramProfile.getOrElse("")}\t\t${ev.thumbnailUrl.getOrElse("")}\t${ev.origem.get}\t"
       })
       if (env.mode == Mode.Prod) {
