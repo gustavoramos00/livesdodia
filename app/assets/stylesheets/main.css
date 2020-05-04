@@ -516,6 +516,7 @@ div[aria-expanded=false] span.icon-caret-square-o-up {
 .dia-box .testi-img img {
   height: 40px;
   width: 40px !important;
+  object-fit: cover;
 }
 
 .destaque-box {

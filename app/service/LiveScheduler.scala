@@ -59,14 +59,14 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
       // Usando fixedDelay com valor alto suficiente para não executar novamente
       val cancellable = actorSystem.scheduler.scheduleWithFixedDelay(duration, 10.hours) { () =>
         logger.warn(s"running schedule for [${eventos.map(_.nome).mkString(", ")}]")
-        Future.sequence(eventos.map(evento =>
-          for {
-            eventoVideo <- youtubeService.fetchLiveVideoId(evento)
-            eventoVideoDetails <- youtubeService.fetchVideoDetails(eventoVideo)
-          } yield eventoVideoDetails
-        )).map(eventosAtualizados => {
-          updateEventosCache(eventosAtualizados)
-        })
+        for {
+          optEventosAtualizados <- eventosCache
+          eventosVideo <- Future.sequence(optEventosAtualizados.getOrElse(eventos).map(youtubeService.fetchLiveVideoId))
+          eventosVideoDetails <- Future.sequence(eventosVideo.map(youtubeService.fetchVideoDetails))
+        } yield {
+          updateEventosCache(eventosVideoDetails)
+          eventosVideoDetails
+        }
       }
       Some(cancellable)
     } else {
@@ -74,15 +74,22 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
     }
   }
 
+  def eventosCache = cache.get[List[Evento]](Evento.cacheKey)
 
   def updateEventosCache(eventos: Seq[Evento]) = {
-    for {
-      Some(eventosCache) <- cache.get[List[Evento]](Evento.cacheKey)
-    } yield {
+
+    def cacheReplace(eventosCache: Seq[Evento]) = {
       val (_, eventosNoMatch) = eventosCache.partition(ev => eventos.exists(_.id == ev.id))
       val eventosFinal = eventos ++ eventosNoMatch
       logger.warn(s"Atualiza cache apos fetch eventos length= [${eventosFinal.length}] ")
-      cache.set(Evento.cacheKey, eventosFinal)
+      eventosFinal
+    }
+
+    for {
+      Some(eventosCache) <- eventosCache
+      done <- cache.set(Evento.cacheKey, cacheReplace(eventosCache))
+    } yield {
+      done
     }
   }
 

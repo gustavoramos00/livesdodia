@@ -51,10 +51,11 @@ $(document).ready(function(){
   setInterval(function(){
     $.ajax({
       url: '/eventoshoje',
-      dataType: 'html'
-    }).done(function(html) {
-      $('#eventos-hoje-container').replaceWith(html);
-      initElements(slider);
+      dataType: 'html',
+      success: function(html) {
+        $('#eventos-hoje-container').replaceWith(html);
+        initElements(slider);
+      }
     });
   },90000); // atualiza a cada 1min30s
 

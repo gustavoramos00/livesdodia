@@ -70,7 +70,7 @@ class YoutubeService @Inject()(
 
   def fetchLiveVideoId(evento: Evento): Future[Evento] = {
     if (enabled && evento.youtubeData.flatMap(_.channelId).isDefined &&
-      !evento.youtubeData.flatMap(_.videoId).isDefined &&
+      evento.youtubeData.flatMap(_.videoId).isEmpty &&
       evento.data.isBefore(LocalDateTime.now) &&
       evento.data.isAfter(LocalDateTime.now.minusHours(3))) {
       ws.url(searchUrl) // TODO usar com cautela, alto uso de quota API Youtube
