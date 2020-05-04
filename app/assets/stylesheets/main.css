@@ -116,13 +116,8 @@ section {
   transition: top 0.4s ease; /* Transition effect when sliding down (and up) */
 }
 
-.maybe-first-section {
+#eventos-hoje-container {
   padding-top: 125px;
-}
-
-/* Remove da segunda possível seção */
-.maybe-first-section + .maybe-first-section {
-  padding-top: 0;
 }
 
 .header-container .container {
@@ -548,7 +543,7 @@ div[aria-expanded=false] span.icon-caret-square-o-up {
 }
 
 .badge-live.jplist-selected{
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .tags {
@@ -885,7 +880,7 @@ a.link-no-decoration {
     height: 70px;
   }
 
-  .maybe-first-section {
+  #eventos-hoje-container {
     padding-top: 100px;
   }
 

@@ -46,9 +46,21 @@ class HomeController @Inject()(repository: RepositoryService,
         atualizadoEm <- repository.atualizadoEm()
         tagsColor <- repository.tagsColor()
       } yield {
-        val proxEventoMiliSec = eventosHoje.headOption.map(ev => LocalDateTime.now.until(ev.data.plusSeconds(cacheDuration.toSeconds), ChronoUnit.MILLIS))
         val jsonld = jsonLdSchemaLivesDoDia(eventosAgora, eventosHoje, eventosProgramacao)
-        Ok(views.html.index(eventosAgora, eventosHoje, eventosProgramacao, atualizadoEm, proxEventoMiliSec, jsonld, tagsColor))
+        Ok(views.html.index(eventosAgora, eventosHoje, eventosProgramacao, atualizadoEm, jsonld, tagsColor))
+      }
+    }
+  }
+
+  def eventosHoje() = cached(_ => "jaComecou", cacheDuration) {
+
+    Action.async { implicit request: Request[AnyContent] =>
+      for {
+        eventosAgora <- repository.eventosAgora()
+        eventosHoje <- repository.eventosAconteceraoHoje()
+        tagsColor <- repository.tagsColor()
+      } yield {
+        Ok(views.html.eventosHoje(eventosAgora, eventosHoje, tagsColor))
       }
     }
   }

@@ -37,9 +37,9 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
         case (data, eventos) =>
           val randSeconds = Random.between(15,240) // para evitar fetches no mesmo instante
           Seq(
-            scheduleEventosDetails(data, eventos), // fetch eventos na hora agendada
-            scheduleEventosDetails(data.plusMinutes(5), eventos), // fetch 5 minutos depois
-            scheduleEventosDetails(data.plusMinutes(20), eventos), // fetch 20 minutos depois
+            scheduleEventosDetails(data.plusSeconds(15), eventos), // fetch pouco depois da hora agendada
+            scheduleEventosDetails(data.plusMinutes(5), eventos), // fetch após
+            scheduleEventosDetails(data.plusMinutes(25), eventos), // fetch última tentativa
             scheduleEventosDetails(data.plusHours(2).plusSeconds(randSeconds), eventos), // fetch ~2h depois
             scheduleEventosDetails(data.plusHours(4).plusSeconds(randSeconds), eventos), // fetch ~4h depois
             scheduleEventosDetails(data.plusHours(6).plusSeconds(randSeconds), eventos) // fetch ~6h depois

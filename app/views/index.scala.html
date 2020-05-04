@@ -2,112 +2,18 @@
 @import model.EventosDia
 
 @(eventosAgora: Seq[Evento],
-  eventosHoje: Seq[Evento],
+  demaisEventosHoje: Seq[Evento],
   eventosDia: Seq[EventosDia],
   atualizadoEm: String,
-  proxEventoMiliSec: Option[Long],
   jsonld: String,
   tags: Seq[(String, String)])
 
-@colorByTag(tag: String) = {@tags.find(t => t._1 == tag).map(_._2).getOrElse("#f103c9")}
-
-@displayEvento(evento: Evento, full: Boolean = false, agora: Boolean = false) = {
-<div class="testi-item" data-jplist-item>
-  <div class="testi-meta-inner d-flex" collapse-control="@evento.generatedId">
-    <div class="testi-img mr-2">
-      @if(evento.thumbnailUrl.isDefined) {
-        <img class="thumbnail" src='@evento.thumbnailUrl.get'>
-      } else {
-        <img class="thumbnail" src='@routes.Assets.versioned("img/microfone.jpg")'>
-      }
-    </div>
-    <div class="testi-details">
-      <p class="testi-destaque mb-0 searchable">
-        @evento.nome
-        @if(evento.destaque) {
-          <span class="icon-star"></span>
-        }
-        @if(evento.encerrado.getOrElse(false)){
-          <i>(Encerrado)</i>
-        }
-
-      </p>      
-      @if(evento.info.nonEmpty) {
-      <p class="testi-info mb-0 searchable">
-        @evento.info
-      </p>
-      }
-      @for(tag <- evento.tags){
-        @if(tag == "Música"){
-          <span class="badge badge-live @tag" hidden>@tag</span>
-        } else {
-          <span class="badge badge-live @tag" style='background-color: @colorByTag(tag)'>@tag</span>
-        }
-      }
-      <p class="testi-desc mb-0">
-        @evento.horarioFmt
-        <!-- <span class="icon-caret-square-o-down"></span>
-        <span class="icon-caret-square-o-up"></span> -->
-      </p>
-    </div>
-  </div>
-  <div class="collapse multi-collapse" id='@evento.generatedId'>
-    <div class="card card-body bg-transparent">
-      <div class="icones-previa">
-        @if(evento.youtubeData.flatMap(_.embeddable).contains(true)){
-          <button type="button" class="button-clear" onclick='playYoutubeVideoId("@evento.youtubeData.flatMap(_.videoId).get", "@evento.nome")'>
-            <span class="icon icon-play-circle"></span>
-          </button>
-        }
-        @if(evento.linkLive.isDefined) {
-          <a class="icone" rel="nofollow" href="@evento.linkLive.get" target="_blank">
-            <span class="icon @evento.iconeLive"></span>
-          </a>
-        }
-        @if(evento.instagramProfile.isDefined && evento.instagramProfile != evento.linkLive)  {
-          <a class="icone" rel="nofollow" href="@evento.instagramProfile.get" target="_blank">
-            <span class="icon icon-instagram"></span>
-          </a>
-        }
-      </div>
-      
-      <span class="h6">
-        Compartilhar live
-        <a class="link-no-decoration" href='https://wa.me/?text=@evento.urlEncodedShare' target="_blank">
-          <span class="icon-whatsapp"></span>
-        </a>
-        <a class="link-no-decoration" href='https://twitter.com/intent/tweet?text=@evento.urlEncodedShare' target="_blank">
-          <span class="icon-twitter"></span>
-        </a>
-        <a class="link-no-decoration" href='https://www.facebook.com/sharer/sharer.php?u=livesdodia.com.br&quote=@evento.urlEncodedShareFacebook' target="_blank">
-          <span class="icon-facebook-square"></span>
-        </a>
-      </span>
-    </div>
-  </div>
-</div>
-}
-
-@tituloHoje() = {
-  @if(eventosAgora.nonEmpty) {
-    Em breve
-  } else {
-    Hoje
-  }
-}
 
 @*
 *<!--@tagSelected(tag: String) = {@(tag.equals("Música") && eventosAgora.flatMap(_.tags).contains("Música"))}-->
 *@
 
 @tagSelected(tag: String) = {false}
-
-
-@buscanaoencontrada() = {
-  <div class="testi-item busca-nao-encontrada" style="display: none">
-    Live não encontrada nessa seção, refaça a busca ou <a href="/incluir">cadastre uma nova</a>.
-  </div>
-}
 
 @base {
   <div  class="yt-player">
@@ -151,10 +57,12 @@
       showElementsPlayVideo();
       player.destroy();
       player = undefined;
+      $("#eventos-hoje-container").css("padding-top", "");
       ga('send', {
         hitType: 'event',
         eventCategory: 'Lives',
-        eventAction: 'video-stop'
+        eventAction: 'video-stop',
+        eventAction: 'video-stop',
       });
     }
 
@@ -171,6 +79,7 @@
       } else {
         player.loadVideoById(videoId);
       }
+      $("#eventos-hoje-container").css("padding-top", "10px");
       ga('send', {
         hitType: 'event',
         eventCategory: 'Lives',
@@ -186,51 +95,7 @@
 
   </script>
 
-  <!-- INICIADAS -->
-  @if(eventosAgora.nonEmpty) {
-  <section class="maybe-first-section section-padding bg-white">
-    <div class="container">
-      <div class="section-content shadow destaque-box" data-aos="fade-up">
-        <div class="heading-section text-center">
-          <h2>
-            Já começou
-          </h2>
-        </div>
-        <div class="row">
-          <div class="testi-content search-not-found-container" data-jplist-group="search-group">
-            @for(evento <- eventosAgora) {
-              @displayEvento(evento, true, true)
-            }
-            @buscanaoencontrada
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  }
-  <!-- FIM INICIADA -->
-
-  @if(eventosHoje.nonEmpty) {
-  <section class="maybe-first-section section-padding bg-fixed bg-white">
-    <div class="container">
-      <div class="section-content shadow destaque-box" data-aos="fade-up">
-        <div class="heading-section text-center">
-          <h2>
-            @tituloHoje()
-          </h2>
-        </div>
-        <div class="row">
-          <div class="testi-content search-not-found-container" data-jplist-group="search-group">
-            @for(evento <- eventosHoje) {
-              @displayEvento(evento, true)
-            }
-            @buscanaoencontrada
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  }
+  @eventosHoje(eventosAgora, demaisEventosHoje, tags)
 
   <div class="tags">
     <button type="button" data-jplist-control="buttons-text-filter" data-path=".badge" data-group="search-group"
@@ -249,7 +114,7 @@
     }
   </div>
 
-  <section id="client" class="overlay bg-fixed" style='background-image: url(@routes.Assets.versioned("img/bg.jpg"));'>
+  <section class="overlay bg-fixed" style='background-image: url(@routes.Assets.versioned("img/bg.jpg"));'>
     <div class="container">
       <div class="section-content" data-aos="fade-up">
         <div class="row">
@@ -260,7 +125,7 @@
           </div>
           <!-- Client Holder -->
           <div class="col-md-12 client-holder search-not-found-container">
-            @buscanaoencontrada
+            @buscaNaoEncontrada()
             <div class="client-slider">
               @for(item <- eventosDia){
               <div class="shadow dia-box">
@@ -274,7 +139,7 @@
                 </div>
                 <div data-jplist-group="search-group">
                   @for(evento <- item.eventos){
-                    @displayEvento(evento, false)
+                    @displayEvento(evento, false, tags = tags)
                   }
                 </div>
               </div>
@@ -301,13 +166,5 @@
       </div>
     </div>
   </section>
-
-  @if(proxEventoMiliSec.isDefined){
-    <script type="text/javascript">
-      setTimeout(function(){
-        location.reload(true);
-      },@proxEventoMiliSec.get)
-    </script>
-  }
 
 }(Some(jsonld), true)

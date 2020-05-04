@@ -1,79 +1,105 @@
 $(document).ready(function(){
 
-/***
- * Show and Hide header container
- */
-var prevScrollpos = window.pageYOffset;
-window.onscroll = function() {
-  var currentScrollPos = window.pageYOffset;
-  var containerTop = $(".yt-player");
-  var containerBottom = $('.tags');
+  initScroll();
   
-  if (prevScrollpos > currentScrollPos) {
-    containerTop.css('top', 0);
-    containerBottom.css('bottom', -containerBottom.height());
-  } else {
-    if (player) {
-      containerTop.css('top', -(containerTop.height()*0.6));
-    }
-    containerBottom.css('bottom', 0);
-  }
-  
+  jplist.init();
 
-  prevScrollpos = currentScrollPos;
+  var slider = tns({
+    container: '.client-slider',
+    controls: false,
+    arrowKeys: true,
+    items: 1,
+    mouseDrag: true,
+    loop: false,
+    responsive: {
+      768: {
+        items: 2
+      },
+      992: {
+        items: 3
+      }
+    }
+  });
+
+  //get a jPList control element
+  const element = document.getElementById('jplist-control-element');
+
+  //listen to the state event
+  element.addEventListener('jplist.state', function(e) {
+
+    /** 
+     * Oculta dias que não tem eventos satisfazendo os critérios de busca 
+    */
+    $('.dia-box:not(:has(.searchable))').hide();
+    $('.dia-box:has(.searchable)').show();
+    slider.goTo('first');
+
+    /**
+     * Exibe 'Busca não encontrada' nas seções
+     */
+    $('.search-not-found-container:not(:has(.searchable))').find('.busca-nao-encontrada').show();
+    $('.search-not-found-container:has(.searchable)').find('.busca-nao-encontrada').hide();
+
+  });
+    
+
+  initElements();
+
+  /******************************
+  * Atualiza seção Eventos do Dia
+  ******************************/
+  setInterval(function(){
+    $.ajax({
+      url: '/eventoshoje',
+      dataType: 'html'
+    }).done(function(html) {
+      $('#eventos-hoje-container').replaceWith(html);
+      initElements(slider);
+    });
+  },90000); // atualiza a cada 1min30s
+
+});
+
+function initElements() {
+  
+  //refresh jPList
+  jplist.resetContent();
+  
+  $('.testi-meta-inner').on('click touch', function () {
+    var controlName = '#' + $(this).attr('collapse-control');
+    var data = $(this).attr('data-control');
+    $(controlName).collapse('toggle');
+    ga('send', {
+      hitType: 'event',
+      eventCategory: 'Toggle',
+      eventAction: data,
+      eventLabel: controlName
+    });
+  });
+
 }
 
-
-jplist.init();
-
-
-$('.testi-meta-inner').on('click touch', function () {
-  var controlName = '#' + $(this).attr('collapse-control');
-  $(controlName).collapse('toggle');
-  ga('send', {
-    hitType: 'event',
-    eventCategory: 'Lives',
-    eventAction: 'toggle',
-    eventLabel: controlName
-  });
-});
-
-var slider = tns({
-  container: '.client-slider',
-  controls: false,
-  arrowKeys: true,
-  items: 1,
-  mouseDrag: true,
-  loop: false,
-  responsive: {
-    768: {
-      items: 2
-    },
-    992: {
-      items: 3
-    }
-  }
-});
-
-
-//get a jPList control element
-const element = document.getElementById('jplist-control-element');
-
-//listen to the state event
-element.addEventListener('jplist.state', function(e) {
-
-  /** 
-   * Oculta dias que não tem eventos satisfazendo os critérios de busca 
-  */
-  $('.dia-box:not(:has(.searchable))').hide();
-  $('.dia-box:has(.searchable)').show();
-  slider.goTo('first');
-
-  /**
-   * Exibe 'Busca não encontrada' nas seções
+function initScroll() {
+    /***
+   * Show and Hide header container
    */
-  $('.search-not-found-container:not(:has(.searchable))').find('.busca-nao-encontrada').show();
-  $('.search-not-found-container:has(.searchable)').find('.busca-nao-encontrada').hide();
+  var prevScrollpos = window.pageYOffset;
+  window.onscroll = function() {
+    var currentScrollPos = window.pageYOffset;
+    var containerTop = $(".yt-player");
+    var containerBottom = $('.tags');
+    
+    if (prevScrollpos > currentScrollPos) {
+      containerTop.css('top', 0);
+      containerBottom.css('bottom', -containerBottom.height());
+    } else {
+      if (player) {
+        containerTop.css('top', -(containerTop.height()*0.6));
+      }
+      containerBottom.css('bottom', 0);
+    }
+    
 
-});
-});
+    prevScrollpos = currentScrollPos;
+  }
+}

@@ -1,0 +1,80 @@
+@import model.Evento
+
+@(evento: Evento, full: Boolean = false, agora: Boolean = false, tags: Seq[(String, String)])
+
+@colorByTag(tag: String) = {@tags.find(t => t._1 == tag).map(_._2).getOrElse("#f103c9")}
+
+<div class="testi-item" data-jplist-item>
+  <div class="testi-meta-inner d-flex" collapse-control="@evento.generatedId" data-control="@evento.data.toLocalDate">
+    <div class="testi-img mr-2">
+      @if(evento.thumbnailUrl.isDefined) {
+      <img class="thumbnail" src='@evento.thumbnailUrl.get'>
+      } else {
+      <img class="thumbnail" src='@routes.Assets.versioned("img/microfone.jpg")'>
+      }
+    </div>
+    <div class="testi-details">
+      <p class="testi-destaque mb-0 searchable">
+        @evento.nome
+        @if(evento.destaque) {
+        <span class="icon-star"></span>
+        }
+        @if(evento.encerrado.getOrElse(false)){
+        <i>(Encerrado)</i>
+        }
+
+      </p>
+      @if(evento.info.nonEmpty) {
+      <p class="testi-info mb-0 searchable">
+        @evento.info
+      </p>
+      }
+      @for(tag <- evento.tags){
+      @if(tag == "Música"){
+      <span class="badge badge-live @tag" hidden>@tag</span>
+      } else {
+      <span class="badge badge-live @tag" style='background-color: @colorByTag(tag)'>@tag</span>
+      }
+      }
+      <p class="testi-desc mb-0">
+        @evento.horarioFmt
+        <!-- <span class="icon-caret-square-o-down"></span>
+        <span class="icon-caret-square-o-up"></span> -->
+      </p>
+    </div>
+  </div>
+  <div class="collapse multi-collapse" id='@evento.generatedId'>
+    <div class="card card-body bg-transparent">
+      <div class="icones-previa">
+        @if(evento.youtubeData.flatMap(_.embeddable).contains(true)){
+        <button type="button" class="button-clear" onclick='playYoutubeVideoId("@evento.youtubeData.flatMap(_.videoId).get", "@evento.nome")'>
+          <span class="icon icon-play-circle"></span>
+        </button>
+        }
+        @if(evento.linkLive.isDefined) {
+        <a class="icone" rel="nofollow" href="@evento.linkLive.get" target="_blank">
+          <span class="icon @evento.iconeLive"></span>
+        </a>
+        }
+        @if(evento.instagramProfile.isDefined && evento.instagramProfile != evento.linkLive)  {
+        <a class="icone" rel="nofollow" href="@evento.instagramProfile.get" target="_blank">
+          <span class="icon icon-instagram"></span>
+        </a>
+        }
+      </div>
+
+      <span class="h6">
+        Compartilhar live
+        <a class="link-no-decoration" href='https://wa.me/?text=@evento.urlEncodedShare' target="_blank">
+          <span class="icon-whatsapp"></span>
+        </a>
+        <a class="link-no-decoration" href='https://twitter.com/intent/tweet?text=@evento.urlEncodedShare' target="_blank">
+          <span class="icon-twitter"></span>
+        </a>
+        <a class="link-no-decoration" href='https://www.facebook.com/sharer/sharer.php?u=livesdodia.com.br&quote=@evento.urlEncodedShareFacebook' target="_blank">
+          <span class="icon-facebook-square"></span>
+        </a>
+      </span>
+    </div>
+  </div>
+</div>

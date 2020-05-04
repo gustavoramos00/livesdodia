@@ -96,8 +96,8 @@ class YoutubeService @Inject()(
 
   def fetchVideoDetails(evento: Evento) = {
     if (enabled && evento.youtubeData.flatMap(_.videoId).isDefined &&
-      !evento.encerrado.getOrElse(false) &&
-      evento.data.isAfter(LocalDateTime.now.minus(liveTtl))) {
+     !evento.encerrado.getOrElse(false) &&
+     evento.data.isAfter(LocalDateTime.now.minus(liveTtl))) {
       ws.url(videosUrl)
         //        .withRequestFilter(AhcCurlRequestLogger())
         .addQueryStringParameters(
@@ -117,7 +117,9 @@ class YoutubeService @Inject()(
             embeddable = embeddable,
             thumbnail = thumbnail
           ))
-          val encerrado = liveBroadcastContent.map(eventStatus => eventStatus == YoutubeData.broadcastEncerrado)
+          val encerrado = liveBroadcastContent
+            .map(eventStatus => eventStatus == YoutubeData.broadcastEncerrado) // youtube encerrado
+            .orElse(evento.youtubeData.map(_.liveBroadcastContent.contains(YoutubeData.broadcastLive))) // sem info, mas já esteve ao vivo
           evento.copy(youtubeData = newYoutubeData, encerrado = encerrado)
         }
     } else {
