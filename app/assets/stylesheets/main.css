@@ -510,6 +510,7 @@ div[aria-expanded=false] span.icon-caret-square-o-up {
 .testi-img img {
   height: 60px;
   width: 60px !important;
+  object-fit: cover;
   border-radius: 50%;
   display: inline-block !important; }
 
