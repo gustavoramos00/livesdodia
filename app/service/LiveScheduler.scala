@@ -51,6 +51,7 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
   }
 
   private def scheduleEventosDetails(data: LocalDateTime, eventos: Seq[Evento]) = {
+
     val seconds = LocalDateTime.now.until(data, ChronoUnit.SECONDS)
     if (seconds > 0) {
       val duration = Duration(seconds, TimeUnit.SECONDS)
@@ -60,8 +61,9 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
       val cancellable = actorSystem.scheduler.scheduleWithFixedDelay(duration, 10.hours) { () =>
         logger.warn(s"running schedule for [${eventos.map(_.nome).mkString(", ")}]")
         for {
-          optEventosAtualizados <- eventosCache
-          eventosVideo <- Future.sequence(optEventosAtualizados.getOrElse(eventos).map(youtubeService.fetchLiveVideoId))
+          eventosDoCache <- eventosCache
+          eventosAtualizados <- Future.successful(eventos.map(evAntes => eventosDoCache.find(_.id == evAntes.id).getOrElse(evAntes)))
+          eventosVideo <- Future.sequence(eventosAtualizados.map(youtubeService.fetchLiveVideoId))
           eventosVideoDetails <- Future.sequence(eventosVideo.map(youtubeService.fetchVideoDetails))
         } yield {
           updateEventosCache(eventosVideoDetails)
@@ -74,7 +76,7 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
     }
   }
 
-  def eventosCache = cache.get[List[Evento]](Evento.cacheKey)
+  def eventosCache = cache.get[List[Evento]](Evento.cacheKey).map(_.getOrElse(Seq.empty))
 
   def updateEventosCache(eventos: Seq[Evento]) = {
 
@@ -86,7 +88,7 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
     }
 
     for {
-      Some(eventosCache) <- eventosCache
+      eventosCache <- eventosCache
       done <- cache.set(Evento.cacheKey, cacheReplace(eventosCache))
     } yield {
       done
