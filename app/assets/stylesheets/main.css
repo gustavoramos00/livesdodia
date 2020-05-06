@@ -159,11 +159,11 @@ section {
   font-size: 30px;
   opacity: 0.9;
   display: inline;
-  padding-left: 10px;
+  padding-left: 5px;
 }
 
 .icone {
-  min-width: 45px;
+  padding-right: 5px !important;
 }
 
 .input-group-busca {
