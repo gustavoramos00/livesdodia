@@ -5,8 +5,7 @@ import java.time.format.DateTimeFormatter
 
 import javax.inject.Inject
 import model.{Evento, YoutubeData}
-import play.api.{Environment, Mode}
-import play.api.libs.json.{JsArray}
+import play.api.libs.json.JsArray
 import play.api.libs.ws.WSClient
 import play.api.mvc.{AnyContent, BaseController, ControllerComponents, Request}
 import service.RepositoryService
@@ -14,7 +13,6 @@ import service.RepositoryService
 import scala.concurrent.{ExecutionContext, Future}
 
 class ConcorrentesController @Inject()(repository: RepositoryService,
-                                       env: Environment,
                                        ws: WSClient,
                                        val controllerComponents: ControllerComponents
                                       )(implicit ec: ExecutionContext) extends BaseController {
@@ -23,7 +21,7 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
   val agendalives = "https://agendalives.info/api"
   val livesdodia = "https://livesdodia.com.br/livesjson"
   val livesbrasil = "https://api.livesbrasil.com/lives"
-  val regexRemoveChars = "(\\r\\n|\\r|\\n|\\t|\u21b5)"
+  val regexRemoveChars = "(;\\r\\n|\\r|\\n|\\t|\u21b5)"
 
   def dadosLivesDoDia = {
     ws.url(livesdodia)
@@ -228,14 +226,10 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
       })
       val eventos = (livesdodia ++ filtrado).sortBy(ev => (ev.data, ev.nome))
       val result = eventos.map(ev => {
-        s"${ev.id.getOrElse("")}\t\t${ev.nome}\t${ev.info}\t${ev.data.toLocalDate}\t${ev.data.toLocalTime}\t${ev.tags.mkString(",")}\t" +
-        s"${ev.youtubeLink.orElse(ev.outroLink).getOrElse("")}\t${ev.instagramProfile.getOrElse("")}\t\t${ev.thumbnailUrl.getOrElse("")}\t${ev.origem.get}\t"
+        s"${ev.id.getOrElse("")};;${ev.nome};${ev.info};${ev.data.toLocalDate};${ev.data.toLocalTime};${ev.tags.mkString(",")};" +
+        s"${ev.youtubeLink.orElse(ev.outroLink).getOrElse("")};${ev.instagramProfile.getOrElse("")};;${ev.thumbnailUrl.getOrElse("")};${ev.origem.get};"
       })
-      if (env.mode == Mode.Prod) {
-        NotFound
-      } else {
-        Ok(result.mkString("\n"))
-      }
+      Ok(result.mkString("\n"))
     }
   }
 
@@ -244,22 +238,14 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
     val lista = lives.sortBy(ev => (ev.data, ev.nome)).map(ev => {
       s"${ev.nome} ${ev.data.format(formatter)}"
     }).mkString("\n")
-    if (env.mode == Mode.Prod) {
-      NotFound
-    } else {
-      Ok(lista)
-    }
+    Ok(lista)
   }
 
   private def printLive(lives: Seq[Evento]) = {
     val lista = lives.sortBy(ev => (ev.data, ev.nome)).map(ev => {
       s"${ev.nome} ${ev.data.toLocalTime}"
     }).mkString("\n")
-    if (env.mode == Mode.Prod) {
-      NotFound
-    } else {
-      Ok(lista)
-    }
+    Ok(lista)
   }
 
   def livesHoje() = Action.async { implicit request: Request[AnyContent] =>
