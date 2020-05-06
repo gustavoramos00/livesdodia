@@ -62,21 +62,31 @@ $(document).ready(function(){
 });
 
 function initElements() {
+
+  $( "a[ga-share-control]" ).click(function() {
+    var control = $(this).attr('ga-share-control');
+    var evento = $(this).attr('ga-share-data');
+    ga('send', {
+      hitType: 'event',
+      eventCategory: 'Share',
+      eventAction: control,
+      eventLabel: evento
+    });
+  });
+
+  $( "a[ga-link-control]" ).click(function() {
+    var control = $(this).attr('ga-link-control');
+    var evento = $(this).attr('ga-share-data');
+    ga('send', {
+      hitType: 'event',
+      eventCategory: 'Link',
+      eventAction: control,
+      eventLabel: evento
+    });
+  });
   
   //refresh jPList
   jplist.resetContent();
-  
-  $('.testi-meta-inner').on('click touch', function () {
-    var controlName = '#' + $(this).attr('collapse-control');
-    var data = $(this).attr('data-control');
-    $(controlName).collapse('toggle');
-    ga('send', {
-      hitType: 'event',
-      eventCategory: 'Toggle',
-      eventAction: data,
-      eventLabel: controlName
-    });
-  });
 
 }
 

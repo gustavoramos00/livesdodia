@@ -24,57 +24,67 @@
         }
 
       </p>
-      @if(evento.info.nonEmpty) {
       <p class="testi-info mb-0 searchable">
-        @evento.info
+        <strong>@evento.horarioFmt</strong> @evento.info
       </p>
-      }
       @for(tag <- evento.tags){
-      @if(tag == "Música"){
-      <span class="badge badge-live @tag" hidden>@tag</span>
-      } else {
-      <span class="badge badge-live @tag" style='background-color: @colorByTag(tag)'>@tag</span>
+        @if(tag == "Música"){
+        <span class="badge badge-live @tag" hidden>@tag</span>
+        } else {
+        <span class="badge badge-live @tag" style='background-color: @colorByTag(tag)'>@tag</span>
+        }
       }
-      }
-      <p class="testi-desc mb-0">
-        @evento.horarioFmt
-        <!-- <span class="icon-caret-square-o-down"></span>
-        <span class="icon-caret-square-o-up"></span> -->
-      </p>
-    </div>
-  </div>
-  <div class="collapse multi-collapse" id='@evento.generatedId'>
-    <div class="card card-body bg-transparent">
-      <div class="icones-previa">
+      <div class="icones-evento">
         @if(evento.youtubeData.flatMap(_.embeddable).contains(true)){
-        <button type="button" class="button-clear" onclick='playYoutubeVideoId("@evento.youtubeData.flatMap(_.videoId).get", "@evento.nome")'>
+        <button type="button" class="icone button-clear" onclick='playYoutubeVideoId("@evento.youtubeData.flatMap(_.videoId).get", "@evento.nome")'>
           <span class="icon icon-play-circle"></span>
         </button>
         }
         @if(evento.linkLive.isDefined) {
-        <a class="icone" rel="nofollow" href="@evento.linkLive.get" target="_blank">
+        <a class="icone" rel="nofollow" 
+          href="@evento.linkLive.get" 
+          ga-link-control="@evento.iconeLive" 
+          ga-share-data="@evento.nome"
+          target="_blank">
           <span class="icon @evento.iconeLive"></span>
         </a>
         }
         @if(evento.instagramProfile.isDefined && evento.instagramProfile != evento.linkLive)  {
-        <a class="icone" rel="nofollow" href="@evento.instagramProfile.get" target="_blank">
+        <a class="icone" 
+          rel="nofollow" 
+          href="@evento.instagramProfile.get" 
+          ga-link-control="instagram" 
+          ga-share-data="@evento.nome"
+          target="_blank">
           <span class="icon icon-instagram"></span>
         </a>
         }
+        <!-- <span class="icon-share icon-share-alt"></span> -->
+        <a class="link-no-decoration" 
+          href='https://wa.me/?text=@evento.urlEncodedShare' 
+          ga-share-control="whatsapp" 
+          ga-share-data="@evento.nome"
+          target="_blank">
+          <span class="icon-share icon-whatsapp"></span>
+        </a>
+        <a class="link-no-decoration" 
+          href='https://twitter.com/intent/tweet?text=@evento.urlEncodedShare' 
+          ga-share-control="twitter" 
+          ga-share-data="@evento.nome"
+          target="_blank">
+          <span class="icon-share icon-twitter"></span>
+        </a>
+        <a class="link-no-decoration" 
+          href='https://www.facebook.com/sharer/sharer.php?u=livesdodia.com.br&quote=@evento.urlEncodedShareFacebook' 
+          ga-share-control="facebook" 
+          ga-share-data="@evento.nome"
+          target="_blank">
+          <span class="icon-share icon-facebook-square"></span>
+        </a>
       </div>
-
-      <span class="h6">
-        Compartilhar live
-        <a class="link-no-decoration" href='https://wa.me/?text=@evento.urlEncodedShare' target="_blank">
-          <span class="icon-whatsapp"></span>
-        </a>
-        <a class="link-no-decoration" href='https://twitter.com/intent/tweet?text=@evento.urlEncodedShare' target="_blank">
-          <span class="icon-twitter"></span>
-        </a>
-        <a class="link-no-decoration" href='https://www.facebook.com/sharer/sharer.php?u=livesdodia.com.br&quote=@evento.urlEncodedShareFacebook' target="_blank">
-          <span class="icon-facebook-square"></span>
-        </a>
-      </span>
+        
+      
     </div>
   </div>
+  <hr />
 </div>
