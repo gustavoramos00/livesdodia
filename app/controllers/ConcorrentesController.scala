@@ -21,7 +21,7 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
   val agendalives = "https://agendalives.info/api"
   val livesdodia = "https://livesdodia.com.br/livesjson"
   val livesbrasil = "https://api.livesbrasil.com/lives"
-  val regexRemoveChars = "(;\\r\\n|\\r|\\n|\\t|\u21b5)"
+  val regexRemoveChars = "(\\r\\n|\\r|\\n|\\t|\u21b5)"
 
   def dadosLivesDoDia = {
     ws.url(livesdodia)
@@ -226,8 +226,8 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
       })
       val eventos = (livesdodia ++ filtrado).sortBy(ev => (ev.data, ev.nome))
       val result = eventos.map(ev => {
-        s"${ev.id.getOrElse("")};;${ev.nome};${ev.info};${ev.data.toLocalDate};${ev.data.toLocalTime};${ev.tags.mkString(",")};" +
-        s"${ev.youtubeLink.orElse(ev.outroLink).getOrElse("")};${ev.instagramProfile.getOrElse("")};;${ev.thumbnailUrl.getOrElse("")};${ev.origem.get};"
+        s"${ev.id.getOrElse("")}\t\t${ev.nome}\t${ev.info}\t${ev.data.toLocalDate}\t${ev.data.toLocalTime}\t${ev.tags.mkString(",")}\t" +
+        s"${ev.youtubeLink.orElse(ev.outroLink).getOrElse("")}\t${ev.instagramProfile.getOrElse("")}\t\t${ev.thumbnailUrl.getOrElse("")}\t${ev.origem.get}\t"
       })
       Ok(result.mkString("\n"))
     }
