@@ -21,7 +21,7 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
   val agendalives = "https://agendalives.info/api"
   val livesdodia = "https://livesdodia.com.br/livesjson"
   val livesbrasil = "https://api.livesbrasil.com/lives"
-  val regexRemoveChars = "(\\r\\n|\\r|\\n|\\t|\u21b5)"
+  val regexRemoveChars = "(;\\r\\n|\\r|\\n|\\t|\u21b5)"
 
   def dadosLivesDoDia = {
     ws.url(livesdodia)
@@ -225,11 +225,40 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
           evld.tags.length > 1).isEmpty
       })
       val eventos = (livesdodia ++ filtrado).sortBy(ev => (ev.data, ev.nome))
-      val result = eventos.map(ev => {
-        s"${ev.id.getOrElse("")}\t\t${ev.nome}\t${ev.info}\t${ev.data.toLocalDate}\t${ev.data.toLocalTime}\t${ev.tags.mkString(",")}\t" +
-        s"${ev.youtubeLink.orElse(ev.outroLink).getOrElse("")}\t${ev.instagramProfile.getOrElse("")}\t\t${ev.thumbnailUrl.getOrElse("")}\t${ev.origem.get}\t"
+      val header = Seq(
+        "UUID",
+        "EMAIL",
+        "NOME",
+        "INFO",
+        "DATA",
+        "HORA",
+        "TAGS",
+        "YOUTUBE/SITE",
+        "INSTAGRAM",
+        "DESTAQUE",
+        "IMAGEM",
+        "ORIGEM/PUBLICAR")
+        .mkString(",")
+      val body =  eventos.map(ev => {
+        Seq(ev.id.getOrElse(""),
+          ev.origem.get,
+          "\"" + ev.nome + "\"",
+          "\"" + ev.info + "\"",
+          Evento.formatDia(ev.data),
+          ev.data.toLocalTime.toString,
+          "\"" + ev.tags.mkString(",") + "\"",
+          "\"" + ev.youtubeLink.orElse(ev.outroLink).getOrElse("") + "\"",
+          "\"" + ev.instagramProfile.getOrElse("") + "\"",
+          "",
+          "\"" + ev.thumbnailUrl.getOrElse("") + "\"",
+          ev.origem.filter(_.equalsIgnoreCase("Lives do Dia")).map(_ => "S").getOrElse("N"))
+          .mkString(",")
       })
-      Ok(result.mkString("\n"))
+      val result = header + "\n" + body.mkString("\n")
+      Ok(result).as("text/csv")
+        .withHeaders(
+          "Content-Disposition" -> "attachment; filename=lives.csv"
+        )
     }
   }
 
