@@ -54,7 +54,7 @@ class RepositoryService @Inject()(
               val optThumbnail = if (thumbnail.isEmpty) None else Some(thumbnail)
               val tagList = tags.split(",").toSeq.map(_.trim)
               val id = Some(carimboDtHrUuid)
-              if (id == null || id.isEmpty) {
+              if (carimboDtHrUuid == null || carimboDtHrUuid.isEmpty) {
                 throw new IllegalArgumentException(s"ID não informado para evento $nome")
               }
               val evento = Evento(
@@ -121,7 +121,6 @@ class RepositoryService @Inject()(
       .get()
       .map { response =>
         val img = (response.json \ "graphql" \ "user" \ "profile_pic_url").asOpt[String]
-        println(s"resp img $img")
         evento.copy(linkImagem = img)
       }
   }
@@ -136,7 +135,6 @@ class RepositoryService @Inject()(
   def obtemImagem(eventos: Seq[Evento]) = {
     val seqFuture = eventos.map( evento => {
       if (evento.thumbnailUrl.map(_.contains("instagram.com")).getOrElse(false)) {
-        println(s"imagem instagram")
         thumbnailFromInstagram(evento)
 //      } else if (evento.thumbnailUrl.map(link => link.contains("youtube.com") && !link.contains("img.youtube")).getOrElse(false)) {
 //        val ydData = YoutubeData.fromYoutubeLink(evento.thumbnailUrl.get)
