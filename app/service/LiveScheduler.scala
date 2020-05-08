@@ -40,8 +40,8 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
             scheduleEventosDetails(data.plusSeconds(15), eventos), // fetch pouco depois da hora agendada
             scheduleEventosDetails(data.plusMinutes(5), eventos), // fetch após
             scheduleEventosDetails(data.plusMinutes(25), eventos), // fetch última tentativa
-            scheduleEventosDetails(data.plusHours(2).plusSeconds(randSeconds), eventos), // fetch ~2h depois
-            scheduleEventosDetails(data.plusHours(4).plusSeconds(randSeconds), eventos), // fetch ~4h depois
+//            scheduleEventosDetails(data.plusHours(2).plusSeconds(randSeconds), eventos), // fetch ~2h depois
+//            scheduleEventosDetails(data.plusHours(4).plusSeconds(randSeconds), eventos), // fetch ~4h depois
             scheduleEventosDetails(data.plusHours(6).plusSeconds(randSeconds), eventos) // fetch ~6h depois
           ).flatten
       }
