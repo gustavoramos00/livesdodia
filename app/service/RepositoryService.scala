@@ -1,6 +1,7 @@
 package service
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.temporal.ChronoUnit
+import java.time.{Duration, LocalDate, LocalDateTime}
 
 import javax.inject.{Inject, Singleton}
 import model.{Evento, EventosDia, YoutubeData}
@@ -20,6 +21,7 @@ class RepositoryService @Inject()(
                                  )
                                  (implicit ec: ExecutionContext){
 
+  val liveTtl = Duration.of(7, ChronoUnit.HOURS) // TODO Unificar
   val endpoint = configuration.get[String]("sheetsEndpoint")
   val spreadsheetId = configuration.get[String]("spreadsheetId")
   val sheetId = configuration.get[String]("sheetId")
@@ -109,7 +111,7 @@ class RepositoryService @Inject()(
   def tagsColor() = {
     getEventos.map(eventos => {
       eventos
-        .filter(_.data.toLocalDate.isAfter(LocalDate.now.minusDays(1)))
+        .filter(_.data.isAfter(LocalDateTime.now.minus(liveTtl)))
         .flatMap(_.tags)
         .filter(_.nonEmpty)
         .distinct
@@ -149,10 +151,10 @@ class RepositoryService @Inject()(
     "#474f95","#85761e","#75366f","#989a50","#a62a5f","#424b14","#a87db8",
     "#685f1d","#d7737d","#817b45","#90445b","#b88352","#903328","#c3663a")
 
-  def obtemImagem(eventos: Seq[Evento]) = {
-    logger.warn(s"Obtendo imagens do instagram")
+  def obtemImagem(eventos: Seq[Evento], id: Option[String]) = {
+    logger.warn(s"Obtendo imagens do instagram [${id.getOrElse("todos")}]")
     val seqFuture = eventos.map( evento => {
-      if (evento.thumbnailUrl.map(_.contains("instagram.com")).getOrElse(false)) {
+      if ((id.isEmpty || id == evento.id) && evento.thumbnailUrl.map(_.contains("instagram.com")).getOrElse(false)) {
         thumbnailFromInstagram(evento)
 //      } else if (evento.thumbnailUrl.map(link => link.contains("youtube.com") && !link.contains("img.youtube")).getOrElse(false)) {
 //        val ydData = YoutubeData.fromYoutubeLink(evento.thumbnailUrl.get)
@@ -167,21 +169,18 @@ class RepositoryService @Inject()(
         Future.successful(evento)
       }
     })
-    Future.sequence(seqFuture).map(seq => {
-      logger.warn(s"Imagens instagram obtidas [${seq.length}]")
-      seq
-    })
+    Future.sequence(seqFuture)
   }
 
-  def forceUpdate() = {
-    logger.warn(s"Forçando atualização de dados")
+  def forceUpdate(id: Option[String]) = {
+    logger.warn(s"Forçando atualização de dados [${id.getOrElse("todos")}]")
     for {
       eventosSheet <- dataFromSheets()
       eventosDadosCache <- recuperaDadosYoutubeCache(eventosSheet)
-      eventosImagem <- obtemImagem(eventosDadosCache)
+      eventosImagem <- obtemImagem(eventosDadosCache, id)
       _ <- cache.set(Evento.cacheKey, eventosImagem)
       _ <- cache.set(dataAtualizacaoCacheKey, LocalDateTime.now)
-      eventosAtualizados <- youtubeService.fetch(eventosImagem)
+      eventosAtualizados <- youtubeService.fetch(eventosImagem, id)
     } yield {
       liveScheduler.reSchedule(eventosAtualizados)
       cache.set(Evento.cacheKey, eventosAtualizados)

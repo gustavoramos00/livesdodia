@@ -65,8 +65,8 @@ class HomeController @Inject()(repository: RepositoryService,
     }
   }
 
-  def updateCache() = Action.async { implicit request: Request[AnyContent] =>
-    repository.forceUpdate()
+  def updateCache(id: Option[String]) = Action.async { implicit request: Request[AnyContent] =>
+    repository.forceUpdate(id)
       .map(_ => Redirect("/"))
   }
 
