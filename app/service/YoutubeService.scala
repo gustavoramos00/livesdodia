@@ -165,6 +165,7 @@ class YoutubeService @Inject()(
   }
 
   def fetch(eventos: Seq[Evento]): Future[Seq[Evento]] = {
+    logger.warn(s"Fetch dados youtube")
     val eventosFiltrado = eventos.filter(_.data.isAfter(LocalDateTime.now.minus(liveTtl)))
     Future.sequence(eventosFiltrado.map(fetchEvento))
   }

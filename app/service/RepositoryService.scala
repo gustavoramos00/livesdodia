@@ -34,11 +34,15 @@ class RepositoryService @Inject()(
       .addQueryStringParameters("key" -> apiKey)
       .get()
       .map { response =>
+        if (response.status != 200) {
+          logger.error(s"Erro ao obter planilha ${response.body}")
+        }
         val valuesList = (response.json \ "values").as[List[List[String]]]
+        logger.warn(s"Dados obtidos da planilha [${valuesList.length}]")
         valuesList
           .tail // remove cabeçalho
           .flatMap {
-          case List(carimboDtHrUuid, _, nome, info, dia, hora, tags: String, liveLink: String, instagramProfile: String, destaque: String, thumbnail: String, "S", _*) =>
+          case List(carimboDtHrUuid: String, _, nome, info, dia, hora, tags: String, liveLink: String, instagramProfile: String, destaque: String, thumbnail: String, "S", _*) =>
             try {
               val data = Evento.parseData(dia, hora)
               val (optYoutube, optOutroLink) =
@@ -87,6 +91,7 @@ class RepositoryService @Inject()(
   }
 
   private def recuperaDadosYoutubeCache(novosEventos: List[Evento]): Future[List[Evento]] = {
+    logger.warn(s"Recuperando dados youtube cache")
     cache.get[List[Evento]](Evento.cacheKey).map {
       case Some(eventosCache) =>
         novosEventos.map(novoEvento => {
@@ -115,14 +120,26 @@ class RepositoryService @Inject()(
 
   def thumbnailFromInstagram(evento: Evento) = {
     val url = evento.thumbnailUrl.get
-    ws.url(url)
-      //        .withRequestFilter(AhcCurlRequestLogger())
-      .withQueryStringParameters("__a" -> "1")
-      .get()
-      .map { response =>
-        val img = (response.json \ "graphql" \ "user" \ "profile_pic_url").asOpt[String]
-        evento.copy(linkImagem = img)
-      }
+    try {
+      ws.url(url)
+        //        .withRequestFilter(AhcCurlRequestLogger())
+        .withQueryStringParameters("__a" -> "1")
+        .get()
+        .map { response =>
+          if (response.status == 200 && response.contentType.contains("application/json")) {
+            val img = (response.json \ "graphql" \ "user" \ "profile_pic_url").asOpt[String]
+            evento.copy(linkImagem = img)
+          } else {
+            logger.error(s"Erro obter imagem instagram [${evento.nome}] Content Type [${response.contentType}]")
+            logger.error(s"reponse body [${response.body.substring(0, 300)}]")
+            evento.copy(linkImagem = None)
+          }
+        }
+    } catch {
+      case err: Throwable =>
+        logger.error(s"### Erro ao obter dados instagram [${evento.nome}]", err)
+        Future.successful(evento.copy(linkImagem = None))
+    }
   }
 
   // obtido em https://medialab.github.io/iwanthue/
@@ -133,6 +150,7 @@ class RepositoryService @Inject()(
     "#685f1d","#d7737d","#817b45","#90445b","#b88352","#903328","#c3663a")
 
   def obtemImagem(eventos: Seq[Evento]) = {
+    logger.warn(s"Obtendo imagens do instagram")
     val seqFuture = eventos.map( evento => {
       if (evento.thumbnailUrl.map(_.contains("instagram.com")).getOrElse(false)) {
         thumbnailFromInstagram(evento)
@@ -149,7 +167,10 @@ class RepositoryService @Inject()(
         Future.successful(evento)
       }
     })
-    Future.sequence(seqFuture)
+    Future.sequence(seqFuture).map(seq => {
+      logger.warn(s"Imagens instagram obtidas [${seq.length}]")
+      seq
+    })
   }
 
   def forceUpdate() = {
