@@ -56,7 +56,7 @@ $(document).ready(function(){
       dataType: 'html',
       success: function(html) {
         $('#eventos-hoje-container').replaceWith(html);
-        initElements(slider);
+        initElements();
       }
     });
   },90000); // atualiza a cada 1min30s

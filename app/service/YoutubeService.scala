@@ -1,7 +1,7 @@
 package service
 
+import java.time.temporal.ChronoUnit
 import java.time.{Duration, LocalDateTime}
-import java.time.temporal.{ChronoUnit, TemporalAmount}
 
 import javax.inject.{Inject, Singleton}
 import model.{Evento, YoutubeData}
@@ -19,6 +19,7 @@ class YoutubeService @Inject()(
                                  )
                               (implicit ec: ExecutionContext){
 
+  val liveTtl = Duration.of(7, ChronoUnit.HOURS) // TODO unificar
   val enabled = configuration.get[Boolean]("enableYoutubeFetch")
   val endpoint = configuration.get[String]("youtubeEndpoint")
   val apiKey = configuration.get[String]("apiKey")
@@ -27,7 +28,6 @@ class YoutubeService @Inject()(
   val searchUrl = s"$endpoint/search"
   val videosUrl = s"$endpoint/videos"
   val liveBroadcastUrl = s"$endpoint/liveBroadcasts"
-  val liveTtl = Duration.of(7, ChronoUnit.HOURS)
 
   private def channelId(evento: Evento): Future[Evento] = {
     if (enabled && evento.youtubeData.flatMap(_.userName).isDefined && !evento.youtubeData.flatMap(_.channelId).isDefined) {
@@ -164,9 +164,16 @@ class YoutubeService @Inject()(
     }
   }
 
-  def fetch(eventos: Seq[Evento]): Future[Seq[Evento]] = {
+  def fetch(eventos: Seq[Evento], id: Option[String]): Future[Seq[Evento]] = {
+    logger.warn(s"Fetch dados youtube [${id.getOrElse("todos")}]")
     val eventosFiltrado = eventos.filter(_.data.isAfter(LocalDateTime.now.minus(liveTtl)))
-    Future.sequence(eventosFiltrado.map(fetchEvento))
+    Future.sequence(eventosFiltrado.map(evento => {
+      if (id.isEmpty || id == evento.id) {
+        fetchEvento(evento)
+      } else {
+        Future.successful(evento)
+      }
+    }))
   }
 
 }
