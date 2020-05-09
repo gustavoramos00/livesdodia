@@ -1,6 +1,8 @@
 $(document).ready(function(){
 
   initScroll();
+
+  initNotification();
   
   jplist.init();
 
@@ -113,4 +115,46 @@ function initScroll() {
 
     prevScrollpos = currentScrollPos;
   }
+}
+
+function initNotification() {
+  if (!('serviceWorker' in navigator)) {
+    // Service Worker isn't supported on this browser, disable or hide UI.
+    return;
+  }
+  
+  if (!('PushManager' in window)) {
+    // Push isn't supported on this browser, disable or hide UI.
+    return;
+  }
+
+  $('.icones-evento span.icon-bell').css('display', 'inline');
+
+  navigator.serviceWorker.register('/assets/js/service-worker.js')
+  .then(function(registration) {
+    console.log('Service worker successfully registered.');
+    return registration;
+  })
+  .catch(function(err) {
+    console.error('Unable to register service worker.', err);
+  });
+ 
+}
+
+function askPermission() {
+  console.log('ask permission');
+  return new Promise(function(resolve, reject) {
+    const permissionResult = Notification.requestPermission(function(result) {
+      resolve(result);
+    });
+
+    if (permissionResult) {
+      permissionResult.then(resolve, reject);
+    }
+  })
+  .then(function(permissionResult) {
+    if (permissionResult !== 'granted') {
+      throw new Error('We weren\'t granted permission.');
+    }
+  });
 }

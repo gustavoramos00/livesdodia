@@ -152,6 +152,12 @@ section {
 .icones-evento span.icon {
   font-size: 40px;
   display: inline;
+  padding-right: 10px;
+}
+
+.icones-evento span.icon-bell {
+  font-size: 35px !important;
+  display: none;
 }
 
 
@@ -162,9 +168,9 @@ section {
   padding-left: 5px;
 }
 
-.icone {
-  padding-right: 5px !important;
-}
+/* .icone {
+  padding-right: 15px !important;
+} */
 
 .input-group-busca {
   max-width: 300px;
