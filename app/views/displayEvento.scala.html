@@ -4,7 +4,7 @@
 
 @colorByTag(tag: String) = {@tags.find(t => t._1 == tag).map(_._2).getOrElse("#f103c9")}
 
-<div class="testi-item" data-jplist-item>
+<div class="col-xl-4 col-md-6 testi-item" data-jplist-item>
   <div class="testi-meta-inner d-flex" collapse-control="@evento.generatedId" data-control="@evento.data.toLocalDate">
     <div class="testi-img mr-2">
       @if(evento.thumbnailUrl.isDefined) {

@@ -21,13 +21,11 @@
               Já começou
             </h2>
           </div>
-          <div class="row">
-            <div class="testi-content search-not-found-container" data-jplist-group="search-group">
-              @for(evento <- eventosAgora) {
+          <div class="row align-items-center justify-content-start testi-content search-not-found-container" data-jplist-group="search-group">
+            @for(evento <- eventosAgora) {
               @displayEvento(evento, true, true, tags)
-              }
-              @buscaNaoEncontrada()
-            </div>
+            }
+            @buscaNaoEncontrada()
           </div>
         </div>
       </div>
@@ -44,13 +42,11 @@
               @tituloHoje()
             </h2>
           </div>
-          <div class="row">
-            <div class="testi-content search-not-found-container" data-jplist-group="search-group">
-              @for(evento <- eventosHoje) {
-                @displayEvento(evento, true, false, tags)
-              }
-              @buscaNaoEncontrada()
-            </div>
+          <div class="row align-items-center justify-content-start testi-content search-not-found-container" data-jplist-group="search-group">
+            @for(evento <- eventosHoje) {
+              @displayEvento(evento, true, false, tags)
+            }
+            @buscaNaoEncontrada()
           </div>
         </div>
       </div>
