@@ -120,6 +120,10 @@ section {
   padding-top: 125px;
 }
 
+.yt-player.active + #eventos-hoje-container {
+  padding-top: 10px;
+}
+
 .header-container .container {
   z-index: 1;
 }

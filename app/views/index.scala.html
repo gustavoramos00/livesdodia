@@ -16,13 +16,6 @@
 @tagSelected(tag: String) = {false}
 
 @base {
-  <div  class="yt-player">
-    <div id="player"></div>
-    <button type="button" class="yt-close-button" onclick="closeVideo()">
-      <span class="icon-close"></span>
-    </button>
-  </div>
-
   <script>
     // 2. This code loads the IFrame Player API code asynchronously.
     var tag = document.createElement('script');
@@ -57,7 +50,7 @@
       showElementsPlayVideo();
       player.destroy();
       player = undefined;
-      $("#eventos-hoje-container").css("padding-top", "");
+      $(".yt-player").removeClass("active");
       ga('send', {
         hitType: 'event',
         eventCategory: 'Lives',
@@ -79,7 +72,7 @@
       } else {
         player.loadVideoById(videoId);
       }
-      $("#eventos-hoje-container").css("padding-top", "10px");
+      $(".yt-player").addClass("active");
       ga('send', {
         hitType: 'event',
         eventCategory: 'Lives',
@@ -94,6 +87,13 @@
     }
 
   </script>
+
+  <div  class="yt-player">
+    <div id="player"></div>
+    <button type="button" class="yt-close-button" onclick="closeVideo()">
+      <span class="icon-close"></span>
+    </button>
+  </div>
 
   @eventosHoje(eventosAgora, demaisEventosHoje, tags)
 
