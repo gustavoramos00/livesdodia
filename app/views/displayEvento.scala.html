@@ -4,7 +4,7 @@
 
 @colorByTag(tag: String) = {@tags.find(t => t._1 == tag).map(_._2).getOrElse("#f103c9")}
 
-<div class="testi-item" data-jplist-item>
+<div class="col-xl-4 col-md-6 testi-item" data-jplist-item>
   <div class="testi-meta-inner d-flex" collapse-control="@evento.generatedId" data-control="@evento.data.toLocalDate">
     <div class="testi-img mr-2">
       @if(evento.thumbnailUrl.isDefined) {
@@ -60,27 +60,29 @@
         </a>
         }
         <!-- <span class="icon-share icon-share-alt"></span> -->
-        <a class="link-no-decoration" 
-          href='https://wa.me/?text=@evento.urlEncodedShare' 
-          ga-share-control="whatsapp" 
-          ga-share-data="@evento.nome"
-          target="_blank">
-          <span class="icon-share icon-whatsapp"></span>
-        </a>
-        <a class="link-no-decoration" 
-          href='https://twitter.com/intent/tweet?text=@evento.urlEncodedShare' 
-          ga-share-control="twitter" 
-          ga-share-data="@evento.nome"
-          target="_blank">
-          <span class="icon-share icon-twitter"></span>
-        </a>
-        <a class="link-no-decoration" 
-          href='https://www.facebook.com/sharer/sharer.php?u=livesdodia.com.br&quote=@evento.urlEncodedShareFacebook' 
-          ga-share-control="facebook" 
-          ga-share-data="@evento.nome"
-          target="_blank">
-          <span class="icon-share icon-facebook-square"></span>
-        </a>
+        <span>
+          <a class="link-no-decoration" 
+            href='https://wa.me/?text=@evento.urlEncodedShare' 
+            ga-share-control="whatsapp" 
+            ga-share-data="@evento.nome"
+            target="_blank">
+            <span class="icon-share icon-whatsapp"></span>
+          </a>
+          <a class="link-no-decoration" 
+            href='https://twitter.com/intent/tweet?text=@evento.urlEncodedShare' 
+            ga-share-control="twitter" 
+            ga-share-data="@evento.nome"
+            target="_blank">
+            <span class="icon-share icon-twitter"></span>
+          </a>
+          <a class="link-no-decoration" 
+            href='https://www.facebook.com/sharer/sharer.php?u=livesdodia.com.br&quote=@evento.urlEncodedShareFacebook' 
+            ga-share-control="facebook" 
+            ga-share-data="@evento.nome"
+            target="_blank">
+            <span class="icon-share icon-facebook-square"></span>
+          </a>
+        </span>
       </div>
         
       
