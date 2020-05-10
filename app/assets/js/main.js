@@ -1,4 +1,10 @@
+
+var serviceWorkerPath = '/assets/js/service-worker.js';
+var vapidPublicKey = 'BPenScjfnRdAhNcPNLP92IYxCgyz_nVnFf2CP3XrvgyG419tWqHua5SM0WGxoZXpliBhd0mrZd9lH0N7K0YPdOk';
+
 $(document).ready(function(){
+
+
 
   initScroll();
 
@@ -128,9 +134,9 @@ function initNotification() {
     return;
   }
 
-  $('.icones-evento span.icon-bell').css('display', 'inline');
+  $('.icones-evento span.icon-bell').show("slow");
 
-  navigator.serviceWorker.register('/assets/js/service-worker.js')
+  navigator.serviceWorker.register(serviceWorkerPath)
   .then(function(registration) {
     console.log('Service worker successfully registered.');
     return registration;
@@ -141,20 +147,67 @@ function initNotification() {
  
 }
 
-function askPermission() {
-  console.log('ask permission');
-  return new Promise(function(resolve, reject) {
-    const permissionResult = Notification.requestPermission(function(result) {
-      resolve(result);
-    });
+function subscribeLive(id) {
+  return navigator.serviceWorker.register(serviceWorkerPath)
+  .then(function(registration) {
+    const subscribeOptions = {
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
+    };
 
-    if (permissionResult) {
-      permissionResult.then(resolve, reject);
-    }
+    return registration.pushManager.subscribe(subscribeOptions);
   })
-  .then(function(permissionResult) {
-    if (permissionResult !== 'granted') {
-      throw new Error('We weren\'t granted permission.');
+  .then(function(pushSubscription) {
+    console.log('Received PushSubscription: ', JSON.stringify(pushSubscription));
+    return sendSubscriptionToBackEnd(pushSubscription, id);
+  })
+  .catch(function(error) {
+    // TODO tratar não aceitação das notificações
+    console.log('Erro', error);
+  });
+}
+
+function sendSubscriptionToBackEnd(subscription, id) {
+  return $.ajax('/subscribe-live/' + id, {
+    method: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(subscription),
+    success: function(response) {
+      
+    },
+    error: function(response) {
+      console.log('error response', response)
+      throw new Error('Bad status code from server.');
     }
   });
+  // .then(function(response) {
+  //   if (!response.ok) {
+  //     throw new Error('Bad status code from server.');
+  //   }
+  //   return response.json();
+  // })
+  // .then(function(responseData) {
+  //   if (!(responseData.data && responseData.data.success)) {
+  //     throw new Error('Bad response from server.');
+  //   }
+  // });
+}
+
+
+/**
+ * https://github.com/GoogleChromeLabs/web-push-codelab/blob/master/app/scripts/main.js
+ */
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, '+')
+    .replace(/_/g, '/');
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
 }

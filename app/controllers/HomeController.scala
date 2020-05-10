@@ -52,6 +52,14 @@ class HomeController @Inject()(repository: RepositoryService,
     }
   }
 
+  def subscribeLive(id: String) = Action { implicit request: Request[AnyContent] =>
+    println(s"subscribe live id [$id]")
+    if (request.contentType.contains("application/json")) {
+      println(s"request body json [${request.body.asJson}]")
+    }
+    InternalServerError
+  }
+
   def eventosHoje() = cached(_ => "jaComecou", cacheDuration) {
 
     Action.async { implicit request: Request[AnyContent] =>

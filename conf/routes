@@ -9,6 +9,9 @@ GET     /eventoshoje                controllers.HomeController.eventosHoje
 GET     /upcache                    controllers.HomeController.updateCache(id: Option[String])
 GET     /incluir                    controllers.HomeController.incluir
 GET     /livesjson                  controllers.HomeController.livesJson
+POST    /subscribe-live/:id         controllers.HomeController.subscribeLive(id: String)
+
+# Análises
 GET     /schedulecount              controllers.HomeController.scheduleCount
 GET     /extrairvgc05               controllers.ConcorrentesController.extrairDados
 GET     /hojevgc                    controllers.ConcorrentesController.livesHoje
