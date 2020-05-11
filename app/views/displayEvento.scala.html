@@ -59,9 +59,11 @@
           <span class="icon icon-instagram"></span>
         </a>
         }
-        <button type="button" class="button-clear" onclick='subscribeLive("@evento.id.get")'>
-          <span class="icon icon-bell"></span>
-        </button>
+        @if(!agora) {
+          <button type="button" class="button-clear" onclick='subscribeLive("@evento.id.get")'>
+            <span class="icon icon-bell"></span>
+          </button>
+        }
         <!-- <span class="icon-share icon-share-alt"></span> -->
         <span>
           <a class="link-no-decoration" 

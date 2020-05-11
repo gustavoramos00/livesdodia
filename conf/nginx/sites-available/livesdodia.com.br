@@ -13,7 +13,7 @@ server {
 # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
 
   location /assets/ {
-    alias /var/play/livesdodia/public/;
+    alias /var/play/livesdodia-assets/public/;
     expires 1y;
     add_header Cache-Control public;
   }

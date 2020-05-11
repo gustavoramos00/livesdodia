@@ -1,8 +1,11 @@
 self.addEventListener('push', function(event) {
-  if (event.data) {
-    console.log('This push event has data: ', event.data.text());
-  } else {
-    console.log('This push event has no data.');
-  }
+  var json = event.data.json();
+  const promiseChain = self.registration.showNotification(json.title, json.options);
+
+  event.waitUntil(promiseChain);
 });
-  
+
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+  event.waitUntil(clients.openWindow('https://livesdodia.com.br'));
+});

@@ -9,7 +9,7 @@ import model.{Evento, EventosDia}
 import play.api.cache.Cached
 import play.api.libs.json.Json
 import play.api.mvc._
-import service.{LiveScheduler, RepositoryService}
+import service.{LiveScheduler, MyPushService, RepositoryService}
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
@@ -22,6 +22,7 @@ import scala.concurrent.duration._
 @Singleton
 class HomeController @Inject()(repository: RepositoryService,
                                cached: Cached,
+                               pushService: MyPushService,
                                liveScheduler: LiveScheduler,
                                val controllerComponents: ControllerComponents
                               )(implicit ec: ExecutionContext) extends BaseController {
@@ -53,11 +54,17 @@ class HomeController @Inject()(repository: RepositoryService,
   }
 
   def subscribeLive(id: String) = Action { implicit request: Request[AnyContent] =>
-    println(s"subscribe live id [$id]")
     if (request.contentType.contains("application/json")) {
-      println(s"request body json [${request.body.asJson}]")
+      val optSubscription = request.body.asJson
+      if (optSubscription.isDefined) {
+        pushService.subscribe(id, request.body.asJson.get)
+        Ok
+      } else {
+        BadRequest
+      }
+    } else {
+      BadRequest
     }
-    InternalServerError
   }
 
   def eventosHoje() = cached(_ => "jaComecou", cacheDuration) {

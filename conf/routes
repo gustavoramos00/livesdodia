@@ -5,11 +5,12 @@
 
 # An example controller showing a sample home page
 GET     /                           controllers.HomeController.index
+GET     /beta                       controllers.HomeController.index
 GET     /eventoshoje                controllers.HomeController.eventosHoje
 GET     /upcache                    controllers.HomeController.updateCache(id: Option[String])
 GET     /incluir                    controllers.HomeController.incluir
 GET     /livesjson                  controllers.HomeController.livesJson
-POST    /subscribe-live/:id         controllers.HomeController.subscribeLive(id: String)
+POST    /subscribe-live             controllers.HomeController.subscribeLive(id: String)
 
 # Análises
 GET     /schedulecount              controllers.HomeController.scheduleCount

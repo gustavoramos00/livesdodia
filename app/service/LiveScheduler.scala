@@ -16,6 +16,7 @@ import scala.util.Random
 
 class LiveScheduler @Inject() (actorSystem: ActorSystem,
                                cache: AsyncCacheApi,
+                               myPushService: MyPushService,
                                youtubeService: YoutubeService,
                                configuration: Configuration)(
   implicit executionContext: ExecutionContext){
@@ -37,12 +38,11 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
         case (data, eventos) =>
           val randSeconds = Random.between(15,240) // para evitar fetches no mesmo instante
           Seq(
-            scheduleEventosDetails(data.plusSeconds(15), eventos), // fetch pouco depois da hora agendada
+            scheduleEventosDetails(data.plusSeconds(5), eventos, true), // fetch ~ na hora agendada
             scheduleEventosDetails(data.plusMinutes(5), eventos), // fetch após
             scheduleEventosDetails(data.plusMinutes(25), eventos), // fetch última tentativa
-//            scheduleEventosDetails(data.plusHours(2).plusSeconds(randSeconds), eventos), // fetch ~2h depois
-//            scheduleEventosDetails(data.plusHours(4).plusSeconds(randSeconds), eventos), // fetch ~4h depois
-            scheduleEventosDetails(data.plusHours(6).plusSeconds(randSeconds), eventos) // fetch ~6h depois
+            scheduleEventosDetails(data.plusHours(3).plusSeconds(randSeconds), eventos), // fetch ~3h depois
+            scheduleEventosDetails(data.plusHours(5).plusSeconds(randSeconds), eventos) // fetch ~5h depois
           ).flatten
       }
     } else {
@@ -50,7 +50,7 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
     }
   }
 
-  private def scheduleEventosDetails(data: LocalDateTime, eventos: Seq[Evento]) = {
+  private def scheduleEventosDetails(data: LocalDateTime, eventos: Seq[Evento], notifyObservers: Boolean = false) = {
 
     val seconds = LocalDateTime.now.until(data, ChronoUnit.SECONDS)
     if (seconds > 0) {
@@ -66,6 +66,9 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
           eventosVideo <- Future.sequence(eventosAtualizados.map(youtubeService.fetchLiveVideoId))
           eventosVideoDetails <- Future.sequence(eventosVideo.map(youtubeService.fetchVideoDetails))
         } yield {
+          if (notifyObservers) {
+            eventosVideoDetails.foreach(evento => myPushService.notify(evento.id.get, evento))
+          }
           updateEventosCache(eventosVideoDetails)
           eventosVideoDetails
         }

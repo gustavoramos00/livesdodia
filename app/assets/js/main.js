@@ -134,7 +134,12 @@ function initNotification() {
     return;
   }
 
-  $('.icones-evento span.icon-bell').show("slow");
+  var beta = window.location.href.includes("/beta");
+  if (beta) {
+    $('.notification-toggle span.icon-bell').show("slow", function() {
+      $('.notification-toggle').removeClass("notification-toggle");
+    });
+  }
 
   navigator.serviceWorker.register(serviceWorkerPath)
   .then(function(registration) {
@@ -147,28 +152,48 @@ function initNotification() {
  
 }
 
-function subscribeLive(id) {
-  return navigator.serviceWorker.register(serviceWorkerPath)
-  .then(function(registration) {
-    const subscribeOptions = {
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
-    };
+function askPermission() {
+  return new Promise(function(resolve, reject) {
+    const permissionResult = Notification.requestPermission(function(result) {
+      resolve(result);
+    });
 
-    return registration.pushManager.subscribe(subscribeOptions);
+    if (permissionResult) {
+      permissionResult.then(resolve, reject);
+    }
   })
-  .then(function(pushSubscription) {
-    console.log('Received PushSubscription: ', JSON.stringify(pushSubscription));
-    return sendSubscriptionToBackEnd(pushSubscription, id);
-  })
-  .catch(function(error) {
-    // TODO tratar não aceitação das notificações
-    console.log('Erro', error);
+  .then(function(permissionResult) {
+    if (permissionResult !== 'granted') {
+      throw new Error('We weren\'t granted permission.');
+    }
+  });
+}
+
+
+function subscribeLive(id) {
+  askPermission().then(function() {
+    return navigator.serviceWorker.register(serviceWorkerPath)
+    .then(function(registration) {
+      const subscribeOptions = {
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
+      };
+
+      return registration.pushManager.subscribe(subscribeOptions);
+    })
+    .then(function(pushSubscription) {
+      console.log('Received PushSubscription: ', JSON.stringify(pushSubscription));
+      return sendSubscriptionToBackEnd(pushSubscription, id);
+    })
+    .catch(function(error) {
+      // TODO tratar não aceitação das notificações
+      console.log('Erro', error);
+    });
   });
 }
 
 function sendSubscriptionToBackEnd(subscription, id) {
-  return $.ajax('/subscribe-live/' + id, {
+  return $.ajax('/subscribe-live?id=' + id, {
     method: 'POST',
     contentType: 'application/json',
     data: JSON.stringify(subscription),

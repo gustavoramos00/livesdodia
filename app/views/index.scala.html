@@ -95,7 +95,9 @@
     </button>
   </div>
 
-  @eventosHoje(eventosAgora, demaisEventosHoje, tags)
+  <div class="notification-toggle">
+    @eventosHoje(eventosAgora, demaisEventosHoje, tags)
+  </div>
 
   <div class="tags">
     <button type="button" data-jplist-control="buttons-text-filter" data-path=".badge" data-group="search-group"
@@ -124,7 +126,7 @@
             </div>
           </div>
           <!-- Client Holder -->
-          <div class="col-md-12 client-holder search-not-found-container">
+          <div class="col-md-12 client-holder search-not-found-container notification-toggle">
             @buscaNaoEncontrada()
             <div class="client-slider">
               @for(item <- eventosDia){
