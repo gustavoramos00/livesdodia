@@ -190,7 +190,7 @@ section {
   border-radius: 50px !important;
 }
 
-.button-clear {
+button.button-clear {
   background: initial;
   border: none;
   color: #ff00cc;

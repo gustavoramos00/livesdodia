@@ -19,6 +19,10 @@
   </script>
   <!-- End Google Analytics -->
 
+  <script>
+    // Define service-worker path
+    var serviceWorkerPath = '@routes.Assets.versioned("js/service-worker.js")';
+  </script>
 
 
 
@@ -46,20 +50,20 @@
   <meta itemprop="image" content="https://livesdodia.com.br/assets/images/logo-200x200-fundo-branco.png">
 
   <!-- Favicon-->
-  <link rel="shortcut icon" href="/assets/favicon.ico">
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/logo-180x180.png">
-  <link rel="icon" type="image/png" href="/assets/images/logo-32x32.png" sizes="32x32">
-  <link rel="icon" type="image/png" href="/assets/images/logo-16x16.png" sizes="16x16">
+  <link rel="shortcut icon" href='@routes.Assets.versioned("favicon.ico")'>
+  <link rel="apple-touch-icon" sizes="180x180" href='@routes.Assets.versioned("images/logo-180x180.png")'>
+  <link rel="icon" type="image/png" href='@routes.Assets.versioned("images/logo-32x32.png")' sizes="32x32">
+  <link rel="icon" type="image/png" href='@routes.Assets.versioned("/images/logo-16x16.png")' sizes="16x16">
 
   <!-- Web app -->
   <meta name="theme-color" content="#4A00E0">
-  <link rel="manifest" href="/assets/manifest.json">
+  <link rel="manifest" href='@routes.Assets.versioned("manifest.json")'>
 
   <!-- Add to home screen for Safari on iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Lives do Dia">
-  <link rel="apple-touch-icon" href="/assets/images/logo-168x168.png">
+  <link rel="apple-touch-icon" href='@routes.Assets.versioned("images/logo-168x168.png")'>
 
   <!-- Open Graph / Facebook -->
   <meta property="og:locale" content="pt_BR">

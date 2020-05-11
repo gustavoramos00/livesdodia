@@ -1,5 +1,4 @@
 
-var serviceWorkerPath = '/assets/js/service-worker.js';
 var vapidPublicKey = 'BPenScjfnRdAhNcPNLP92IYxCgyz_nVnFf2CP3XrvgyG419tWqHua5SM0WGxoZXpliBhd0mrZd9lH0N7K0YPdOk';
 
 $(document).ready(function(){
@@ -124,22 +123,26 @@ function initScroll() {
 }
 
 function initNotification() {
-  if (!('serviceWorker' in navigator)) {
-    // Service Worker isn't supported on this browser, disable or hide UI.
-    return;
-  }
-  
-  if (!('PushManager' in window)) {
-    // Push isn't supported on this browser, disable or hide UI.
-    return;
-  }
+  setTimeout(function(){
+    var beta = document.location.href.includes("/beta");
 
-  var beta = window.location.href.includes("/beta");
-  if (beta) {
-    $('.notification-toggle span.icon-bell').show("slow", function() {
-      $('.notification-toggle').removeClass("notification-toggle");
-    });
-  }
+    if (beta) {
+
+      if (!('serviceWorker' in navigator)) {
+        // Service Worker isn't supported on this browser, disable or hide UI.
+        return;
+      }
+      
+      if (!('PushManager' in window)) {
+        // Push isn't supported on this browser, disable or hide UI.
+        return;
+      }
+
+      $('.notification-toggle span.icon-bell').show("slow", function() {
+        $('.notification-toggle').removeClass("notification-toggle");
+      });
+    }
+  },350);
 
   navigator.serviceWorker.register(serviceWorkerPath)
   .then(function(registration) {
