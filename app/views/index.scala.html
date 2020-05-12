@@ -44,6 +44,7 @@
       $('.rectangle-transparent-2').show();
       $('.header-container').css('background', 'linear-gradient(to right, #333399, #ff00cc)').addClass('shadow');
       $('section').first().addClass('maybe-first-section');
+      $('.btn-play-active').removeClass('btn-play-active');
     }
 
     function closeVideo() {
@@ -59,7 +60,9 @@
       });
     }
 
-    function playYoutubeVideoId(videoId, nome) {
+    function playYoutubeVideoId(videoId, nome, element) {
+      $('.btn-play-active').removeClass('btn-play-active');
+      $(element).addClass('btn-play-active');
       hideElementsPlayVideo();
       if (!player) {
         player = new YT.Player('player', {
@@ -95,7 +98,7 @@
     </button>
   </div>
 
-  <div class="notification-toggle">
+  <div id="eventos-hoje-container" class="notification-toggle">
     @eventosHoje(eventosAgora, demaisEventosHoje, tags)
   </div>
 

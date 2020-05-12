@@ -10,7 +10,7 @@
   }
 }
 
-<div id="eventos-hoje-container">
+<div id="eventos-hoje">
   <!-- INICIADAS -->
   @if(eventosAgora.nonEmpty) {
     <section class="maybe-first-section section-padding bg-white">
@@ -21,7 +21,7 @@
               Já começou
             </h2>
           </div>
-          <div class="row align-items-center justify-content-start testi-content search-not-found-container" data-jplist-group="search-group">
+          <div class="row no-gutters-sm align-items-center justify-content-start testi-content search-not-found-container" data-jplist-group="search-group">
             @for(evento <- eventosAgora) {
               @displayEvento(evento, true, true, tags)
             }
@@ -42,7 +42,7 @@
               @tituloHoje()
             </h2>
           </div>
-          <div class="row align-items-center justify-content-start testi-content search-not-found-container" data-jplist-group="search-group">
+          <div class="row no-gutters-sm align-items-center justify-content-start testi-content search-not-found-container" data-jplist-group="search-group">
             @for(evento <- eventosHoje) {
               @displayEvento(evento, true, false, tags)
             }

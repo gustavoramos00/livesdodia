@@ -143,10 +143,7 @@ section {
 }
 
 .icones-evento {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: start;
-  align-items: center;
+  margin: 1px;
 }
 
 .icones-evento a.icone {
@@ -154,22 +151,17 @@ section {
 }
 
 .icones-evento span.icon {
-  font-size: 40px;
+  font-size: 30px;
   display: inline;
-  padding-right: 10px;
 }
 
-.icones-evento span.icon-bell {
-  font-size: 35px !important;
-}
-
-.notification-toggle span.icon-bell {
+.notification-toggle button.notification-button {
   display: none;
 }
 
 
 .icones-evento span.icon-share {
-  font-size: 30px;
+  font-size: 25px;
   opacity: 0.9;
   display: inline;
   padding-left: 5px;
@@ -270,22 +262,33 @@ footer span.icon-instagram {
 =            BUTTON            =
 ==============================*/
 .btn {
+  line-height: 1;
   font-size: 14px;
   font-weight: 600;
-  border-radius: 30px;
-  padding: 9px 25px;
+  border-radius: 10px;
+  padding: 7px;
   text-transform: capitalize;
   transition: all 0.3s ease 0s; }
 
 .btn-primary {
   display: inline-block;
-  background-color: #ff00cc;
-  border-color: #ff00cc;
+  background-color: #793ace;
+  border-color: #793ace;
   color: #fff; }
   .btn-primary:hover {
-    background-color: #333399;
-    border-color: #333399;
+    background-color: #ff00cc;
+    border-color: #ff00cc;
     color: #fff; }
+  .btn-primary:active {
+    background-color: #ff00cc !important;
+    border-color: #ff00cc !important;
+    color: #fff !important; }   
+
+.btn-play-active {
+  background-color: #ff00cc !important;
+  border-color: #ff00cc !important;
+  color: #fff !important;
+}    
 
 .btn-outline-primary {
   color: #fff;
@@ -296,6 +299,16 @@ footer span.icon-instagram {
     background-color: #333399;
     border-color: #333399;
     color: #fff; }
+
+.btn-secondary {
+  color: inherit;
+  border-color: inherit;
+  background: none;
+}
+.btn-secondary:hover {
+  background-color: #ff00cc;
+  border-color: #ff00cc;
+  color: #fff; }
 
 .btn-shadow {
   box-shadow: -5px 8px 20px 0px rgba(229, 16, 2, 0.15); }
@@ -595,8 +608,8 @@ footer span.icon-instagram {
   color: #ff00cc; }
 
 .testi-content {
-  width: 100%;
-  padding: 10px; }
+  width: 100%; 
+}
 
 a.link-no-decoration {
   color: inherit;
@@ -605,7 +618,7 @@ a.link-no-decoration {
 .testi-item {
   min-width: 350px;
   position: relative;
-  padding-bottom: 30px;
+  padding-bottom: 10px;
 }
 
 .testi-meta-inner {
@@ -715,6 +728,17 @@ a.link-no-decoration {
 }
 
 @media (max-width: 768px) {
+
+  .no-gutters-sm {
+    margin-right: 0;
+    margin-left: 0;
+  }
+  
+  .no-gutters-sm > .col,
+  .no-gutters-sm > [class*="col-"] {
+      padding-right: 0;
+      padding-left: 0;
+  }
 
   .header-container {
     height: 70px;

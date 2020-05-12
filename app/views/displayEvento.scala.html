@@ -34,14 +34,14 @@
         <span class="badge badge-live @tag" style='background-color: @colorByTag(tag)'>@tag</span>
         }
       }
-      <div class="icones-evento">
+      <div class="icones-evento btn-group" role="group">
         @if(evento.youtubeData.flatMap(_.embeddable).contains(true)){
-        <button type="button" class="icone button-clear" onclick='playYoutubeVideoId("@evento.youtubeData.flatMap(_.videoId).get", "@evento.nome")'>
+        <button type="button" class="btn btn-primary icone" onclick='playYoutubeVideoId("@evento.youtubeData.flatMap(_.videoId).get", "@evento.nome", this)'>
           <span class="icon icon-play-circle"></span>
         </button>
         }
         @if(evento.linkLive.isDefined) {
-        <a class="icone" rel="nofollow" 
+        <a class="btn btn-primary icone" rel="nofollow" 
           href="@evento.linkLive.get" 
           ga-link-control="@evento.iconeLive" 
           ga-share-data="@evento.nome"
@@ -50,7 +50,7 @@
         </a>
         }
         @if(evento.instagramProfile.isDefined && evento.instagramProfile != evento.linkLive)  {
-        <a class="icone" 
+        <a class="btn btn-primary icone" 
           rel="nofollow" 
           href="@evento.instagramProfile.get" 
           ga-link-control="icon-instagram"
@@ -60,34 +60,34 @@
         </a>
         }
         @if(!agora) {
-          <button type="button" class="button-clear" onclick='subscribeLive("@evento.id.get")'>
+          <button type="button" class="btn btn-primary notification-button" onclick='subscribeLive("@evento.id.get")'>
             <span class="icon icon-bell"></span>
           </button>
         }
-        <!-- <span class="icon-share icon-share-alt"></span> -->
-        <span>
-          <a class="link-no-decoration" 
-            href='https://wa.me/?text=@evento.urlEncodedShare' 
-            ga-share-control="whatsapp" 
-            ga-share-data="@evento.nome"
-            target="_blank">
-            <span class="icon-share icon-whatsapp"></span>
-          </a>
-          <a class="link-no-decoration" 
-            href='https://twitter.com/intent/tweet?text=@evento.urlEncodedShare' 
-            ga-share-control="twitter" 
-            ga-share-data="@evento.nome"
-            target="_blank">
-            <span class="icon-share icon-twitter"></span>
-          </a>
-          <a class="link-no-decoration" 
-            href='https://www.facebook.com/sharer/sharer.php?u=livesdodia.com.br&quote=@evento.urlEncodedShareFacebook' 
-            ga-share-control="facebook" 
-            ga-share-data="@evento.nome"
-            target="_blank">
-            <span class="icon-share icon-facebook-square"></span>
-          </a>
-        </span>
+      </div>
+      <div class="icones-evento btn-group" role="group">
+      
+        <a class="btn btn-secondary" 
+          href='https://wa.me/?text=@evento.urlEncodedShare' 
+          ga-share-control="whatsapp" 
+          ga-share-data="@evento.nome"
+          target="_blank">
+          <span class="icon-share icon-whatsapp"></span>
+        </a>
+        <a class="btn btn-secondary" 
+          href='https://twitter.com/intent/tweet?text=@evento.urlEncodedShare' 
+          ga-share-control="twitter" 
+          ga-share-data="@evento.nome"
+          target="_blank">
+          <span class="icon-share icon-twitter"></span>
+        </a>
+        <a class="btn btn-secondary" 
+          href='https://www.facebook.com/sharer/sharer.php?u=livesdodia.com.br&quote=@evento.urlEncodedShareFacebook' 
+          ga-share-control="facebook" 
+          ga-share-data="@evento.nome"
+          target="_blank">
+          <span class="icon-share icon-facebook-square"></span>
+        </a>
       </div>
         
       

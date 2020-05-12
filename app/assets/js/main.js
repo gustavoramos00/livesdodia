@@ -60,7 +60,7 @@ $(document).ready(function(){
       url: '/eventoshoje',
       dataType: 'html',
       success: function(html) {
-        $('#eventos-hoje-container').replaceWith(html);
+        $('#eventos-hoje').replaceWith(html);
         initElements();
       }
     });
@@ -130,17 +130,21 @@ function initNotification() {
 
       if (!('serviceWorker' in navigator)) {
         // Service Worker isn't supported on this browser, disable or hide UI.
+        $('button.notification-button').remove();
         return;
       }
       
       if (!('PushManager' in window)) {
         // Push isn't supported on this browser, disable or hide UI.
+        $('button.notification-button').remove();
         return;
       }
 
-      $('.notification-toggle span.icon-bell').show("slow", function() {
+      $('.notification-toggle button.notification-button').show("slow", function() {
         $('.notification-toggle').removeClass("notification-toggle");
       });
+    } else {
+      $('button.notification-button').remove();
     }
   },350);
 
