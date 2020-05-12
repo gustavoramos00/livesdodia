@@ -3,12 +3,8 @@ var vapidPublicKey = 'BPenScjfnRdAhNcPNLP92IYxCgyz_nVnFf2CP3XrvgyG419tWqHua5SM0W
 
 $(document).ready(function(){
 
-
-
   initScroll();
-
   initNotification();
-  
   jplist.init();
 
   var slider = tns({
@@ -125,37 +121,25 @@ function initScroll() {
 function initNotification() {
   setTimeout(function(){
     var beta = document.location.href.includes("/beta");
-
-    if (beta) {
-
-      if (!('serviceWorker' in navigator)) {
-        // Service Worker isn't supported on this browser, disable or hide UI.
-        $('button.notification-button').remove();
-        return;
-      }
-      
-      if (!('PushManager' in window)) {
-        // Push isn't supported on this browser, disable or hide UI.
-        $('button.notification-button').remove();
-        return;
-      }
-
+    var hasSW = 'serviceWorker' in navigator;
+    var hasPM = 'PushManager' in window;
+    if (beta && hasSW && hasPM) {
       $('.notification-toggle button.notification-button').show("slow", function() {
         $('.notification-toggle').removeClass("notification-toggle");
       });
+
+      navigator.serviceWorker.register(serviceWorkerPath)
+        .then(function(registration) {
+          console.log('Service worker successfully registered.');
+          return registration;
+        })
+        .catch(function(err) {
+          console.error('Unable to register service worker.', err);
+        });
     } else {
       $('button.notification-button').remove();
     }
   },350);
-
-  navigator.serviceWorker.register(serviceWorkerPath)
-  .then(function(registration) {
-    console.log('Service worker successfully registered.');
-    return registration;
-  })
-  .catch(function(err) {
-    console.error('Unable to register service worker.', err);
-  });
  
 }
 
