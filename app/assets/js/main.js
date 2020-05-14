@@ -124,7 +124,6 @@ function initNotification() {
     var hasSW = 'serviceWorker' in navigator;
     var hasPM = 'PushManager' in window;
     if (beta && hasSW && hasPM) {
-    // if (true) {
   
       $('.notification-toggle button.notification-button').show("slow", function() {
         $('.notification-toggle').removeClass("notification-toggle");
@@ -151,14 +150,16 @@ function fetchSubscribedLives() {
     .then(function(sw) {
       return sw.pushManager.getSubscription();
     })
-    .then(function(sub) {  
-      $.ajax({
-        url: '/fetch-subscribed-lives/' + sub.toJSON().keys.p256dh ,
-        dataType: 'json',
-        success: function(livesId) {
-          btnLivesAtivas(livesId);
-        }
-      });
+    .then(function(sub) {
+      if (sub) {
+        $.ajax({
+          url: '/fetch-subscribed-lives/' + sub.toJSON().keys.p256dh ,
+          dataType: 'json',
+          success: function(livesId) {
+            btnLivesAtivas(livesId);
+          }
+        });
+      }
     });
   }
 }
@@ -173,29 +174,13 @@ function btnLivesAtivas(livesId) {
   }
 }
 
-// function askPermission() {
-//   return new Promise(function(resolve, reject) {
-//     const permissionResult = Notification.requestPermission(function(result) {
-//       resolve(result);
-//     });
-
-//     if (permissionResult) {
-//       permissionResult.then(resolve, reject);
-//     }
-//   })
-//   .then(function(permissionResult) {
-//     if (permissionResult !== 'granted') {
-//       throw new Error('We weren\'t granted permission.');
-//     }
-//   });
-// }
-
-
 function subscribeLive(id) {
   if (id) {
     liveSubscribeId = id;
   }
-  if (id && Notification.permission !== "granted") {
+  if (Notification.permission == "denied") {
+    $('#pushModalDenied').modal();
+  } else if (id && Notification.permission !== "granted") {
     $('#pushModal').modal();
   } else {
     return navigator.serviceWorker.getRegistration('/assets/js/')

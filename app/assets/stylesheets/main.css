@@ -746,6 +746,11 @@ a.link-no-decoration {
 
 @media (max-width: 768px) {
 
+  .sm-container {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
   .no-gutters-sm {
     margin-right: 0;
     margin-left: 0;
