@@ -24,16 +24,19 @@
         }
 
       </p>
-      <p class="testi-info mb-0 searchable">
-        <strong>@evento.horarioFmt</strong> @evento.info
-      </p>
-      @for(tag <- evento.tags){
-        @if(tag == "Música"){
-        <span class="badge badge-live @tag" hidden>@tag</span>
-        } else {
-        <span class="badge badge-live @tag" style='background-color: @colorByTag(tag)'>@tag</span>
+      <div class="testi-info mb-0 searchable">
+        <strong>@evento.horarioFmt</strong> 
+        @for(tag <- evento.tags){
+          @if(tag == "Música"){
+          <span class="badge badge-live @tag" hidden>@tag</span>
+          } else {
+          <span class="badge badge-live @tag" style='background-color: @colorByTag(tag)'>@tag</span>
+          }
         }
-      }
+        <div>
+          @evento.info
+        </div>
+      </div>
       <div class="icones-evento btn-group" role="group">
         @if(evento.youtubeData.flatMap(_.embeddable).contains(true)){
         <button type="button" class="btn btn-primary icone" onclick='playYoutubeVideoId("@evento.youtubeData.flatMap(_.videoId).get", "@evento.nome", this)'>
@@ -59,12 +62,15 @@
           <span class="icon icon-instagram"></span>
         </a>
         }
+      </div>
+      <div class="icones-evento btn-group" role="group">
         @if(!agora) {
-          <button type="button" class="btn btn-primary notification-button" onclick='subscribeLive("@evento.id.get")'>
+          <button type="button" btn-push-live-id="@evento.id.get" class="btn btn-primary notification-button" onclick='subscribeLive("@evento.id.get")'>
             <span class="icon icon-bell"></span>
           </button>
         }
       </div>
+      <!-- <div class="w-100"></div> -->
       <div class="icones-evento btn-group" role="group">
       
         <a class="btn btn-secondary" 

@@ -16,7 +16,6 @@ import play.api.libs.ws.WSClient
 import play.api.{Configuration, Logger}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.duration._
 
 @Singleton
 class MyPushService @Inject()(actorSystem: ActorSystem,
@@ -28,17 +27,38 @@ class MyPushService @Inject()(actorSystem: ActorSystem,
 
   Security.addProvider(new BouncyCastleProvider)
 
+  val prefix = "push-"
+  val keySeparator = "__SEPARADOR__"
   val logger = Logger(getClass)
   val vapidPublicKey = configuration.get[String]("vapid-public-key")
   val vapidPrivateKey = configuration.get[String]("vapid-private-key")
 
-  def fmtCacheKey(liveId: String, authKey: String) = s"push-$liveId:$authKey"
+  def fmtCacheKey(liveId: String, subscriptionKey: String) = s"$prefix$liveId$keySeparator$subscriptionKey"
 
-  def subscribe(liveId: String, subscriptionJson: JsValue) = {
-    logger.warn(s"request body json [${subscriptionJson}]")
-    val authkey = (subscriptionJson \ "keys" \ "auth").as[String]
-    val pushKey = fmtCacheKey(liveId, authkey)
-    cache.set(pushKey, subscriptionJson.toString)
+  def toggleSubscription(liveId: String, subscriptionJson: JsValue) = {
+
+    val p256dh = (subscriptionJson \ "keys" \ "p256dh").as[String]
+    val pushKey = fmtCacheKey(liveId, p256dh)
+
+    def action(cacheExistenteSubscription: Option[String]) = {
+      if (cacheExistenteSubscription.isEmpty)
+        cache.set(pushKey, Json.stringify(subscriptionJson))
+      else
+        cache.remove(pushKey)
+    }
+
+    for {
+      keyStr <- cache.get[String](pushKey)
+      _ <- action(keyStr)
+      subscribedLives <- fetchSubscribedLives(p256dh)
+    } yield subscribedLives
+  }
+
+  def fetchSubscribedLives(p256dh: String) = {
+    cache.matching(fmtCacheKey("*", p256dh)).map(cacheKeys => {
+      cacheKeys.map(_.replaceFirst(prefix, "").split(keySeparator).head)
+    })
+
   }
 
   def notify(liveId: String, evento: Evento) = {
@@ -61,7 +81,7 @@ class MyPushService @Inject()(actorSystem: ActorSystem,
           val payload = Json.obj(
             "title" -> s"${evento.horarioFmt} - ${evento.nome}",
             "options" -> Json.obj(
-              "body" -> "Sua live acaba de começar",
+              "body" -> "Tá na hora da sua Live!",
               "renotify" -> true,
               "tag" -> evento.nome,
               "requireInteraction" -> true,

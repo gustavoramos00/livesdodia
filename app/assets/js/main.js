@@ -1,6 +1,6 @@
 
 var vapidPublicKey = 'BPenScjfnRdAhNcPNLP92IYxCgyz_nVnFf2CP3XrvgyG419tWqHua5SM0WGxoZXpliBhd0mrZd9lH0N7K0YPdOk';
-
+var liveSubscribeId;
 $(document).ready(function(){
 
   initScroll();
@@ -124,13 +124,15 @@ function initNotification() {
     var hasSW = 'serviceWorker' in navigator;
     var hasPM = 'PushManager' in window;
     if (beta && hasSW && hasPM) {
+    // if (true) {
+  
       $('.notification-toggle button.notification-button').show("slow", function() {
         $('.notification-toggle').removeClass("notification-toggle");
       });
 
       navigator.serviceWorker.register(serviceWorkerPath)
         .then(function(registration) {
-          console.log('Service worker successfully registered.');
+          fetchSubscribedLives();
           return registration;
         })
         .catch(function(err) {
@@ -143,27 +145,60 @@ function initNotification() {
  
 }
 
-function askPermission() {
-  return new Promise(function(resolve, reject) {
-    const permissionResult = Notification.requestPermission(function(result) {
-      resolve(result);
+function fetchSubscribedLives() {
+  if (Notification.permission == "granted") {
+    navigator.serviceWorker.getRegistration('/assets/js/')
+    .then(function(sw) {
+      return sw.pushManager.getSubscription();
+    })
+    .then(function(sub) {  
+      $.ajax({
+        url: '/fetch-subscribed-lives/' + sub.toJSON().keys.p256dh ,
+        dataType: 'json',
+        success: function(livesId) {
+          btnLivesAtivas(livesId);
+        }
+      });
     });
-
-    if (permissionResult) {
-      permissionResult.then(resolve, reject);
-    }
-  })
-  .then(function(permissionResult) {
-    if (permissionResult !== 'granted') {
-      throw new Error('We weren\'t granted permission.');
-    }
-  });
+  }
 }
+
+function btnLivesAtivas(livesId) {
+  $('button[btn-push-live-id]').removeClass('btn-active-push');
+  if (livesId && livesId.length > 0) {
+    for (var i = 0; i < livesId.length; i++) {
+      var liveId = livesId[i];
+      $('button[btn-push-live-id=' + liveId + ']').addClass('btn-active-push');
+    }
+  }
+}
+
+// function askPermission() {
+//   return new Promise(function(resolve, reject) {
+//     const permissionResult = Notification.requestPermission(function(result) {
+//       resolve(result);
+//     });
+
+//     if (permissionResult) {
+//       permissionResult.then(resolve, reject);
+//     }
+//   })
+//   .then(function(permissionResult) {
+//     if (permissionResult !== 'granted') {
+//       throw new Error('We weren\'t granted permission.');
+//     }
+//   });
+// }
 
 
 function subscribeLive(id) {
-  askPermission().then(function() {
-    return navigator.serviceWorker.register(serviceWorkerPath)
+  if (id) {
+    liveSubscribeId = id;
+  }
+  if (id && Notification.permission !== "granted") {
+    $('#pushModal').modal();
+  } else {
+    return navigator.serviceWorker.getRegistration('/assets/js/')
     .then(function(registration) {
       const subscribeOptions = {
         userVisibleOnly: true,
@@ -173,14 +208,13 @@ function subscribeLive(id) {
       return registration.pushManager.subscribe(subscribeOptions);
     })
     .then(function(pushSubscription) {
-      console.log('Received PushSubscription: ', JSON.stringify(pushSubscription));
-      return sendSubscriptionToBackEnd(pushSubscription, id);
+      return sendSubscriptionToBackEnd(pushSubscription, liveSubscribeId);
     })
     .catch(function(error) {
       // TODO tratar não aceitação das notificações
       console.log('Erro', error);
-    });
-  });
+    });  
+  }
 }
 
 function sendSubscriptionToBackEnd(subscription, id) {
@@ -188,8 +222,8 @@ function sendSubscriptionToBackEnd(subscription, id) {
     method: 'POST',
     contentType: 'application/json',
     data: JSON.stringify(subscription),
-    success: function(response) {
-      
+    success: function(livesId) {
+      btnLivesAtivas(livesId);
     },
     error: function(response) {
       console.log('error response', response)

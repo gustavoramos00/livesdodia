@@ -11,7 +11,7 @@ import play.api.libs.json.Json
 import play.api.mvc._
 import service.{LiveScheduler, MyPushService, RepositoryService}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 
 
@@ -53,18 +53,23 @@ class HomeController @Inject()(repository: RepositoryService,
     }
   }
 
-  def subscribeLive(id: String) = Action { implicit request: Request[AnyContent] =>
+  def subscribeLive(id: String) = Action.async { implicit request: Request[AnyContent] =>
     if (request.contentType.contains("application/json")) {
       val optSubscription = request.body.asJson
       if (optSubscription.isDefined) {
-        pushService.subscribe(id, request.body.asJson.get)
-        Ok
+        pushService.toggleSubscription(id, request.body.asJson.get).map(livesId => Ok(Json.toJson(livesId)))
       } else {
-        BadRequest
+        Future.successful(BadRequest)
       }
     } else {
-      BadRequest
+      Future.successful(BadRequest)
     }
+  }
+
+  def fetchSubscribedLives(p256dh: String) = Action.async { implicit request: Request[AnyContent] =>
+    pushService.fetchSubscribedLives(p256dh).map(livesId => {
+      Ok(Json.toJson(livesId))
+    })
   }
 
   def eventosHoje() = cached(_ => "jaComecou", cacheDuration) {

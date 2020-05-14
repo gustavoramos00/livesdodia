@@ -151,7 +151,7 @@ section {
 }
 
 .icones-evento span.icon {
-  font-size: 30px;
+  font-size: 25px;
   display: inline;
 }
 
@@ -161,7 +161,7 @@ section {
 
 
 .icones-evento span.icon-share {
-  font-size: 25px;
+  font-size: 20px;
   opacity: 0.9;
   display: inline;
   padding-left: 5px;
@@ -254,6 +254,12 @@ footer span.icon-instagram {
     .overlay.bg-white:before {
       background: #fff;
       opacity: .7; }
+  .overlay .notification-button {
+    display: inline-block;
+    background-color: #ffffff;
+    border-color: #ffffff;
+    color: #793ace
+  }
 
 .text-white {
   color: #fff; }
@@ -302,7 +308,7 @@ footer span.icon-instagram {
 
 .btn-secondary {
   color: inherit;
-  border-color: inherit;
+  border-color: initial;
   background: none;
 }
 .btn-secondary:hover {
@@ -318,6 +324,12 @@ footer span.icon-instagram {
 
 .btn-link {
   color: #ff00cc; }
+
+.btn-active-push {
+  background-color: #ff00cc !important;
+  border-color: #ff00cc !important;
+  color: #fff !important;
+}  
 
 /*=====  End of BUTTON  ======*/
 /*==========================================
@@ -549,13 +561,14 @@ footer span.icon-instagram {
 
 .testi-destaque {
   font-weight: bolder;
-  font-size: 24px;
+  font-size: 26px;
 }
 
 .badge-live {
   color: #fff;
   background-color: #7728e3;
   border: none;
+  vertical-align: text-bottom;
 }
 
 .testi-details .badge-live {
@@ -619,6 +632,10 @@ a.link-no-decoration {
   min-width: 350px;
   position: relative;
   padding-bottom: 10px;
+}
+
+.dia-box .testi-item {
+  min-width: 300px;
 }
 
 .testi-meta-inner {
