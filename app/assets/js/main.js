@@ -1,6 +1,7 @@
 
 var vapidPublicKey = 'BPenScjfnRdAhNcPNLP92IYxCgyz_nVnFf2CP3XrvgyG419tWqHua5SM0WGxoZXpliBhd0mrZd9lH0N7K0YPdOk';
 var liveSubscribeId;
+var livesSubscrebedIds;
 $(document).ready(function(){
 
   initScroll();
@@ -58,6 +59,7 @@ $(document).ready(function(){
       success: function(html) {
         $('#eventos-hoje').replaceWith(html);
         initElements();
+        btnLivesAtivas();
       }
     });
   },90000); // atualiza a cada 1min30s
@@ -165,10 +167,13 @@ function fetchSubscribedLives() {
 }
 
 function btnLivesAtivas(livesId) {
+  if (livesId) {
+    livesSubscrebedIds = livesId;
+  }
   $('button[btn-push-live-id]').removeClass('btn-active-push');
-  if (livesId && livesId.length > 0) {
-    for (var i = 0; i < livesId.length; i++) {
-      var liveId = livesId[i];
+  if (livesSubscrebedIds && livesSubscrebedIds.length > 0) {
+    for (var i = 0; i < livesSubscrebedIds.length; i++) {
+      var liveId = livesSubscrebedIds[i];
       $('button[btn-push-live-id=' + liveId + ']').addClass('btn-active-push');
     }
   }
@@ -215,17 +220,6 @@ function sendSubscriptionToBackEnd(subscription, id) {
       throw new Error('Bad status code from server.');
     }
   });
-  // .then(function(response) {
-  //   if (!response.ok) {
-  //     throw new Error('Bad status code from server.');
-  //   }
-  //   return response.json();
-  // })
-  // .then(function(responseData) {
-  //   if (!(responseData.data && responseData.data.success)) {
-  //     throw new Error('Bad response from server.');
-  //   }
-  // });
 }
 
 
