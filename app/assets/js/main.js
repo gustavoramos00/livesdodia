@@ -8,23 +8,6 @@ $(document).ready(function(){
   initNotification();
   jplist.init();
 
-  var slider = tns({
-    container: '.client-slider',
-    controls: false,
-    arrowKeys: true,
-    items: 1,
-    mouseDrag: true,
-    loop: false,
-    responsive: {
-      768: {
-        items: 2
-      },
-      992: {
-        items: 3
-      }
-    }
-  });
-
   //get a jPList control element
   const element = document.getElementById('jplist-control-element');
 
@@ -36,8 +19,6 @@ $(document).ready(function(){
     */
     $('.dia-box:not(:has(.searchable))').hide();
     $('.dia-box:has(.searchable)').show();
-    slider.goTo('first');
-
     /**
      * Exibe 'Busca não encontrada' nas seções
      */
@@ -155,7 +136,7 @@ function fetchSubscribedLives() {
     .then(function(sub) {
       if (sub) {
         $.ajax({
-          url: '/fetch-subscribed-lives/' + sub.toJSON().keys.p256dh ,
+          url: '/fetch-subscribed-lives?id=' + sub.toJSON().keys.p256dh ,
           dataType: 'json',
           success: function(livesId) {
             btnLivesAtivas(livesId);
@@ -174,7 +155,7 @@ function btnLivesAtivas(livesId) {
   if (livesSubscrebedIds && livesSubscrebedIds.length > 0) {
     for (var i = 0; i < livesSubscrebedIds.length; i++) {
       var liveId = livesSubscrebedIds[i];
-      $('button[btn-push-live-id=' + liveId + ']').addClass('btn-active-push');
+      $('button[btn-push-live-id="' + liveId + '"]').addClass('btn-active-push');
     }
   }
 }

@@ -11,7 +11,7 @@ GET     /upcache                    controllers.HomeController.updateCache(id: O
 GET     /incluir                    controllers.HomeController.incluir
 GET     /livesjson                  controllers.HomeController.livesJson
 POST    /subscribe-live             controllers.HomeController.subscribeLive(id: String)
-GET     /fetch-subscribed-lives/:id controllers.HomeController.fetchSubscribedLives(id: String)
+GET     /fetch-subscribed-lives     controllers.HomeController.fetchSubscribedLives(id: String)
 
 # Análises
 GET     /schedulecount              controllers.HomeController.scheduleCount

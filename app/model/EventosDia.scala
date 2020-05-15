@@ -8,7 +8,7 @@ case class EventosDia(
                      eventos: Seq[Evento]
                      ) {
   def diaFmt(): String = data.format(DateTimeFormatter.ofPattern("dd/MM"))
-  def diaSemanaFmt(): String = data.format(DateTimeFormatter.ofPattern("EEEE"))
+  def diaSemanaFmt(): String = data.format(DateTimeFormatter.ofPattern("EEEE")).replaceAll("-feira", "")
   def diaProgramacaoFmt(): String = {
     if (data.isEqual(LocalDate.now())) {
       "hoje"

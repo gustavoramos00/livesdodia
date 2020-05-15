@@ -21,7 +21,7 @@
               Já começou
             </h2>
           </div>
-          <div class="row no-gutters-sm align-items-center justify-content-start testi-content search-not-found-container" data-jplist-group="search-group">
+          <div class="row no-gutters-sm align-items-center justify-content-start search-not-found-container" data-jplist-group="search-group">
             @for(evento <- eventosAgora) {
               @displayEvento(evento, true, true, tags)
             }
@@ -42,7 +42,7 @@
               @tituloHoje()
             </h2>
           </div>
-          <div class="row no-gutters-sm align-items-center justify-content-start testi-content search-not-found-container" data-jplist-group="search-group">
+          <div class="row no-gutters-sm align-items-center justify-content-start search-not-found-container" data-jplist-group="search-group">
             @for(evento <- eventosHoje) {
               @displayEvento(evento, true, false, tags)
             }

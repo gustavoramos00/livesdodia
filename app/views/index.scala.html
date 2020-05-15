@@ -119,39 +119,34 @@
     }
   </div>
 
-  <section class="overlay bg-fixed" style='background-image: url(@routes.Assets.versioned("img/bg.jpg"));'>
-    <div class="container">
-      <div class="section-content" data-aos="fade-up">
-        <div class="row">
-          <div class="col-md-12">
-            <div class="title-wrap">
-              <h2>Programação</h2>
-            </div>
-          </div>
-          <!-- Client Holder -->
-          <div class="col-md-12 client-holder search-not-found-container notification-toggle">
-            @buscaNaoEncontrada()
-            <div class="client-slider">
-              @for(item <- eventosDia){
-              <div class="shadow dia-box">
-                <div class="heading-section text-center">
-                  <p>
-                    @item.diaProgramacaoFmt
-                  </p>
-                  <h2 class="mb-4">
-                    @item.diaFmt
-                  </h2>
-                </div>
-                <div data-jplist-group="search-group">
-                  @for(evento <- item.eventos){
-                    @displayEvento(evento, false, tags = tags)
-                  }
-                </div>
+  <section class="overlay bg-fixed" style='background-image: url(@routes.Assets.versioned("img/bg.jpg"));'>    
+    <div class="container sm-container shadow destaque-box" data-aos="fade-up">
+      <div class="position-relative">
+        <div class="title-wrap w-100">
+          <h2>Programação</h2>
+        </div>
+        
+        <!-- Client Holder -->
+        <div class="w-100 search-not-found-container notification-toggle">
+          @buscaNaoEncontrada()
+          <div>
+            @for(item <- eventosDia){
+            <div class="shadow destaque-box dia-box">
+              <div class="heading-section text-center">
+                <h3 class="mb-4">
+                  @item.diaFmt
+                  @item.diaProgramacaoFmt
+                </h3>
               </div>
-              }
+              <div data-jplist-group="search-group" class="align-items-center justify-content-start no-gutters-sm search-not-found-container testi-content ">
+                @for(evento <- item.eventos){
+                  @displayEvento(evento, false, tags = tags)
+                }
+              </div>
             </div>
-            <!-- End of Client Holder -->
+            }
           </div>
+          <!-- End of Client Holder -->
         </div>
       </div>
     </div>

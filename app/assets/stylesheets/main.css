@@ -553,7 +553,7 @@ footer span.icon-instagram {
 
 .destaque-box {
   margin: 0 auto 30px auto;
-  padding: 30px 10px 0 10px;
+  padding: 20px 10px 5px 10px;
 }
 
 .testi-details {
@@ -586,6 +586,8 @@ footer span.icon-instagram {
   padding: 10px 10px 0px 10px;
   position: sticky;
   bottom: 0;
+  top: 90px;
+  z-index: 10;
   white-space: nowrap;
   overflow-x: scroll;
   background: rgb(83,62,165);
@@ -621,7 +623,10 @@ footer span.icon-instagram {
   color: #ff00cc; }
 
 .testi-content {
-  width: 100%; 
+  width: 100%;
+  display: flex;
+  overflow-x: auto;
+  flex-wrap: wrap;
 }
 
 a.link-no-decoration {
@@ -742,9 +747,20 @@ a.link-no-decoration {
     min-width: 300px;
   }
 
+
 }
 
 @media (max-width: 768px) {
+
+  
+  .testi-content {
+    flex-wrap: nowrap;
+  }
+
+  .testi-content hr {
+    display: none;
+  }
+  
 
   .sm-container {
     padding-left: 8px;
@@ -764,6 +780,10 @@ a.link-no-decoration {
 
   .header-container {
     height: 70px;
+  }
+
+  .tags {
+    top: 65px
   }
     
   .testi-meta-inner {
