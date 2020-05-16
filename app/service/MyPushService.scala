@@ -41,10 +41,13 @@ class MyPushService @Inject()(actorSystem: ActorSystem,
     val pushKey = fmtCacheKey(liveId, p256dh)
 
     def action(cacheExistenteSubscription: Option[String]) = {
-      if (cacheExistenteSubscription.isEmpty)
+      if (cacheExistenteSubscription.isEmpty) {
+//        logger.warn(s"Ativando notificação para $liveId")
         cache.set(pushKey, Json.stringify(subscriptionJson))
-      else
+      } else {
+        logger.warn(s"Removendo notificação para $liveId")
         cache.remove(pushKey)
+      }
     }
 
     for {

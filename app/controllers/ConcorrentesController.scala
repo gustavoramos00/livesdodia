@@ -212,6 +212,41 @@ class ConcorrentesController @Inject()(repository: RepositoryService,
       })
   }
 
+//  def dadosSofaDeCasa = {
+//    def endpoint(dia: String) = s"https://www.sofadecasa.com.br/api/lives?day=$dia"
+//
+//    ws.url(endpoint(LocalDate.now.toString))
+//      .get()
+//      .map(response => {
+//        val lives = (response.json \ "lives").as[JsArray]
+//        (lives)
+//          .value
+//          .filter(event => !(event \ "startsAt").as[ZonedDateTime].withZoneSameInstant(ZoneId.systemDefault()).toLocalDate.isBefore(LocalDate.now)) // exclui antigos
+//          .map(event => {
+//          val artista = (event \ "title").asOpt[String].getOrElse("").replaceAll(regexRemoveChars, "").trim
+//          val info = (event \ "description").asOpt[String].getOrElse("").replaceAll(regexRemoveChars, "").trim
+//          val data = (event \ "startsAt").as[ZonedDateTime].withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime
+//          val url = (event \ "url").asOpt[String]
+//          val youtubeLink = if (url.isDefined && !url.get.contains("instagram")) url else None
+//          val instagram = if (url.isDefined && url.get.contains("instagram")) url else None
+//          val categoria = (event \ "genreName").asOpt[String].getOrElse("")
+//          val thumbnail = (event \ "imageUrl").asOpt[String]
+//          Evento(
+//            id = None,
+//            nome = artista,
+//            info = info,
+//            data = data,
+//            tags = Seq(categoria),
+//            youtubeLink = youtubeLink,
+//            instagramProfile = instagram,
+//            destaque = false,
+//            linkImagem = thumbnail,
+//            origem = Some("LivesBrasil"))
+//        })
+//          .toSeq
+//      })
+//  }
+
   def extrairDados() = Action.async { implicit request: Request[AnyContent] =>
     for {
       livesdodia <- dadosLivesDoDia

@@ -65,7 +65,7 @@
       </div>
       <div class="icones-evento btn-group" role="group">
         @if(!agora) {
-          <button type="button" btn-push-live-id="@evento.id.get" class="btn btn-primary notification-button" onclick='subscribeLive("@evento.id.get")'>
+          <button type="button" btn-push-live-id="@evento.id.get" class="btn btn-primary notification-button" onclick='subscribeLive("@evento.id.get", "@evento.nome")'>
             <span class="icon icon-bell"></span>
           </button>
         }

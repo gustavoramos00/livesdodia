@@ -1,6 +1,7 @@
 
 var vapidPublicKey = 'BPenScjfnRdAhNcPNLP92IYxCgyz_nVnFf2CP3XrvgyG419tWqHua5SM0WGxoZXpliBhd0mrZd9lH0N7K0YPdOk';
 var liveSubscribeId;
+var liveSubscribedNome;
 var livesSubscrebedIds;
 $(document).ready(function(){
 
@@ -103,10 +104,9 @@ function initScroll() {
 
 function initNotification() {
   setTimeout(function(){
-    var beta = document.location.href.includes("/beta");
     var hasSW = 'serviceWorker' in navigator;
     var hasPM = 'PushManager' in window;
-    if (beta && hasSW && hasPM) {
+    if (hasSW && hasPM) {
   
       $('.notification-toggle button.notification-button').show("slow", function() {
         $('.notification-toggle').removeClass("notification-toggle");
@@ -118,7 +118,12 @@ function initNotification() {
           return registration;
         })
         .catch(function(err) {
-          console.error('Unable to register service worker.', err);
+          ga('send', {
+            hitType: 'event',
+            eventCategory: 'Push Error',
+            eventAction: 'Push - Erro registrar sw',
+            eventLabel: 'Push - Erro registrar sw'
+          });
         });
     } else {
       $('button.notification-button').remove();
@@ -160,14 +165,29 @@ function btnLivesAtivas(livesId) {
   }
 }
 
-function subscribeLive(id) {
+function subscribeLive(id, nome) {
   if (id) {
     liveSubscribeId = id;
   }
+  if (nome) {
+    liveSubscribedNome = nome;
+  }
   if (Notification.permission == "denied") {
     $('#pushModalDenied').modal();
+    ga('send', {
+      hitType: 'event',
+      eventCategory: 'Push',
+      eventAction: 'Push - Permissão negada',
+      eventLabel: 'Push - Permissão negada'
+    });
   } else if (id && Notification.permission !== "granted") {
     $('#pushModal').modal();
+    ga('send', {
+      hitType: 'event',
+      eventCategory: 'Push',
+      eventAction: 'Push - Solicitar permissão',
+      eventLabel: 'Push - Solicitar permissão'
+    });
   } else {
     return navigator.serviceWorker.getRegistration('/assets/js/')
     .then(function(registration) {
@@ -182,8 +202,12 @@ function subscribeLive(id) {
       return sendSubscriptionToBackEnd(pushSubscription, liveSubscribeId);
     })
     .catch(function(error) {
-      // TODO tratar não aceitação das notificações
-      console.log('Erro', error);
+      ga('send', {
+        hitType: 'event',
+        eventCategory: 'Push Error',
+        eventAction: 'Push - Erro subscribe',
+        eventLabel: 'Push - Erro subscribe'
+      });
     });  
   }
 }
@@ -197,7 +221,12 @@ function sendSubscriptionToBackEnd(subscription, id) {
       btnLivesAtivas(livesId);
     },
     error: function(response) {
-      console.log('error response', response)
+      ga('send', {
+        hitType: 'event',
+        eventCategory: 'Push Error',
+        eventAction: 'Push - Erro send subscription',
+        eventLabel: 'Push - Erro send subscription'
+      });
       throw new Error('Bad status code from server.');
     }
   });
