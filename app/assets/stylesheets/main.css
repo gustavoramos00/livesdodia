@@ -120,6 +120,11 @@ section {
   padding-top: 125px;
 }
 
+.sidebar-overlay, #sidebar {
+  margin-top: 95px;
+}
+
+
 .yt-player.active + #eventos-hoje-container {
   padding-top: 10px;
 }
@@ -590,33 +595,13 @@ footer span.icon-instagram {
 }
 
 .tags {
-  scrollbar-width: none;
   text-align: center;
-  height: 40px;
-  padding: 10px 10px 0px 10px;
-  position: sticky;
-  bottom: 0;
-  top: 90px;
-  z-index: 10;
-  white-space: nowrap;
-  overflow-x: scroll;
-  background: rgb(83,62,165);
-  background: linear-gradient(0deg, rgba(83,62,165,1) 10%, rgba(255,255,255,0) 86%, rgba(255,255,255,0) 100%);
-  transition: bottom 0.4s ease; /* Transition effect when sliding down (and up) */
-}
-
-.tags::-webkit-scrollbar {
-  display: none;
-}
-
-/* Hide scrollbar for IE and Edge */
-.tags {
-  -ms-overflow-style: none;
 }
 
 .tags button {
   font-size: 15px;
   display: inline;
+  margin: 4px;
 }
 
 .testi-text {
@@ -657,26 +642,13 @@ a.link-no-decoration {
   min-height: 175px;
 }
 
-.tns-nav {
-  text-align: center;
-  margin: 10px 0;
-}  
-
-.tns-nav > [aria-controls] {
-  width: 9px;
-  height: 9px;
-  padding: 0;
-  margin: 0 5px;
-  border-radius: 50%;
-  border: 0;
-
-  background-color: rgba(255, 0, 204, 0.3);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0);
+.btn.menu {
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  font-size: 25px;
+  margin-left: 5px;
 }
-
-.tns-nav > [aria-controls].tns-nav-active {
-  background-color: transparent;
-  box-shadow: 0 0 0 2px #ff00cc; }
 
 .heading-section {
   position: relative; }
@@ -749,6 +721,70 @@ a.link-no-decoration {
 
 /*=====  End of FORM CONTROL  ======*/
 /*==================================
+=          SIDEBAR OVERLAY         =
+==================================*/
+
+.filtro-tag {
+  position: fixed;
+  right: 0;
+  top: 150px;
+  z-index: 10;
+}
+
+
+.sidebar-wrapper {
+  display: block;
+}
+
+
+#sidebar {
+  width: 250px;
+  position: fixed;
+  top: 0;
+  right: -250px;
+  height: 100vh;
+  z-index: 999;
+  background-color: #0000007a;
+  color: #fff;
+  transition: all 0.3s;
+  overflow-y: scroll;
+  box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.2);
+}
+
+#sidebar.active {
+  right: 0;
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  /* full screen */
+  width: 100vw;
+  height: 100vh;
+  /* transparent black */
+  background: rgba(0, 0, 0, 0.7);
+  /* middle layer, i.e. appears below the sidebar */
+  z-index: 998;
+  opacity: 0;
+  /* animate the transition */
+  transition: all 0.5s ease-in-out;
+}
+/* display .overlay when it has the .active class */
+.sidebar-overlay.active {
+  display: block;
+  opacity: 1;
+}
+
+#dismiss {
+  width: 35px;
+  height: 35px;
+  position: absolute;
+  /* top right corner of the sidebar */
+  top: 10px;
+  right: 10px;
+}
+/*===  End of SIDEBAR OVERLAY ====*/
+/*==================================
 =            RESPONSIVE            =
 ==================================*/
 @media (max-width: 992px) {
@@ -798,6 +834,10 @@ a.link-no-decoration {
     
   .testi-meta-inner {
     min-height: 0;
+  }
+
+  .sidebar-overlay, #sidebar {
+    margin-top: 70px;
   }
 
   #eventos-hoje-container {

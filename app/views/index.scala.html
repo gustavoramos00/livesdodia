@@ -91,34 +91,58 @@
 
   </script>
 
-  <div  class="yt-player">
-    <div id="player"></div>
-    <button type="button" class="yt-close-button" onclick="closeVideo()">
-      <span class="icon-close"></span>
-    </button>
+  <div class="filtro-tag">
+
   </div>
 
-  <div id="eventos-hoje-container" class="notification-toggle">
-    @eventosHoje(eventosAgora, demaisEventosHoje, tags)
-  </div>
+  <div class="sidebar-wrapper">
+    <!-- Sidebar -->
+    <div id="sidebar" class="shadow">
+      <div id="dismiss">
+        <i class="fas fa-arrow-left"></i>
+      </div>
+      <div class="sidebar-header text-center">
+        <h3>Tags</h3>
+      </div>
+      <div class="tags">
+        <button onclick="toggleSidebar()" type="button" data-jplist-control="buttons-text-filter" data-path=".badge" data-group="search-group"
+                data-mode="radio" data-selected="true" data-text="" class="badge badge-live" data-name="buttons-text-filter">
+          Todos
+        </button>
+        @for(tag <- tags) {
+          <button type="button" onclick='toggleSidebar("@tag._1")'
+                  data-jplist-control="buttons-text-filter" data-path=".badge-live" data-group="search-group"
+                  data-mode="radio" data-text="@tag._1" class="badge badge-live" data-name="buttons-text-filter"
+                  data-selected='@tagSelected(tag._1)'
+                  style='background-color: @tag._2'
+                  >
+            @tag._1
+            <span data-jplist-control="counter"
+              data-group="search-group"
+              data-format="({count})"
+              data-path='.badge.@tag._1'
+              data-mode="static"
+              data-name="counter-@tag._1-filter"
+              data-filter-type="path"></span>
+          </button>
+        }
+      </div>
+    </div>
+    
+    <!-- Dark Overlay element -->
+    <div class="sidebar-overlay"></div>
 
-  <div class="tags">
-    <button type="button" data-jplist-control="buttons-text-filter" data-path=".badge" data-group="search-group"
-            data-mode="radio" data-selected="true" data-text="" class="badge badge-live" data-name="buttons-text-filter">
-      Todos
-    </button>
-    @for(tag <- tags) {
-      <button type="button"
-              data-jplist-control="buttons-text-filter" data-path=".badge" data-group="search-group"
-              data-mode="radio" data-text="@tag._1" class="badge badge-live" data-name="buttons-text-filter"
-              data-selected='@tagSelected(tag._1)'
-              style='background-color: @tag._2'
-              >
-        @tag._1
+    <div  class="yt-player">
+      <div id="player"></div>
+      <button type="button" class="yt-close-button" onclick="closeVideo()">
+        <span class="icon-close"></span>
       </button>
-    }
-  </div>
+    </div>
 
+    <div id="eventos-hoje-container" class="notification-toggle">
+      @eventosHoje(eventosAgora, demaisEventosHoje, tags)
+    </div>
+  </div>
   <section class="overlay bg-fixed" style='background-image: url(@routes.Assets.versioned("img/bg.jpg"));'>    
     <div class="container sm-container shadow destaque-box" data-aos="fade-up">
       <div class="position-relative">

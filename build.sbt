@@ -3,7 +3,7 @@ name := """livesdodia"""
 organization := "br.com.livesdodia"
 maintainer := "gustavo@livesdodia.com.br"
 
-version := "1.9"
+version := "1.10"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 

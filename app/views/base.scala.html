@@ -105,9 +105,6 @@
       <a class="navbar-brand d-flex align-items-center text-white" href="/">
         <img src='@routes.Assets.versioned("logo/logo-completo-branco.svg")'>
       </a>
-      <!-- <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-nav-header" aria-controls="navbar-nav-header" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="lnr lnr-menu"></span>
-      </button> -->
 
       <!-- text filter control -->
       @if(showSearch) {
@@ -131,6 +128,10 @@
           </button> -->
         </div>
       }
+
+      <button type="button" onclick="toggleSidebar()" class="btn btn-primary icone menu">
+        <span class="icon-bars"></span>
+      </button>
 
       <!-- <div class="collapse navbar-collapse" id="navbar-nav-header">
         <ul class="navbar-nav ml-auto">

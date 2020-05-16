@@ -8,6 +8,7 @@ $(document).ready(function(){
   initScroll();
   initNotification();
   jplist.init();
+  initSidebar();
 
   //get a jPList control element
   const element = document.getElementById('jplist-control-element');
@@ -47,6 +48,38 @@ $(document).ready(function(){
   },90000); // atualiza a cada 1min30s
 
 });
+
+
+// function selecionaTag(tag) {
+//   $('.filtro-tag').empty();
+//   if (tag) {
+//     var tagSpan = $('span.badge.badge-live.' + tag).first().clone();
+//     console.log('tag', tag, tagSpan);
+//     $('.filtro-tag').append(tagSpan);
+//   }
+//   toggleSidebar();
+// }
+
+function toggleSidebar() {
+  // open sidebar
+  $('#sidebar').toggleClass('active');
+  // fade in the overlay
+  $('.sidebar-overlay').toggleClass('active');
+  $('.collapse.in').toggleClass('in');
+}
+
+function initSidebar() {
+  $('#dismiss, .sidebar-overlay').on('click', function () {
+    // hide sidebar
+    $('#sidebar').removeClass('active');
+    // hide overlay
+    $('.sidebar-overlay').removeClass('active');
+  });
+
+  $('#sidebarCollapse').on('click', function () {
+      
+  });
+}
 
 function initElements() {
 
