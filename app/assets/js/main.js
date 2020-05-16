@@ -199,6 +199,12 @@ function subscribeLive(id, nome) {
       return registration.pushManager.subscribe(subscribeOptions);
     })
     .then(function(pushSubscription) {
+      ga('send', {
+        hitType: 'event',
+        eventCategory: 'Push',
+        eventAction: 'Push Live',
+        eventLabel: 'Push Live - ' + liveSubscribedNome
+      });
       return sendSubscriptionToBackEnd(pushSubscription, liveSubscribeId);
     })
     .catch(function(error) {
