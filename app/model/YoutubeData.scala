@@ -20,7 +20,7 @@ case class YoutubeData(
 
   def linkVideoId = videoId.map(vid => s"https://youtube.com/watch?v=$vid")
 
-  def canalYoutube = channelId.map(channel => s"https://youtube.com/channel/$channel")
+  def canalYoutube = channelId.map(channel => s"https://youtube.com/channel/$channel/live")
 }
 
 object YoutubeData {

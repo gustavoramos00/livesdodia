@@ -29,7 +29,7 @@ class YoutubeService @Inject()(
   val videosUrl = s"$endpoint/videos"
   val liveBroadcastUrl = s"$endpoint/liveBroadcasts"
 
-  private def channelId(evento: Evento): Future[Evento] = {
+  private def channelIdByUsername(evento: Evento): Future[Evento] = {
     if (enabled && evento.youtubeData.flatMap(_.userName).isDefined && !evento.youtubeData.flatMap(_.channelId).isDefined) {
       ws.url(channelUrl)
 //        .withRequestFilter(AhcCurlRequestLogger())
@@ -40,7 +40,7 @@ class YoutubeService @Inject()(
           val item = (response.json \ "items" \ 0)
           val id = (item \ "id").asOpt[String]
           val channelImg = (item \ "snippet" \ "thumbnails" \ "default" \ "url").asOpt[String]
-          logger.warn(s"fetch byUserName channelId ${evento.nome} [${id.getOrElse("")}]")
+//          logger.warn(s"fetch byUserName channelId ${evento.nome} [${id.getOrElse("")}]")
           val newYoutubeData = evento.youtubeData.map(_.copy(channelId = id, thumbnail = channelImg))
           evento.copy(youtubeData = newYoutubeData)
         }
@@ -50,8 +50,7 @@ class YoutubeService @Inject()(
   }
 
   private def channelThumbnail(evento: Evento): Future[Evento] = {
-    if (enabled && evento.thumbnailUrl.isEmpty && evento.youtubeData.flatMap(_.channelId).isDefined &&
-      evento.youtubeData.flatMap(ev => ev.thumbnail.orElse(ev.videoImg)).isEmpty) {
+    if (enabled && evento.thumbnailUrl.isEmpty && evento.youtubeData.flatMap(_.channelId).isDefined) {
       ws.url(channelUrl)
         .addQueryStringParameters("key" -> apiKey, "part" -> "snippet", "id" -> evento.youtubeData.get.channelId.get)
         .get()
@@ -59,7 +58,7 @@ class YoutubeService @Inject()(
           if (response.status != 200) logger.error(s"Erro ao fazer requisição ${response.json}")
           val item = (response.json \ "items" \ 0)
           val channelImg = (item \ "snippet" \ "thumbnails" \ "default" \ "url").asOpt[String]
-          logger.warn(s"fetch channel thumbnail ${evento.nome} [$channelImg]")
+//          logger.warn(s"fetch channel thumbnail ${evento.nome} [$channelImg]")
           val newYoutubeData = evento.youtubeData.map(_.copy(thumbnail = channelImg))
           evento.copy(youtubeData = newYoutubeData)
         }
@@ -68,7 +67,7 @@ class YoutubeService @Inject()(
     }
   }
 
-  def fetchLiveVideoId(evento: Evento): Future[Evento] = {
+  def searchLiveVideoId(evento: Evento): Future[Evento] = {
     if (enabled && evento.youtubeData.flatMap(_.channelId).isDefined &&
       evento.youtubeData.flatMap(_.videoId).isEmpty &&
       evento.data.isBefore(LocalDateTime.now) &&
@@ -94,10 +93,39 @@ class YoutubeService @Inject()(
     }
   }
 
-  def fetchVideoDetails(evento: Evento) = {
+  def fetchChannelByUpcomingVideoId(evento: Evento) = {
+    if (enabled && evento.youtubeData.flatMap(_.videoId).isDefined &&
+      evento.youtubeData.flatMap(_.channelId).isEmpty &&
+      evento.data.isAfter(LocalDateTime.now)) {
+
+      ws.url(videosUrl)
+        //        .withRequestFilter(AhcCurlRequestLogger())
+        .addQueryStringParameters(
+        "key" -> apiKey,
+        "part" -> " snippet",
+        "id" -> evento.youtubeData.get.videoId.get)
+        .get()
+        .map { response =>
+          if (response.status != 200) logger.error(s"Erro ao fazer requisição ${response.json}")
+          val item = response.json \ "items" \ 0
+          val channelId = (item \ "snippet" \ "channelId").asOpt[String]
+          val thumbnail = evento.thumbnailUrl.orElse((item \ "snippet" \ "thumbnails" \ "default").asOpt[String])
+          val newYoutubeData = evento.youtubeData.map(_.copy(
+            thumbnail = thumbnail,
+            channelId = channelId
+          ))
+          evento.copy(youtubeData = newYoutubeData)
+        }
+    } else {
+      Future.successful(evento)
+    }
+  }
+
+
+  def fetchLiveVideoDetails(evento: Evento) = {
     if (enabled && evento.youtubeData.flatMap(_.videoId).isDefined &&
       !evento.encerrado.getOrElse(false) &&
-      evento.data.isBefore(LocalDateTime.now.plusHours(1)) &&
+      evento.data.isBefore(LocalDateTime.now) &&
       evento.data.isAfter(LocalDateTime.now.minus(liveTtl))) {
 
       ws.url(videosUrl)
@@ -111,20 +139,30 @@ class YoutubeService @Inject()(
           if (response.status != 200) logger.error(s"Erro ao fazer requisição ${response.json}")
           val item = response.json \ "items" \ 0
           val liveBroadcastContent = (item \ "snippet" \ "liveBroadcastContent").asOpt[String]
+          val channelId = (item \ "snippet" \ "channelId").asOpt[String]
           val embeddable = (item \ "status" \ "embeddable").asOpt[Boolean]
           val thumbnail = evento.thumbnailUrl.orElse((item \ "snippet" \ "thumbnails" \ "default").asOpt[String])
-          logger.warn(s"fetch videoDetails ${evento.nome} " +
-            s"live [${liveBroadcastContent.getOrElse("")}] " +
-            s"embeddable [${embeddable.getOrElse("")}]")
+          if (!liveBroadcastContent.contains(YoutubeData.broadcastLive)) {
+            logger.warn(s"fetch videoDetails ${evento.nome} " +
+              s"live [${liveBroadcastContent.getOrElse("")}] " +
+              s"embeddable [${embeddable.getOrElse("")}]")
+          }
           val newYoutubeData = evento.youtubeData.map(_.copy(
             liveBroadcastContent = liveBroadcastContent,
             embeddable = embeddable,
-            thumbnail = thumbnail
+            channelId = channelId.orElse(evento.youtubeData.flatMap(_.channelId)),
+            thumbnail = thumbnail.orElse(evento.youtubeData.flatMap(_.thumbnail))
           ))
-          val encerrado = liveBroadcastContent
-            .map(eventStatus => eventStatus == YoutubeData.broadcastEncerrado) // youtube encerrado
-            .orElse(evento.youtubeData.map(_.liveBroadcastContent.contains(YoutubeData.broadcastLive))) // sem info, mas já esteve ao vivo
-          evento.copy(youtubeData = newYoutubeData, encerrado = encerrado)
+          if (liveBroadcastContent.isEmpty || liveBroadcastContent.contains(YoutubeData.broadcastEncerrado)) {
+            if (evento.data.isAfter(LocalDateTime.now.minusHours(1))) { // recente -> erro transmissão
+              val ytEmptyVideoId = newYoutubeData.map(_.copy(videoId = None))
+              evento.copy(youtubeData = ytEmptyVideoId)
+            } else { // encerrado
+              evento.copy(youtubeData = newYoutubeData, encerrado = Some(true))
+            }
+          } else {
+            evento.copy(youtubeData = newYoutubeData)
+          }
         }
     } else {
       Future.successful(evento)
@@ -153,14 +191,16 @@ class YoutubeService @Inject()(
   }
 
   def fetchEvento(evento: Evento): Future[Evento] = {
+
     for {
       eventoUrlUnshorten <- urlUnshorten(evento)
-      eventoChannel <- channelId(eventoUrlUnshorten)
-      eventoChannelThumnail <- channelThumbnail(eventoChannel)
-      eventoVideo <- fetchLiveVideoId(eventoChannelThumnail)
-      eventoVideoDetails <- fetchVideoDetails(eventoVideo)
+      eventoChannelId <- fetchChannelByUpcomingVideoId(eventoUrlUnshorten)
+      eventoChannel <- channelIdByUsername(eventoChannelId)
+      eventoVideoDetails <- fetchLiveVideoDetails(eventoChannel)
+      eventoChannelThumnail <- channelThumbnail(eventoVideoDetails)
+      eventoVideo <- searchLiveVideoId(eventoChannelThumnail)
     } yield {
-      eventoVideoDetails
+      eventoVideo
     }
   }
 

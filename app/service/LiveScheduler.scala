@@ -40,7 +40,8 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
           Seq(
             scheduleEventosDetails(data.plusSeconds(5), eventos, true), // fetch ~ na hora agendada
             scheduleEventosDetails(data.plusMinutes(5), eventos), // fetch após
-            scheduleEventosDetails(data.plusMinutes(25), eventos), // fetch última tentativa
+            scheduleEventosDetails(data.plusMinutes(15), eventos), // fetch 15 min
+            scheduleEventosDetails(data.plusMinutes(30), eventos), // fetch última tentativa
             scheduleEventosDetails(data.plusHours(3).plusSeconds(randSeconds), eventos), // fetch ~3h depois
             scheduleEventosDetails(data.plusHours(5).plusSeconds(randSeconds), eventos) // fetch ~5h depois
           ).flatten
@@ -63,8 +64,8 @@ class LiveScheduler @Inject() (actorSystem: ActorSystem,
         for {
           eventosDoCache <- eventosCache
           eventosAtualizados <- Future.successful(eventos.map(evAntes => eventosDoCache.find(_.id == evAntes.id).getOrElse(evAntes)))
-          eventosVideo <- Future.sequence(eventosAtualizados.map(youtubeService.fetchLiveVideoId))
-          eventosVideoDetails <- Future.sequence(eventosVideo.map(youtubeService.fetchVideoDetails))
+          eventosVideo <- Future.sequence(eventosAtualizados.map(youtubeService.searchLiveVideoId))
+          eventosVideoDetails <- Future.sequence(eventosVideo.map(youtubeService.fetchLiveVideoDetails))
         } yield {
           if (notifyObservers) {
             eventosVideoDetails.foreach(evento => myPushService.notify(evento.id.get, evento))

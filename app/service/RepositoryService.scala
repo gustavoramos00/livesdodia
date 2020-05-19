@@ -58,7 +58,7 @@ class RepositoryService @Inject()(
               val booleanDestaque = if (destaque.isEmpty) false else true
               val optYoutubeData = optYoutube.map(YoutubeData.fromYoutubeLink)
               val optThumbnail = if (thumbnail.isEmpty) None else Some(thumbnail)
-              val tagList = tags.split(",").toSeq.map(_.trim)
+              val tagList = tags.split(Array(',', '/')).toSeq.map(_.trim)
               val id = Some(carimboDtHrUuid)
               if (carimboDtHrUuid == null || carimboDtHrUuid.isEmpty) {
                 throw new IllegalArgumentException(s"ID não informado para evento $nome")
@@ -98,10 +98,18 @@ class RepositoryService @Inject()(
       case Some(eventosCache) =>
         novosEventos.map(novoEvento => {
           val maybeEventoExistente = eventosCache.find(ev => ev.id == novoEvento.id && ev.linkRegistrado == novoEvento.linkRegistrado)
-          if (maybeEventoExistente.isDefined) {
-            novoEvento.copy(youtubeData = maybeEventoExistente.get.youtubeData, encerrado = maybeEventoExistente.get.encerrado)
-          } else {
-            novoEvento
+          (maybeEventoExistente.flatMap(_.youtubeData), novoEvento.youtubeData) match {
+            case (Some(ytExistente), Some(ytNovo)) =>
+              val ytFinal = ytNovo.copy(
+                channelId = ytNovo.channelId.orElse(ytExistente.channelId),
+                userName = ytNovo.userName.orElse(ytExistente.userName),
+                customUrl = ytNovo.customUrl.orElse(ytExistente.customUrl),
+                thumbnail = ytNovo.thumbnail.orElse(ytExistente.thumbnail),
+                videoImg = ytNovo.videoImg.orElse(ytExistente.videoImg)
+              )
+              novoEvento.copy(youtubeData = Some(ytFinal), encerrado = maybeEventoExistente.get.encerrado)
+            case _ =>
+              novoEvento
           }
         })
       case None => novosEventos
@@ -120,30 +128,6 @@ class RepositoryService @Inject()(
     })
   }
 
-  def thumbnailFromInstagram(evento: Evento) = {
-    val url = evento.thumbnailUrl.get
-    try {
-      ws.url(url)
-        //        .withRequestFilter(AhcCurlRequestLogger())
-        .withQueryStringParameters("__a" -> "1")
-        .get()
-        .map { response =>
-          if (response.status == 200 && response.contentType.contains("application/json")) {
-            val img = (response.json \ "graphql" \ "user" \ "profile_pic_url").asOpt[String]
-            evento.copy(linkImagem = img)
-          } else {
-            logger.error(s"Erro obter imagem instagram [${evento.nome}] Content Type [${response.contentType}]")
-            logger.error(s"reponse body [${response.body.substring(0, 300)}]")
-            evento.copy(linkImagem = None)
-          }
-        }
-    } catch {
-      case err: Throwable =>
-        logger.error(s"### Erro ao obter dados instagram [${evento.nome}]", err)
-        Future.successful(evento.copy(linkImagem = None))
-    }
-  }
-
   // obtido em https://medialab.github.io/iwanthue/
   def colorList = Seq("#794b1e","#6530be","#4dad39","#bb4ee2","#839f31","#5d5ad4","#3e812d",
     "#da44bb","#4ea264","#e74285","#3ea792","#e24720","#5692cc","#db8227",
@@ -151,36 +135,15 @@ class RepositoryService @Inject()(
     "#474f95","#85761e","#75366f","#989a50","#a62a5f","#424b14","#a87db8",
     "#685f1d","#d7737d","#817b45","#90445b","#b88352","#903328","#c3663a")
 
-  def obtemImagem(eventos: Seq[Evento], id: Option[String]) = {
-    logger.warn(s"Obtendo imagens do instagram [${id.getOrElse("todos")}]")
-    val seqFuture = eventos.map( evento => {
-      if ((id.isEmpty || id == evento.id) && evento.thumbnailUrl.map(_.contains("instagram.com")).getOrElse(false)) {
-        thumbnailFromInstagram(evento)
-//      } else if (evento.thumbnailUrl.map(link => link.contains("youtube.com") && !link.contains("img.youtube")).getOrElse(false)) {
-//        val ydData = YoutubeData.fromYoutubeLink(evento.thumbnailUrl.get)
-//        youtubeService.fetchChannelDetails(Some(ydData)).map {
-//          case Some(ydDataNovo) =>
-//            println(s"imagem obtida youtube ${evento.nome}")
-//            evento.copy(linkImagem= ydDataNovo.thumbnail)
-//          case None =>
-//            evento
-//        }
-      } else {
-        Future.successful(evento)
-      }
-    })
-    Future.sequence(seqFuture)
-  }
 
   def forceUpdate(id: Option[String]) = {
     logger.warn(s"Forçando atualização de dados [${id.getOrElse("todos")}]")
     for {
       eventosSheet <- dataFromSheets()
       eventosDadosCache <- recuperaDadosYoutubeCache(eventosSheet)
-      eventosImagem <- obtemImagem(eventosDadosCache, id)
-      _ <- cache.set(Evento.cacheKey, eventosImagem)
+      _ <- cache.set(Evento.cacheKey, eventosDadosCache)
       _ <- cache.set(dataAtualizacaoCacheKey, LocalDateTime.now)
-      eventosAtualizados <- youtubeService.fetch(eventosImagem, id)
+      eventosAtualizados <- youtubeService.fetch(eventosDadosCache, id)
     } yield {
       liveScheduler.reSchedule(eventosAtualizados)
       cache.set(Evento.cacheKey, eventosAtualizados)
