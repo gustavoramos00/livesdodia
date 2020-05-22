@@ -3,9 +3,10 @@
 @(evento: Evento, full: Boolean = false, agora: Boolean = false, tags: Seq[(String, String)])
 
 @colorByTag(tag: String) = {@tags.find(t => t._1 == tag).map(_._2).getOrElse("#f103c9")}
+@destaqueClass(evento: Evento) = {@if(evento.destaque){evento-destaque} else {}}  
 
 <div class="col-xl-4 col-md-6 testi-item" data-jplist-item>
-  <div class="testi-meta-inner d-flex" collapse-control="@evento.generatedId" data-control="@evento.data.toLocalDate">
+  <div class="testi-meta-inner d-flex @destaqueClass(evento)" collapse-control="@evento.generatedId" data-control="@evento.data.toLocalDate">
     <div class="testi-img mr-2">
       @if(evento.thumbnailUrl.isDefined) {
       <img class="thumbnail" src='@evento.thumbnailUrl.get'>
@@ -16,9 +17,6 @@
     <div class="testi-details">
       <p class="testi-destaque mb-0 searchable">
         @evento.nome
-        @if(evento.destaque) {
-        <span class="icon-star"></span>
-        }
         @if(evento.encerrado.getOrElse(false)){
         <i>(Encerrado)</i>
         }
@@ -99,5 +97,4 @@
       
     </div>
   </div>
-  <hr />
 </div>

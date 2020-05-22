@@ -104,6 +104,9 @@ class RepositoryService @Inject()(
                 channelId = ytNovo.channelId.orElse(ytExistente.channelId),
                 userName = ytNovo.userName.orElse(ytExistente.userName),
                 customUrl = ytNovo.customUrl.orElse(ytExistente.customUrl),
+                videoId = ytNovo.videoId.orElse(ytExistente.videoId),
+                embeddable = ytNovo.embeddable.orElse(ytExistente.embeddable),
+                liveBroadcastContent =  ytNovo.liveBroadcastContent.orElse(ytExistente.liveBroadcastContent),
                 thumbnail = ytNovo.thumbnail.orElse(ytExistente.thumbnail),
                 videoImg = ytNovo.videoImg.orElse(ytExistente.videoImg)
               )
@@ -166,7 +169,8 @@ class RepositoryService @Inject()(
     val futureEventos = getEventos.map(eventos => {
       eventos
         .filter(filtroEventoJaComecou)
-        .sortBy(_.data)(Ordering[LocalDateTime].reverse) // mais recentes primeiro
+        .sortBy(ev =>
+          (ev.destaque && !ev.encerrado.getOrElse(false), ev.data))(Ordering[(Boolean, LocalDateTime)].reverse)
     })
     // verifica eventos sem links
     futureEventos.map(eventos => {

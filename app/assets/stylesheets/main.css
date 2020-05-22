@@ -566,9 +566,27 @@ footer span.icon-instagram {
   min-height: 0;
 }
 
+@keyframes evento-destaque {
+  from {background-color: #f5caf3;}
+  to {background-color: #f5daf44f;}
+}
+
+@keyframes evento-destaque-overlay {
+  from {background-color: #353e9c75;}
+  to {background-color: #353e9c2d;}
+}
+
+.evento-destaque {
+  border-radius: 10px;
+  animation: evento-destaque 1s alternate infinite;
+}
+
+.overlay .evento-destaque {
+  animation: evento-destaque-overlay 1s alternate infinite;
+}
+
 .destaque-box {
   margin: 0 auto 30px auto;
-  padding: 20px 10px 5px 10px;
 }
 
 .testi-details {
@@ -640,6 +658,13 @@ a.link-no-decoration {
 
 .testi-meta-inner {
   min-height: 175px;
+  padding:8px 8px 14px 8px;
+  margin: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+.overlay .testi-meta-inner {
+  border-bottom: none;
 }
 
 .btn.menu {
@@ -798,6 +823,9 @@ a.link-no-decoration {
 
 @media (max-width: 768px) {
 
+  .testi-item:last-child  .testi-meta-inner {
+    border-bottom: none;
+  }
   
   .testi-content {
     flex-wrap: nowrap;
