@@ -6,7 +6,7 @@
 @destaqueClass(evento: Evento) = {@if(evento.destaque){evento-destaque} else {}}  
 
 <div class="col-xl-4 col-md-6 testi-item" data-jplist-item>
-  <div class="testi-meta-inner d-flex @destaqueClass(evento)" collapse-control="@evento.generatedId" data-control="@evento.data.toLocalDate">
+  <div class="testi-meta-inner shadow d-flex @destaqueClass(evento)" collapse-control="@evento.generatedId" data-control="@evento.data.toLocalDate">
     <div class="testi-img mr-2">
       @if(evento.thumbnailUrl.isDefined) {
       <img class="thumbnail" src='@evento.thumbnailUrl.get'>
@@ -30,6 +30,12 @@
           } else {
           <span class="badge badge-live @tag" style='background-color: @colorByTag(tag)'>@tag</span>
           }
+        }
+        @if(evento.destaque){
+          <span class="badge badge-live Destaque">
+            Destaque
+            <span class="icon-star"></span>
+          </span>
         }
         <div>
           @evento.info

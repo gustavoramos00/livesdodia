@@ -126,8 +126,9 @@ class RepositoryService @Inject()(
         .flatMap(_.tags)
         .filter(_.nonEmpty)
         .distinct
-        .sortBy(t => (Evento.tagsCategoria.contains(t), t))(Ordering.Tuple2(Ordering.Boolean.reverse, Ordering.String))
         .zip(colorList)
+        .appended("Destaque","#e606c6")
+        .sortBy(t => (Evento.tagsCategoria.contains(t._1), t._1))(Ordering.Tuple2(Ordering.Boolean.reverse, Ordering.String))
     })
   }
 

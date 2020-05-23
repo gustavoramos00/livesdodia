@@ -51,8 +51,8 @@ section {
   position: relative; }
 
 .section-content {
-  padding-top: 30px;
-  padding-bottom: 20px; }
+  padding-bottom: 20px; 
+}
 
 .title-wrap,
 .section-title {
@@ -566,25 +566,6 @@ footer span.icon-instagram {
   min-height: 0;
 }
 
-@keyframes evento-destaque {
-  from {background-color: #f5caf3;}
-  to {background-color: #f5daf44f;}
-}
-
-@keyframes evento-destaque-overlay {
-  from {background-color: #353e9c75;}
-  to {background-color: #353e9c2d;}
-}
-
-.evento-destaque {
-  border-radius: 10px;
-  animation: evento-destaque 1s alternate infinite;
-}
-
-.overlay .evento-destaque {
-  animation: evento-destaque-overlay 1s alternate infinite;
-}
-
 .destaque-box {
   margin: 0 auto 30px auto;
 }
@@ -595,6 +576,14 @@ footer span.icon-instagram {
 .testi-destaque {
   font-weight: bolder;
   font-size: 26px;
+}
+
+.icon-star {
+  color: yellow;
+}
+
+.badge.badge-live.Destaque {
+  background-color: #e606c6;
 }
 
 .badge-live {
@@ -658,9 +647,10 @@ a.link-no-decoration {
 
 .testi-meta-inner {
   min-height: 175px;
-  padding:8px 8px 14px 8px;
+  padding: 14px 5px;
   margin: 5px;
   border-bottom: 1px solid #ddd;
+  border-radius: 10px;
 }
 
 .overlay .testi-meta-inner {
