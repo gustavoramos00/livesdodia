@@ -155,7 +155,7 @@ class YoutubeService @Inject()(
           ))
           if (liveBroadcastContent.isEmpty || liveBroadcastContent.contains(YoutubeData.broadcastEncerrado)) {
             if (evento.data.isAfter(LocalDateTime.now.minusHours(1))) { // recente -> erro transmissão
-              val ytEmptyVideoId = newYoutubeData.map(_.copy(videoId = None))
+              val ytEmptyVideoId = evento.youtubeData.map(_.copy(videoId = None, liveBroadcastContent = None))
               evento.copy(youtubeData = ytEmptyVideoId)
             } else { // encerrado
               evento.copy(youtubeData = newYoutubeData, encerrado = Some(true))

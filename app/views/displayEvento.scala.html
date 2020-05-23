@@ -36,7 +36,7 @@
         </div>
       </div>
       <div class="icones-evento btn-group" role="group">
-        @if(evento.youtubeData.flatMap(_.embeddable).contains(true)){
+        @if(evento.youtubeData.flatMap(_.videoId).nonEmpty && evento.youtubeData.flatMap(_.embeddable).contains(true)){
         <button type="button" class="btn btn-primary icone" onclick='playYoutubeVideoId("@evento.youtubeData.flatMap(_.videoId).get", "@evento.nome", this)'>
           <span class="icon icon-play-circle"></span>
         </button>
