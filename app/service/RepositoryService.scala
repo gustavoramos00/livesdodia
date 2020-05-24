@@ -149,7 +149,7 @@ class RepositoryService @Inject()(
       _ <- cache.set(dataAtualizacaoCacheKey, LocalDateTime.now)
       eventosAtualizados <- youtubeService.fetch(eventosDadosCache, id)
     } yield {
-      liveScheduler.reSchedule(eventosAtualizados)
+      liveScheduler.reSchedule()
       cache.set(Evento.cacheKey, eventosAtualizados)
       cache.set(dataAtualizacaoCacheKey, LocalDateTime.now)
     }
