@@ -1,8 +1,7 @@
 package service
 
-import java.time.{Duration, LocalDateTime}
 import java.time.temporal.ChronoUnit
-import java.util.concurrent.TimeUnit
+import java.time.{Duration, LocalDateTime}
 
 import akka.actor.{ActorSystem, Cancellable}
 import javax.inject.Inject
@@ -10,9 +9,8 @@ import model.Evento
 import play.api.cache.AsyncCacheApi
 import play.api.{Configuration, Logger}
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
-import scala.util.Random
+import scala.concurrent.{ExecutionContext, Future}
 
 class LiveScheduler @Inject() (actorSystem: ActorSystem,
                                cache: AsyncCacheApi,

@@ -1,8 +1,7 @@
 package controllers
 
 import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
-import java.time.{LocalDate, LocalDateTime, ZoneId}
+import java.time.{LocalDate, ZoneId}
 
 import javax.inject._
 import model.{Evento, EventosDia}
@@ -11,8 +10,8 @@ import play.api.libs.json.Json
 import play.api.mvc._
 import service.{LiveScheduler, MyPushService, RepositoryService}
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 
 
 /**
