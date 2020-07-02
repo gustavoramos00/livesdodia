@@ -7,7 +7,7 @@
 GET     /                           controllers.HomeController.index
 GET     /eventoshoje                controllers.HomeController.eventosHoje
 GET     /upcache                    controllers.HomeController.updateCache(id: Option[String])
-GET     /incluir                    controllers.HomeController.incluir
+# GET     /incluir                    controllers.HomeController.incluir
 GET     /livesjson                  controllers.HomeController.livesJson
 POST    /subscribe-live             controllers.HomeController.subscribeLive(id: String)
 GET     /fetch-subscribed-lives     controllers.HomeController.fetchSubscribedLives(id: String)
@@ -18,6 +18,11 @@ GET     /extrairvgc05               controllers.ConcorrentesController.extrairDa
 GET     /hojevgc                    controllers.ConcorrentesController.livesHoje
 GET     /amanhavgc                  controllers.ConcorrentesController.livesAmanha
 GET     /semanavgc                  controllers.ConcorrentesController.livesSemana
+
+
+# Instagram API
+POST    /insta-webhook          controllers.HomeController.instaWebhook
+GET     /insta-webhook          controllers.HomeController.verifyInstaWebhook
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
